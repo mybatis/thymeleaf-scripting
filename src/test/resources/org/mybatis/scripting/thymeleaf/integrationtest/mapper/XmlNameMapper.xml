@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+       Copyright 2018 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameMapper">
+
+    <select id="getAllNames" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        SELECT * FROM names
+    </select>
+
+    <select id="findByIds" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        sql/NameMapper/findByIds.sql
+    </select>
+
+    <select id="findByIdsWithoutParamAnnotation" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        sql/NameMapper/findByIdsWithoutParamAnnotation.sql
+    </select>
+
+    <select id="findById" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        sql/NameMapper/findById.sql
+    </select>
+
+    <select id="findByIdWithoutParamAnnotation" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        sql/NameMapper/findByIdWithoutParamAnnotation.sql
+    </select>
+
+    <select id="findByIdWithNestedParam" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        sql/NameMapper/findByIdWithNestedParam.sql
+    </select>
+
+    <select id="findUsingScript" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        SELECT * FROM names WHERE 1 = 1
+        /*[# th:insert="~{sql/NameMapper/findByIdWhere.sql}" /]*/
+    </select>
+
+    <select id="findUsingTemplateFile" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        sql/NameMapper/findById.sql
+    </select>
+
+</mapper>

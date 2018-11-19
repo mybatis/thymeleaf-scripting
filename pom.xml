@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.mybatis.scripting</groupId>
+  <artifactId>mybatis-thymeleaf</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <parent>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis-parent</artifactId>
+    <version>31-SNAPSHOT</version>
+    <relativePath />
+  </parent>
+
+  <name>MyBatis Thymeleaf</name>
+  <description>Thymeleaf support for MyBatis</description>
+  <url>https://github.com/kazuki43zoo/thymeleaf-scripting</url>
+
+  <inceptionYear>2018</inceptionYear>
+
+  <scm>
+    <url>https://github.com/kazuki43zoo/thymeleaf-scripting</url>
+    <connection>scm:git:ssh://github.com/kazuki43zoo/thymeleaf-scripting.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/kazuki43zoo/thymeleaf-scripting.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+  <issueManagement>
+    <system>GitHub Issue Management</system>
+    <url>https://github.com/kazuki43zoo/thymeleaf-scripting/issues</url>
+  </issueManagement>
+  <ciManagement>
+    <system>Travis CI</system>
+    <url>https://travis-ci.org/kazuki43zoo/thymeleaf-scripting</url>
+  </ciManagement>
+  <distributionManagement>
+    <site>
+      <id>gh-pages</id>
+      <name>Mybatis GitHub Pages</name>
+      <url>git:ssh://git@github.com/kazuki43zoo/thymeleaf-scripting.git?gh-pages#</url>
+    </site>
+  </distributionManagement>
+
+  <properties>
+    <mybatis.version>3.5.0-SNAPSHOT</mybatis.version>
+    <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+      <version>${mybatis.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.thymeleaf</groupId>
+      <artifactId>thymeleaf</artifactId>
+      <version>${thymeleaf.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.3.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.4.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>sonatype-oss-snapshots</id>
+      <name>Sonatype OSS Snapshots Repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
+
+</project>

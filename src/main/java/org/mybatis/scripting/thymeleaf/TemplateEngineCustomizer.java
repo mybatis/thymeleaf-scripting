@@ -1,0 +1,72 @@
+/**
+ *    Copyright 2018 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package org.mybatis.scripting.thymeleaf;
+
+import org.thymeleaf.TemplateEngine;
+
+import java.util.function.Consumer;
+
+/**
+ * The interface for customizing a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf.
+ * <p>
+ * If you want to customize a default {@code TemplateEngine},
+ * you implements class of this interface and you need to specify
+ * the 'template.customizer' property of mybatis-thymeleaf.properties.
+ * </p>
+ * <br />
+ * e.g.) Implementation class:
+ * <pre>{@code
+ * package com.example;
+ * // ...
+ * public class MyTemplateEngineCustomizer implements TemplateEngineCustomizer {
+ *   @Override
+ *   public void customize(TemplateEngine defaultTemplateEngine) {
+ *     // ...
+ *   }
+ * }
+ * }</pre>
+ * e.g.) Configuration file (mybatis-thymeleaf.properties):
+ * <pre>{@code
+ * template.customizer=com.example.MyTemplateEngineCustomizer
+ * }</pre>
+ *
+ * @author Kazuki Shimizu
+ * @version 1.0.0
+ */
+@FunctionalInterface
+public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
+
+  /**
+   * The default implementation that do nothing.
+   */
+  TemplateEngineCustomizer DEFAULT = defaultTemplateEngine -> {};
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  default void accept(TemplateEngine templateEngine) {
+    customize(templateEngine);
+  }
+
+  /**
+   * Customize a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf.
+   *
+   * @param defaultTemplateEngine a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf
+   */
+  void customize(TemplateEngine defaultTemplateEngine);
+
+}
