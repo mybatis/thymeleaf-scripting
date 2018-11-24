@@ -15,6 +15,7 @@
 :sectlinks:
 :linkcss:
 
+// Define variable for urls
 :mybatis-doc-url: http://www.mybatis.org/mybatis-3
 :mybatis-spring-boot-doc-url: http://www.mybatis.org/spring-boot-starter
 :thymeleaf-doc-url: https://www.thymeleaf.org/doc/tutorials/3.0
@@ -505,7 +506,7 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-<1> Use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method (For details, please see <<Expression utility object>>)
+<1> Use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method (For details, please see <<Using expression utility object>>)
 
 
 === Using fragment
@@ -675,12 +676,12 @@ UPDATE names
 
 ====
 
-== Using Custom Dialect
+== Custom Dialect
 
 The mybatis-thymeleaf provide the custom dialect class(`org.mybatis.scripting.thymeleaf.MyBatisDialect`)
 that help for generating SQL.
 
-=== Expression utility object
+=== Using expression utility object
 
 By default, you can access it using `#mybatis` expression.
 
@@ -747,7 +748,7 @@ id IN (
 )
 ----
 
-== Using on framework
+== Usage on framework
 
 In this chapter, we explain ways that integrate with an application framework.
 
