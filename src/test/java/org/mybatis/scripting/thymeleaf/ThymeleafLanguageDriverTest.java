@@ -38,14 +38,12 @@ import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import java.io.Reader;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -105,17 +103,20 @@ class ThymeleafLanguageDriverTest {
     new SqlSessionFactoryBuilder().build(configuration);
 
     TemplateEngine templateEngine = DefaultTemplateEngineCustomizer.templateEngine;
-    Iterator<ITemplateResolver> it = templateEngine.getTemplateResolvers().iterator();
-    ClassLoaderTemplateResolver classLoaderTemplateResolver = (ClassLoaderTemplateResolver) it.next();
-    StringTemplateResolver stringTemplateResolver = (StringTemplateResolver) it.next();
+    ClassLoaderTemplateResolver classLoaderTemplateResolver =
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
 
     Assertions.assertEquals(TemplateMode.CSS, classLoaderTemplateResolver.getTemplateMode());
     Assertions.assertTrue(classLoaderTemplateResolver.isCacheable());
     Assertions.assertNull(classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("UTF-8", classLoaderTemplateResolver.getCharacterEncoding());
-    Assertions.assertEquals("/", classLoaderTemplateResolver.getPrefix());
+    Assertions.assertEquals("", classLoaderTemplateResolver.getPrefix());
     Assertions.assertEquals(new LinkedHashSet<>(Collections.singleton("*.sql")), classLoaderTemplateResolver.getResolvablePatterns());
 
+    StringTemplateResolver stringTemplateResolver =
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
     Assertions.assertEquals(TemplateMode.CSS, stringTemplateResolver.getTemplateMode());
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
     Assertions.assertNull(stringTemplateResolver.getCacheTTLMs());
@@ -131,9 +132,9 @@ class ThymeleafLanguageDriverTest {
     new SqlSessionFactoryBuilder().build(configuration);
 
     TemplateEngine templateEngine = CustomTemplateEngineCustomizer.templateEngine;
-    Iterator<ITemplateResolver> it = templateEngine.getTemplateResolvers().iterator();
-    ClassLoaderTemplateResolver classLoaderTemplateResolver = (ClassLoaderTemplateResolver) it.next();
-    StringTemplateResolver stringTemplateResolver = (StringTemplateResolver) it.next();
+    ClassLoaderTemplateResolver classLoaderTemplateResolver =
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
 
     Assertions.assertEquals(TemplateMode.TEXT, classLoaderTemplateResolver.getTemplateMode());
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
@@ -143,6 +144,9 @@ class ThymeleafLanguageDriverTest {
     Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")), classLoaderTemplateResolver.getResolvablePatterns());
 
 
+    StringTemplateResolver stringTemplateResolver =
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
     Assertions.assertEquals(TemplateMode.TEXT, stringTemplateResolver.getTemplateMode());
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
 

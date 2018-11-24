@@ -15,15 +15,24 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.templateresolver.FileTemplateResolver;
 
-public class DefaultTemplateEngineCustomizer implements TemplateEngineCustomizer {
-  static TemplateEngine templateEngine;
+class TemplateEngineCustomizerTest {
 
-  @Override
-  public void customize(TemplateEngine defaultTemplateEngine) {
-    TemplateEngineCustomizer.DEFAULT.customize(defaultTemplateEngine);
-    templateEngine = defaultTemplateEngine;
+  @Test
+  void testNoMatchType() {
+    Configuration configuration = new Configuration();
+    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
+    new SqlSessionFactoryBuilder().build(configuration);
+
+    TemplateEngine templateEngine = DefaultTemplateEngineCustomizer.templateEngine;
+    Assertions.assertFalse(
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, FileTemplateResolver.class).isPresent());
   }
 
 }

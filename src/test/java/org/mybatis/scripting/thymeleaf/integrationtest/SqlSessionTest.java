@@ -33,6 +33,7 @@ import java.util.List;
 
 class SqlSessionTest {
   private static SqlSessionFactory sqlSessionFactory;
+  private static SqlSessionFactory sqlSessionFactoryForH2;
 
   @BeforeAll
   static void setUp() throws Exception {
@@ -50,6 +51,21 @@ class SqlSessionTest {
         conn.commit();
       }
     }
+
+    try (Reader reader = Resources.getResourceAsReader("mapper-config.xml")) {
+      sqlSessionFactoryForH2 = new SqlSessionFactoryBuilder().build(reader, "h2");
+    }
+
+    try (Connection conn = sqlSessionFactoryForH2.getConfiguration().getEnvironment().getDataSource().getConnection()) {
+      try (Reader reader = Resources.getResourceAsReader("create-db.sql")) {
+        ScriptRunner runner = new ScriptRunner(conn);
+        runner.setLogWriter(null);
+        runner.setErrorLogWriter(null);
+        runner.runScript(reader);
+        conn.commit();
+      }
+    }
+
   }
 
   @Test
@@ -63,7 +79,7 @@ class SqlSessionTest {
   @Test
   void testListParamUsing_include() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByIdsUsing_include", Arrays.asList(1,3,4));
+      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByIdsUsing_include", Arrays.asList(1, 3, 4));
       Assertions.assertEquals(3, names.size());
       Assertions.assertEquals(1, names.get(0).getId());
       Assertions.assertEquals(3, names.get(1).getId());
@@ -108,5 +124,100 @@ class SqlSessionTest {
       Assertions.assertEquals("hsql", databaseId);
     }
   }
+
+  @Test
+  void testDatabaseIdWithH2() {
+    try (SqlSession sqlSession = sqlSessionFactoryForH2.openSession()) {
+      String databaseId = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findDatabaseId");
+      Assertions.assertEquals("h2", databaseId);
+    }
+  }
+
+  @Test
+  void testInsert() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      sqlSession.insert("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.insert", name);
+
+      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
+      Assertions.assertEquals(name.getFirstName(), loadedName.getFirstName());
+      Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testUpdate() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      sqlSession.insert("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.insert", name);
+
+      Name updatingName = new Name();
+      updatingName.setId(name.getId());
+      updatingName.setFirstName("Thymeleaf3");
+      sqlSession.update("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.update", updatingName);
+
+      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
+      Assertions.assertEquals(updatingName.getFirstName(), loadedName.getFirstName());
+      Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testUpdateWithEmptyComment() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      sqlSession.insert("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.insert", name);
+
+      Name updatingName = new Name();
+      updatingName.setId(name.getId());
+      updatingName.setFirstName("Thymeleaf3");
+      updatingName.setLastName("MyBatis3");
+      sqlSession.update("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.updateWithEmptyComment", updatingName);
+
+      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
+      Assertions.assertEquals(updatingName.getFirstName(), loadedName.getFirstName());
+      Assertions.assertEquals(updatingName.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testDelete() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      sqlSession.insert("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.insert", name);
+
+      sqlSession.delete("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.delete", name);
+
+      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
+      Assertions.assertNull(loadedName);
+    }
+  }
+
+  @Test
+  void testFindByNameWithEmptyComment() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      sqlSession.insert("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.insert", name);
+
+      NameParam param = new NameParam();
+      param.setFirstName(name.getFirstName());
+      param.setLastName(name.getLastName());
+      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByNameWithEmptyComment", param);
+      Assertions.assertEquals(param.getFirstName(), loadedName.getFirstName());
+      Assertions.assertEquals(param.getLastName(), loadedName.getLastName());
+    }
+  }
+
+
 
 }

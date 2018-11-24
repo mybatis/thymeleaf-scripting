@@ -16,32 +16,32 @@
 package org.mybatis.scripting.thymeleaf;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
  * The interface for customizing a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf.
- * <p>
+ * <br>
  * If you want to customize a default {@code TemplateEngine},
  * you implements class of this interface and you need to specify
  * the 'template.customizer' property of mybatis-thymeleaf.properties.
- * </p>
- * <br />
+ * <br>
  * e.g.) Implementation class:
- * <pre>{@code
+ * <pre>
  * package com.example;
  * // ...
  * public class MyTemplateEngineCustomizer implements TemplateEngineCustomizer {
- *   @Override
  *   public void customize(TemplateEngine defaultTemplateEngine) {
  *     // ...
  *   }
  * }
- * }</pre>
+ * </pre>
  * e.g.) Configuration file (mybatis-thymeleaf.properties):
- * <pre>{@code
+ * <pre>
  * template.customizer=com.example.MyTemplateEngineCustomizer
- * }</pre>
+ * </pre>
  *
  * @author Kazuki Shimizu
  * @version 1.0.0
@@ -52,7 +52,8 @@ public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
   /**
    * The default implementation that do nothing.
    */
-  TemplateEngineCustomizer DEFAULT = defaultTemplateEngine -> {};
+  TemplateEngineCustomizer DEFAULT = defaultTemplateEngine -> {
+  };
 
   /**
    * {@inheritDoc}
@@ -68,5 +69,19 @@ public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
    * @param defaultTemplateEngine a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf
    */
   void customize(TemplateEngine defaultTemplateEngine);
+
+  /**
+   * Utility method to extract a {@code ITemplateResolver} that implements specified type.
+   *
+   * @param templateEngine A target {@code TemplateEngine}
+   * @param type A target type for extracting instance
+   * @param <T> A type that implements the {@code ITemplateResolver}
+   * @return A {@code ITemplateResolver} instance that implements specified type
+   */
+  static <T extends ITemplateResolver> Optional<T> extractTemplateResolver(
+      TemplateEngine templateEngine, Class<T> type) {
+    return templateEngine.getTemplateResolvers().stream()
+        .filter(type::isInstance).map(type::cast).findFirst();
+  }
 
 }

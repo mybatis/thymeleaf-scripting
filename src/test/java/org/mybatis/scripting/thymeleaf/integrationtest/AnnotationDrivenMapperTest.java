@@ -30,8 +30,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
-import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
+import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 
 import java.io.Reader;
 import java.sql.Connection;
@@ -82,7 +82,7 @@ class AnnotationDrivenMapperTest {
   void testListParamWithParamAnnotation() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       NameMapper mapper = sqlSession.getMapper(NameMapper.class);
-      List<Name> names = mapper.findByIds(Arrays.asList(1,3,4));
+      List<Name> names = mapper.findByIds(Arrays.asList(1, 3, 4));
       Assertions.assertEquals(3, names.size());
       Assertions.assertEquals(1, names.get(0).getId());
       Assertions.assertEquals(3, names.get(1).getId());
@@ -94,13 +94,14 @@ class AnnotationDrivenMapperTest {
   void testListParamWithoutParamAnnotation() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       NameMapper mapper = sqlSession.getMapper(NameMapper.class);
-      List<Name> names = mapper.findByIdsWithoutParamAnnotation(Arrays.asList(1,3,4));
+      List<Name> names = mapper.findByIdsWithoutParamAnnotation(Arrays.asList(1, 3, 4));
       Assertions.assertEquals(3, names.size());
       Assertions.assertEquals(1, names.get(0).getId());
       Assertions.assertEquals(3, names.get(1).getId());
       Assertions.assertEquals(4, names.get(2).getId());
     }
   }
+
   @Test
   void testParamObject() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
@@ -109,7 +110,6 @@ class AnnotationDrivenMapperTest {
       Assertions.assertEquals(1, names.size());
       Name name = names.get(0);
       Assertions.assertEquals(4, name.getId());
-      mapper.findUsingScript(new NameParam(4));
     }
   }
 
@@ -154,6 +154,61 @@ class AnnotationDrivenMapperTest {
       Assertions.assertEquals(1, names.size());
       Name name = names.get(0);
       Assertions.assertEquals(3, name.getId());
+    }
+  }
+
+  @Test
+  void testInsert() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      mapper.insert(name);
+
+      List<Name> names = mapper.findById(name.getId());
+      Assertions.assertEquals(1, names.size());
+      Name loadedName = names.get(0);
+      Assertions.assertEquals(name.getFirstName(), loadedName.getFirstName());
+      Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testUpdate() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      mapper.insert(name);
+
+      Name updatingName = new Name();
+      updatingName.setId(name.getId());
+      updatingName.setFirstName("Thymeleaf3");
+      mapper.update(updatingName);
+
+      List<Name> names = mapper.findById(name.getId());
+      Assertions.assertEquals(1, names.size());
+      Name loadedName = names.get(0);
+      Assertions.assertEquals(updatingName.getFirstName(), loadedName.getFirstName());
+      Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testDelete() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      mapper.insert(name);
+
+      mapper.delete(name);
+
+      List<Name> names = mapper.findById(name.getId());
+      Assertions.assertEquals(0, names.size());
     }
   }
 

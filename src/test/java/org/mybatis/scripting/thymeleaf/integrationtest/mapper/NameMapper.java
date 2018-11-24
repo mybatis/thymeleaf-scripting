@@ -15,13 +15,23 @@
  */
 package org.mybatis.scripting.thymeleaf.integrationtest.mapper;
 
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 
 import java.util.List;
 
 public interface NameMapper {
+
+  @Options(useGeneratedKeys = true, keyProperty = "id")
+  @Insert("sql/NameMapper/insert.sql")
+  void insert(Name name);
+
+  @Update("sql/NameMapper/update.sql")
+  void update(Name name);
+
+  @Delete("sql/NameMapper/delete.sql")
+  void delete(Name name);
+
   @Select("SELECT * FROM names")
   List<Name> getAllNames();
 
@@ -41,7 +51,7 @@ public interface NameMapper {
   List<Name> findByIdWithNestedParam(@Param("p") NameParam param);
 
   @Select({
-      "SELECT * FROM names WHERE 1 = 1 ",
+      "SELECT * FROM names",
       "/*[# th:insert=\"~{sql/NameMapper/findByIdWhere.sql}\" /]*/"
   })
   List<Name> findUsingScript(NameParam nameParam);

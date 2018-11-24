@@ -14,6 +14,7 @@
 --    limitations under the License.
 --
 
+WHERE 1 = 1
 /*[# th:if="${id} != null"]*/
   AND id = /*[('#{id}')]*/ 1
 /*[/]*/

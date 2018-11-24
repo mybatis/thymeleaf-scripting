@@ -14,14 +14,12 @@
 --    limitations under the License.
 --
 
-SELECT * FROM names
-  WHERE 1 = 1
-  /*[# th:if="${not #lists.isEmpty(list)}"]*/
-    AND id IN (
-    /*[# th:each="id : ${list}"]*/
-      /*[(${#mybatis.commaIfNotFirst(idStat)})]*/
-      /*[('#{list[' + ${idStat.index} + ']}')]*/ 1
-    /*[/]*/
-    )
+UPDATE names
+  SET id = id
+  /*[# th:if="${firstName} != null"]*/
+    ,firstName = /*[('#{firstName}')]*/ 'Taro'
   /*[/]*/
-  ORDER BY id
+  /*[# th:if="${lastName} != null"]*/
+    ,lastName = /*[('#{lastName}')]*/ 'Yamada'
+  /*[/]*/
+  WHERE id = /*[('#{id}')]*/ 1

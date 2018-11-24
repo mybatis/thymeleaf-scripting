@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+       Copyright 2018 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -44,8 +61,11 @@
   </distributionManagement>
 
   <properties>
-    <mybatis.version>3.5.0-SNAPSHOT</mybatis.version>
+    <mybatis.version>3.4.6</mybatis.version>
     <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
+
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <asciidoctor-maven-plugin.version>1.5.7.1</asciidoctor-maven-plugin.version>
   </properties>
 
   <dependencies>
@@ -73,12 +93,44 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.197</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.2.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.asciidoctor</groupId>
+        <artifactId>asciidoctor-maven-plugin</artifactId>
+        <version>${asciidoctor-maven-plugin.version}</version>
+        <configuration>
+          <backend>html</backend>
+          <outputDirectory>${project.build.directory}/site</outputDirectory>
+          <attributes>
+            <revnumber>${project.version}</revnumber>
+          </attributes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>generate-html</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>process-asciidoc</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
   <repositories>
     <repository>

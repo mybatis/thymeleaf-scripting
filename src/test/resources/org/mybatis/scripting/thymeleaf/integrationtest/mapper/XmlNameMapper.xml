@@ -21,6 +21,18 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameMapper">
 
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        sql/NameMapper/insert.sql
+    </insert>
+
+    <update id="update">
+        sql/NameMapper/update.sql
+    </update>
+
+    <delete id="delete">
+        sql/NameMapper/delete.sql
+    </delete>
+
     <select id="getAllNames" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
         SELECT * FROM names
     </select>
@@ -46,7 +58,7 @@
     </select>
 
     <select id="findUsingScript" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
-        SELECT * FROM names WHERE 1 = 1
+        SELECT * FROM names
         /*[# th:insert="~{sql/NameMapper/findByIdWhere.sql}" /]*/
     </select>
 

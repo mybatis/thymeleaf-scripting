@@ -15,5 +15,4 @@
 --
 
 SELECT * FROM names
-  WHERE 1 = 1
   /*[# th:insert="~{sql/NameMapper/findByIdWhere.sql}" /]*/

@@ -83,7 +83,7 @@ class XmlDrivenMapperTest {
   void testListParamWithParamAnnotation() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       XmlNameMapper mapper = sqlSession.getMapper(XmlNameMapper.class);
-      List<Name> names = mapper.findByIds(Arrays.asList(1,3,4));
+      List<Name> names = mapper.findByIds(Arrays.asList(1, 3, 4));
       Assertions.assertEquals(3, names.size());
       Assertions.assertEquals(1, names.get(0).getId());
       Assertions.assertEquals(3, names.get(1).getId());
@@ -95,7 +95,7 @@ class XmlDrivenMapperTest {
   void testListParamWithoutParamAnnotation() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       XmlNameMapper mapper = sqlSession.getMapper(XmlNameMapper.class);
-      List<Name> names = mapper.findByIdsWithoutParamAnnotation(Arrays.asList(1,3,4));
+      List<Name> names = mapper.findByIdsWithoutParamAnnotation(Arrays.asList(1, 3, 4));
       Assertions.assertEquals(3, names.size());
       Assertions.assertEquals(1, names.get(0).getId());
       Assertions.assertEquals(3, names.get(1).getId());
@@ -155,6 +155,61 @@ class XmlDrivenMapperTest {
       Assertions.assertEquals(1, names.size());
       Name name = names.get(0);
       Assertions.assertEquals(3, name.getId());
+    }
+  }
+
+  @Test
+  void testInsert() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      XmlNameMapper mapper = sqlSession.getMapper(XmlNameMapper.class);
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      mapper.insert(name);
+
+      List<Name> names = mapper.findById(name.getId());
+      Assertions.assertEquals(1, names.size());
+      Name loadedName = names.get(0);
+      Assertions.assertEquals(name.getFirstName(), loadedName.getFirstName());
+      Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testUpdate() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      XmlNameMapper mapper = sqlSession.getMapper(XmlNameMapper.class);
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      mapper.insert(name);
+
+      Name updatingName = new Name();
+      updatingName.setId(name.getId());
+      updatingName.setFirstName("Thymeleaf3");
+      mapper.update(updatingName);
+
+      List<Name> names = mapper.findById(name.getId());
+      Assertions.assertEquals(1, names.size());
+      Name loadedName = names.get(0);
+      Assertions.assertEquals(updatingName.getFirstName(), loadedName.getFirstName());
+      Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testDelete() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      XmlNameMapper mapper = sqlSession.getMapper(XmlNameMapper.class);
+      Name name = new Name();
+      name.setFirstName("Thymeleaf");
+      name.setLastName("MyBatis");
+      mapper.insert(name);
+
+      mapper.delete(name);
+
+      List<Name> names = mapper.findById(name.getId());
+      Assertions.assertEquals(0, names.size());
     }
   }
 

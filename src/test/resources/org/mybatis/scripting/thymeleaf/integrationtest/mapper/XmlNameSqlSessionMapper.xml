@@ -21,6 +21,33 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper">
 
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO names (firstName, lastName)
+          VALUES (/*[('#{firstName}')]*/ 'Taro', /*[('#{lastName}')]*/ 'Yamada')
+    </insert>
+
+    <update id="update">
+        UPDATE names
+          SET id = id
+          /*[# th:if="${firstName} != null"]*/
+            ,firstName = /*[('#{firstName}')]*/ 'Taro'
+          /*[/]*/
+          /*[# th:if="${lastName} != null"]*/
+            ,lastName = /*[('#{lastName}')]*/ 'Yamada'
+          /*[/]*/
+          WHERE id = /*[('#{id}')]*/ 1
+    </update>
+
+    <update id="updateWithEmptyComment">
+        UPDATE names
+        SET firstName = /*[('#{firstName}')]*/ 'Taro' ,lastName = /*[('#{lastName}')]*/ 'Yamada' /**/ WHERE id = /*[('#{id}')]*/ 1
+    </update>
+
+    <delete id="delete">
+        DELETE FROM names
+          WHERE id = /*[('#{id}')]*/ 1
+    </delete>
+
     <select id="getAllNames" resultType="Name">
         SELECT * FROM names
     </select>
@@ -40,6 +67,11 @@
         /*[/]*/
     </select>
 
+    <select id="findByNameWithEmptyComment" resultType="Name">
+        SELECT * FROM names
+        WHERE firstName = /*[('#{firstName}')]*/ 'Taro' /**/ AND lastName = /*[('#{lastName}')]*/
+    </select>
+
     <select id="findUsing_parameter" resultType="Name">
         SELECT * FROM names WHERE 1 = 1
         /*[# th:if="${_parameter.id} != null"]*/
@@ -53,18 +85,21 @@
 
     <sql id="inValues">
         /*[# th:if="${not #lists.isEmpty(list)}"]*/
-        AND id in (
+        AND id IN (
         /*[# th:each="value : ${list}"]*/
-          /*[+ [# th:if="${not valueStat.first}"][(',')][/] +]*/
           /*[('#{list[' + ${valueStat.index} + ']}')]*/ 1
+          /*[(${#mybatis.commaIfNotLast(valueStat)})]*/
         /*[/]*/
         )
         /*[/]*/
     </sql>
 
     <select id="findDatabaseId" resultType="string" databaseId="hsql">
-        SELECT /*[(|'${_databaseId}'|)]*/ 'test db'
-        FROM INFORMATION_SCHEMA.SYSTEM_USERS
+        SELECT /*[('#{_databaseId}')]*/ 'test db'
+          FROM INFORMATION_SCHEMA.SYSTEM_USERS
     </select>
 
+    <select id="findDatabaseId" resultType="string" databaseId="h2">
+        SELECT /*[('#{_databaseId}')]*/ 'test db'
+    </select>
 </mapper>

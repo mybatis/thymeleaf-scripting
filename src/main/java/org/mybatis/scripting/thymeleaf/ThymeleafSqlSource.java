@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The {@code SqlSource} for integrating with Thymeleaf.
@@ -40,10 +39,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * @version 1.0.0
  */
 class ThymeleafSqlSource implements SqlSource {
-
   private final Configuration configuration;
   private final ITemplateEngine templateEngine;
-  private final AtomicReference<MetaClass> parameterTypeMetaClass = new AtomicReference<>();
   private final SqlSourceBuilder sqlSourceBuilder;
   private final String sqlTemplate;
 
@@ -79,17 +76,15 @@ class ThymeleafSqlSource implements SqlSource {
 
     String sql = templateEngine.process(sqlTemplate, context);
 
-    System.out.println(sql);
-
     SqlSource sqlSource = sqlSourceBuilder.parse(sql, parameterType, dynamicContext.getBindings());
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);
     return boundSql;
   }
 
-  private IContext createMetaClassBasedContext(Object parameterObject, Class<?> parameterType, DynamicContext dynamicContext) {
-    MetaClass metaClass = parameterTypeMetaClass.updateAndGet(
-        v -> v == null ? MetaClass.forClass(parameterType, configuration.getReflectorFactory()) : v);
+  private IContext createMetaClassBasedContext(
+      Object parameterObject, Class<?> parameterType, DynamicContext dynamicContext) {
+    MetaClass metaClass = MetaClass.forClass(parameterType, configuration.getReflectorFactory());
     return new MetaClassBasedThymeleafContext(parameterObject, metaClass, parameterType, dynamicContext);
   }
 
@@ -101,7 +96,8 @@ class ThymeleafSqlSource implements SqlSource {
     private final DynamicContext dynamicContext;
     private final Set<String> variableNames;
 
-    private MetaClassBasedThymeleafContext(Object parameterObject, MetaClass parameterMetaClass, Class<?> parameterType, DynamicContext dynamicContext) {
+    private MetaClassBasedThymeleafContext(
+        Object parameterObject, MetaClass parameterMetaClass, Class<?> parameterType, DynamicContext dynamicContext) {
       this.parameterObject = parameterObject;
       this.parameterMetaClass = parameterMetaClass;
       this.parameterType = parameterType;
@@ -145,7 +141,8 @@ class ThymeleafSqlSource implements SqlSource {
       try {
         return parameterMetaClass.getGetInvoker(name).invoke(parameterObject, null);
       } catch (IllegalAccessException | InvocationTargetException e) {
-        throw new IllegalStateException(String.format("Cannot get a value for property named '%s' in '%s'", name, parameterType), e);
+        throw new IllegalStateException(
+            String.format("Cannot get a value for property named '%s' in '%s'", name, parameterType), e);
       }
     }
 

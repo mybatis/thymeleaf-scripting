@@ -15,12 +15,15 @@
  */
 package org.mybatis.scripting.thymeleaf.integrationtest.mapper;
 
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.*;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 
 import java.util.List;
 
 public interface XmlNameMapper {
+  void insert(Name name);
+  void update(Name name);
+  void delete(Name name);
   List<Name> getAllNames();
   List<Name> findByIds(@Param("ids") List<Integer> ids);
   List<Name> findByIdsWithoutParamAnnotation(List<Integer> ids);

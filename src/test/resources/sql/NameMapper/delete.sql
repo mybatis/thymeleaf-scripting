@@ -14,14 +14,5 @@
 --    limitations under the License.
 --
 
-SELECT * FROM names
-  WHERE 1 = 1
-  /*[# th:if="${not #lists.isEmpty(list)}"]*/
-    AND id IN (
-    /*[# th:each="id : ${list}"]*/
-      /*[(${#mybatis.commaIfNotFirst(idStat)})]*/
-      /*[('#{list[' + ${idStat.index} + ']}')]*/ 1
-    /*[/]*/
-    )
-  /*[/]*/
-  ORDER BY id
+DELETE FROM names
+  WHERE id = /*[('#{id}')]*/ 1

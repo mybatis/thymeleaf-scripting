@@ -43,23 +43,29 @@ import java.util.Set;
 
 /**
  * The {@code LanguageDriver} for integrating with Thymeleaf.
- * <p>
+ * <br>
  * If you want to customize a default {@code TemplateEngine},
  * you can configure some property using mybatis-thymeleaf.properties.
  * Also, you can change the properties file that will read using system property(-Dmybatis-thymeleaf.config=...).
- * </p>
- * <br/>
+ * <br>
  * Supported properties are as follows:
  * <ul>
- *   <li>template.use-2way: Whether use the 2-way SQL. Default is true</li>
- *   <li>template.cache.enabled: Whether use the cache feature. Default is true</li>
- *   <li>template.cache.ttl: The cache TTL for resolved templates. Default is null(no TTL)</li>
- *   <li>template.file.character-encoding: The character encoding for reading template resources. Default is 'UTF-8'</li>
- *   <li>template.file.base-dir: The base directory for reading template resources. Default is '/'(just under class path)</li>
- *   <li>template.file.patterns: The patterns for reading as template resources. Default is '*.sql'</li>
- *   <li>template.customizer: The implementation class for customizing a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf.</li>
+ *   <li>use-2way:
+ *            Whether use the 2-way SQL. Default is true</li>
+ *   <li>cache.enabled:
+ *            Whether use the cache feature. Default is true</li>
+ *   <li>cache.ttl:
+ *            The cache TTL for resolved templates. Default is null(no TTL)</li>
+ *   <li>file.character-encoding:
+ *            The character encoding for reading template resources. Default is 'UTF-8'</li>
+ *   <li>file.base-dir:
+ *            The base directory for reading template resources. Default is ''(just under class path)</li>
+ *   <li>file.patterns:
+ *            The patterns for reading as template resources. Default is '*.sql'</li>
+ *   <li>customizer:
+ *            The implementation class for customizing a default {@code TemplateEngine}
+ *            instanced by the MyBatis Thymeleaf.</li>
  * </ul>
- * </p>
  * @author Kazuki Shimizu
  * @version 1.0.0
  */
@@ -95,25 +101,25 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
       throw new IllegalStateException(e);
     }
 
-    TemplateMode mode = Optional.ofNullable(properties.getProperty("template.use-2way"))
+    TemplateMode mode = Optional.ofNullable(properties.getProperty("use-2way"))
         .map(String::trim).map(Boolean::valueOf).orElse(Boolean.TRUE) ? TemplateMode.CSS : TemplateMode.TEXT;
 
-    boolean cacheEnabled = Optional.ofNullable(properties.getProperty("template.cache.enabled"))
+    boolean cacheEnabled = Optional.ofNullable(properties.getProperty("cache.enabled"))
         .map(String::trim).map(Boolean::parseBoolean).orElse(AbstractConfigurableTemplateResolver.DEFAULT_CACHEABLE);
 
-    Long cacheTtl = Optional.ofNullable(properties.getProperty("template.cache.ttl"))
+    Long cacheTtl = Optional.ofNullable(properties.getProperty("cache.ttl"))
         .map(String::trim).map(Long::parseLong).orElse(AbstractConfigurableTemplateResolver.DEFAULT_CACHE_TTL_MS);
 
-    String characterEncoding = Optional.ofNullable(properties.getProperty("template.file.character-encoding"))
+    String characterEncoding = Optional.ofNullable(properties.getProperty("file.character-encoding"))
         .map(String::trim).orElse(StandardCharsets.UTF_8.name());
 
-    String baseDir = Optional.ofNullable(properties.getProperty("template.file.base-dir"))
-        .map(String::trim).orElse("/");
+    String baseDir = Optional.ofNullable(properties.getProperty("file.base-dir"))
+        .map(String::trim).orElse("");
 
     Set<String> patterns = new LinkedHashSet<>(Arrays.asList(Optional.ofNullable(
-        properties.getProperty("template.file.patterns")).orElse("*.sql").trim().split(",")));
+        properties.getProperty("file.patterns")).orElse("*.sql").trim().split(",")));
 
-    TemplateEngineCustomizer customizer = Optional.ofNullable(properties.getProperty("template.customizer"))
+    final TemplateEngineCustomizer customizer = Optional.ofNullable(properties.getProperty("customizer"))
         .map(String::trim).map(v -> {
           try {
             return Resources.classForName(v);
@@ -123,8 +129,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
         }).map(v -> {
           try {
             return v.getConstructor().newInstance();
-          } catch (InstantiationException | IllegalAccessException |
-              InvocationTargetException | NoSuchMethodException e) {
+          } catch (InstantiationException | IllegalAccessException
+              | InvocationTargetException | NoSuchMethodException e) {
             throw new IllegalStateException("Cannot create an instance for class: " + v, e);
           }
         }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.DEFAULT);
@@ -145,6 +151,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     TemplateEngine templateEngine = new TemplateEngine();
     templateEngine.addTemplateResolver(classLoaderTemplateResolver);
     templateEngine.addTemplateResolver(stringTemplateResolver);
+    templateEngine.addDialect(new MyBatisDialect());
 
     customizer.accept(templateEngine);
     return templateEngine;
@@ -154,7 +161,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    * {@inheritDoc}
    */
   @Override
-  public ParameterHandler createParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
+  public ParameterHandler createParameterHandler(
+      MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
     return new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);
   }
 
