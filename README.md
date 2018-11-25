@@ -116,3 +116,24 @@ dependencies {
 ## Documentation
 
 * [User's Guide](src/main/asciidoc/user-guide.adoc)
+
+## Contact us
+
+### Question
+
+When there is a question, at first please confirm whether exists same question at following web sites.
+
+* [Google group for mybatis user(official mailing list)](https://groups.google.com/forum/#!forum/mybatis-user)
+* [Stack Overflow tagged mybatis](https://stackoverflow.com/questions/tagged/mybatis)
+
+If you cannot find a same question, please post new question to the [mailing list](https://groups.google.com/forum/#!newtopic/mybatis-user) or the [Stack Overflow](https://stackoverflow.com/questions/ask?tags=mybatis,mybatis-thymeleaf).
+
+### Report and Request
+
+When you found a bug or want to submit a feature request(new feature or current feature improvement), at first please confirm whether exists same bug or request at following pages.
+
+* [Issue List](https://github.com/mybatis/thymeleaf-scripting/issues)
+* [Pull Request List](https://github.com/mybatis/thymeleaf-scripting/pulls)
+
+If you cannot find a same report or request, please post new issue to the [issue tracker](https://github.com/mybatis/thymeleaf-scripting/issues/new).
+
