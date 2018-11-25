@@ -29,7 +29,6 @@
     <section name="What is MyBatis Thymeleaf ?">
       <p>
         The mybatis-thymeleaf is a plugin that helps applying a 2-way SQL using natural template provided by Thymeleaf 3.
-        If you are not familiar with Thymeleaf 3 syntax, you can see the Thymeleaf documentations.
       </p>
       <p>
         For details, please see the <a href="./user-guide.html">User's Guide</a>.

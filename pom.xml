@@ -34,37 +34,45 @@
 
   <name>MyBatis Thymeleaf</name>
   <description>Thymeleaf support for MyBatis</description>
-  <url>https://github.com/kazuki43zoo/thymeleaf-scripting</url>
+  <url>https://github.com/mybatis/thymeleaf-scripting</url>
 
   <inceptionYear>2018</inceptionYear>
 
+  <contributors>
+    <contributor>
+      <name>Kazuki Shimizu</name>
+      <email>kazuki43zoo@gmail.com</email>
+    </contributor>
+  </contributors>
+
   <scm>
-    <url>https://github.com/kazuki43zoo/thymeleaf-scripting</url>
-    <connection>scm:git:ssh://github.com/kazuki43zoo/thymeleaf-scripting.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/kazuki43zoo/thymeleaf-scripting.git</developerConnection>
+    <url>https://github.com/mybatis/thymeleaf-scripting</url>
+    <connection>scm:git:ssh://github.com/mybatis/thymeleaf-scripting.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issue Management</system>
-    <url>https://github.com/kazuki43zoo/thymeleaf-scripting/issues</url>
+    <url>https://github.com/mybatis/thymeleaf-scripting/issues</url>
   </issueManagement>
   <ciManagement>
     <system>Travis CI</system>
-    <url>https://travis-ci.org/kazuki43zoo/thymeleaf-scripting</url>
+    <url>https://travis-ci.org/mybatis/thymeleaf-scripting</url>
   </ciManagement>
   <distributionManagement>
     <site>
       <id>gh-pages</id>
-      <name>Mybatis GitHub Pages</name>
-      <url>git:ssh://git@github.com/kazuki43zoo/thymeleaf-scripting.git?gh-pages#</url>
+      <name>MyBatis Thymeleaf GitHub Pages</name>
+      <url>git:ssh://git@github.com/mybatis/thymeleaf-scripting.git?gh-pages#</url>
     </site>
   </distributionManagement>
 
   <properties>
+    <!-- Dependencies artifact version -->
     <mybatis.version>3.4.6</mybatis.version>
     <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
 
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <!-- Dependencies plugin version -->
     <asciidoctor-maven-plugin.version>1.5.7.1</asciidoctor-maven-plugin.version>
   </properties>
 
@@ -73,6 +81,7 @@
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
       <version>${mybatis.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.thymeleaf</groupId>

@@ -1,7 +1,7 @@
 # MyBatis Thymeleaf 3 Support
 
-[![Build Status](https://travis-ci.org/kazuki43zoo/thymeleaf-scripting.svg?branch=master)](https://travis-ci.org/kazuki43zoo/thymeleaf-scripting)
-[![Coverage Status](https://coveralls.io/repos/github/kazuki43zoo/thymeleaf-scripting/badge.svg?branch=master)](https://coveralls.io/github/kazuki43zoo/thymeleaf-scripting?branch=master)
+[![Build Status](https://travis-ci.org/mybatis/thymeleaf-scripting.svg?branch=master)](https://travis-ci.org/mybatis/thymeleaf-scripting)
+[![Coverage Status](https://coveralls.io/repos/github/mybatis/thymeleaf-scripting/badge.svg?branch=master)](https://coveralls.io/github/mybatis/thymeleaf-scripting?branch=master)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 ![thymeleaf-scripting](http://mybatis.github.io/images/mybatis-logo.png)
