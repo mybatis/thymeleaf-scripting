@@ -220,6 +220,8 @@ Also, you can specify a 2-way SQL on template file(e.g. `/NameMapper/findById.sq
 Name findById(@Param("id") Integer id);
 ----
 
+By default setting, the mybatis-thymeleaf read a specified template file from just under classpath.
+
 [[_getting-started-template-sql]]
 [source,sql]
 .src/main/resources/NameMapper/findById.sql
@@ -358,8 +360,7 @@ templateEngine.addDialect(new MyBatisDialect());
 // ...
 
 Configuration configuration = new Configuration();
-configuration.getLanguageRegistry()
-  .register(new ThymeleafLanguageDriver(templateEngine)); // <2>
+configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(templateEngine)); // <2>
 configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
 ----
 
@@ -444,9 +445,8 @@ UPDATE names
   WHERE id = /*[('#{id}')]*/ 1
 ----
 
-<1> Specify an evaluation condition that become to `true` on always at first position
-    because the mybatis-thymeleaf does not provide the trimming feature
-    such as `<where>` of XML based scripting language
+<1> Specify a non-dynamic condition at first position because the mybatis-thymeleaf does not provide
+    the trimming feature such as `<where>` of XML based scripting language
 
 <2> Specify a condition on start tag using natural template
 
@@ -454,9 +454,8 @@ UPDATE names
 
 <4> Specify an end tag of condition
 
-<5> Specify a static updating column at first position
-    because the mybatis-thymeleaf does not provide the trimming feature
-    such as `<set>` of XML based scripting language
+<5> Specify a non-dynamic updating column at first position because the mybatis-thymeleaf does not provide
+    the trimming feature such as `<set>` of XML based scripting language
 
 ==== Using tag for iteration
 
@@ -782,8 +781,8 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
     TemplateEngine templateEngine = new TemplateEngine(); // <1>
     templateEngine.addDialect(new MyBatisDialect());
     // ...
-    configuration.getLanguageRegistry()
-      .register(new ThymeleafLanguageDriver(templateEngine)); // <2>
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(templateEngine)); // <2>
+    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
   };
 }
 ----
@@ -791,6 +790,9 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
 <1> Create an instance of class that implements `org.thymeleaf.ITemplateEngine`
 
 <2> Register an instance of `ThymeleafLanguageDriver` that associate with user-defined template engine instance
+
+<3> Set the `ThymeleafLanguageDriver` class as default scripting language driver instead of
+    specifying as configuration properties
 
 == Appendix
 
