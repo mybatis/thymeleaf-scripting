@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/mybatis/thymeleaf-scripting.svg?branch=master)](https://travis-ci.org/mybatis/thymeleaf-scripting)
 [![Coverage Status](https://coveralls.io/repos/github/mybatis/thymeleaf-scripting/badge.svg?branch=master)](https://coveralls.io/github/mybatis/thymeleaf-scripting?branch=master)
+[![Maven central](https://maven-badges.herokuapp.com/maven-central/org.mybatis.scripting/mybatis-thymeleaf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.mybatis.scripting/mybatis-thymeleaf)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 ![thymeleaf-scripting](http://mybatis.github.io/images/mybatis-logo.png)
@@ -76,15 +77,6 @@ SELECT * FROM names
 
 ## Installation
 
-The mybatis-thymeleaf is not available in Maven Central yet.
-So, if you want to use, you should be install to the local repository as follow:
-
-```text
-$ git clone https://github.com/mybatis/thymeleaf-scripting.git
-$ cd thymeleaf-scripting
-$ ./mvnw clean install
-```
-
 ### Maven
 
 If you are using the Maven as build tool, you can add as follow:
@@ -102,14 +94,37 @@ If you are using the Maven as build tool, you can add as follow:
 </dependency>
 ```
 
+If you use a snapshot version, you need add the configuration for using the "Sonatype OSS Snapshots Repository" as follow:
+
+```xml
+<repositories>
+  <!-- ... -->
+  <repository>
+    <id>sonatype-oss-snapshots</id>
+    <name>Sonatype OSS Snapshots Repository</name>
+    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+  </repository>
+</repositories>
+```
+
 ### Gradle
 
 If you are using the Gradle as build tool, you can add as follow:
 
 ```groovy
 dependencies {
+  // ...
   compile("org.mybatis:mybatis:3.4.6") // Adjust version to your application
   compile("org.mybatis.scripting:mybatis-thymeleaf:1.0.0-SNAPSHOT")
+}
+```
+
+If you use a snapshot version, you need add the configuration for using the "Sonatype OSS Snapshots Repository" as follow:
+
+```groovy
+repositories {
+  // ...
+  maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 ```
 

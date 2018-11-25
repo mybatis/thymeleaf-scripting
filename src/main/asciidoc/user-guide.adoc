@@ -127,22 +127,12 @@ In this chapter, we explain basic usage of the mybatis-thymeleaf.
 
 === Installation
 
-The mybatis-thymeleaf is not available in Maven Central yet.
-So, if you want to use, you should be install to the local repository as follow:
-
-[sources,text,subs="attributes"]
-----
-$ git clone {github-organization-url}/thymeleaf-scripting.git
-$ cd thymeleaf-scripting
-$ ./mvnw clean install
-----
-
 ==== Maven
 
 If you are using the Maven as build tool, you can add as follow:
 
 [source,xml,subs="specialchars,attributes"]
-.pom.xml
+.pom.xml (dependencies)
 ----
 <dependency>
   <groupId>org.mybatis</groupId>
@@ -156,16 +146,45 @@ If you are using the Maven as build tool, you can add as follow:
 </dependency>
 ----
 
+If you use a snapshot version, you need add the configuration
+for using the "Sonatype OSS Snapshots Repository" as follow:
+
+[source,xml,subs="specialchars,attributes"]
+.pom.xml (repositories)
+----
+<repositories>
+  <!-- ... -->
+  <repository>
+    <id>sonatype-oss-snapshots</id>
+    <name>Sonatype OSS Snapshots Repository</name>
+    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+  </repository>
+</repositories>
+```
+----
+
 ==== Gradle
 
 If you are using the Gradle as build tool, you can add as follow:
 
 [source,groovy,subs="specialchars,attributes"]
-.build.gradle
+.build.gradle (dependencies)
 ----
 dependencies {
+  // ...
   compile("org.mybatis:mybatis:3.4.6") // Adjust version to your application
   compile("org.mybatis.scripting:mybatis-thymeleaf:{revnumber}")
+}
+----
+
+If you use a snapshot version, you need add the configuration for using the "Sonatype OSS Snapshots Repository" as follow:
+
+[source,groovy,subs="specialchars,attributes"]
+.build.gradle (repositories)
+----
+repositories {
+  // ...
+  maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 ----
 
