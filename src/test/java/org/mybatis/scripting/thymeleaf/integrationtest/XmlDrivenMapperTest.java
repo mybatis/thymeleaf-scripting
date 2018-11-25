@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
+import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameMapper;
 
@@ -210,6 +211,18 @@ class XmlDrivenMapperTest {
 
       List<Name> names = mapper.findById(name.getId());
       Assertions.assertEquals(0, names.size());
+    }
+  }
+
+  @Test
+  void testCustomBindVariables() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      XmlNameMapper mapper = sqlSession.getMapper(XmlNameMapper.class);
+      NameParam param = new NameParam();
+      param.setFirstName("B");
+      param.setLastName("Rub");
+      List<Name> names = mapper.findByName(param);
+      Assertions.assertEquals(2, names.size());
     }
   }
 

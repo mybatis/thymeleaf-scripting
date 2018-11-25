@@ -59,4 +59,6 @@ public interface NameMapper {
   @Select("sql/NameMapper/findById.sql")
   List<Name> findUsingTemplateFile(NameParam nameParam);
 
+  @Select("sql/NameMapper/findByName.sql")
+  List<Name> findByName(NameParam param);
 }

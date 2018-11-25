@@ -15,6 +15,7 @@
  */
 package org.mybatis.scripting.thymeleaf.integrationtest;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
@@ -29,7 +30,9 @@ import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import java.io.Reader;
 import java.sql.Connection;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class SqlSessionTest {
   private static SqlSessionFactory sqlSessionFactory;
@@ -219,5 +222,29 @@ class SqlSessionTest {
   }
 
 
+  @Test
+  void testCustomBindVariables() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("firstName", "B");
+      params.put("lastName", "Rub");
+      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByName", params);
+      Assertions.assertEquals(2, names.size());
+    }
+  }
+
+  @Test
+  void testCustomBindNameIsEmpty() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameParam param = new NameParam();
+      param.setFirstName("B");
+      param.setLastName("Rub");
+      sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByNameBindNameIsEmpty", param);
+      Assertions.fail();
+    } catch (PersistenceException e) {
+      Assertions.assertEquals("Variable name expression evaluated as null or empty: \"${''}\" (template: \"/*[# mybatis:bind=\"${''}=1\" /]*/\n" +
+          "      SELECT * FROM names\" - line 1, col 6)", e.getCause().getCause().getMessage());
+    }
+  }
 
 }

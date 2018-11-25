@@ -32,4 +32,6 @@ public interface XmlNameMapper {
   List<Name> findByIdWithNestedParam(@Param("p") NameParam param);
   List<Name> findUsingScript(NameParam nameParam);
   List<Name> findUsingTemplateFile(NameParam nameParam);
+  List<Name> findByName(NameParam param);
+
 }

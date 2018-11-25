@@ -66,4 +66,8 @@
         sql/NameMapper/findById.sql
     </select>
 
+    <select id="findByName" resultType="org.mybatis.scripting.thymeleaf.integrationtest.domain.Name">
+        sql/NameMapper/findByName.sql
+    </select>
+
 </mapper>

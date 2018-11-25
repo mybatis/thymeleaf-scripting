@@ -15,22 +15,30 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
+import org.mybatis.scripting.thymeleaf.expression.MyBatisExpression;
+import org.mybatis.scripting.thymeleaf.processor.MyBatisBindTagProcessor;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.dialect.IExpressionObjectDialect;
-import org.thymeleaf.engine.IterationStatusVar;
 import org.thymeleaf.expression.IExpressionObjectFactory;
 import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.standard.StandardDialect;
+import org.thymeleaf.templatemode.TemplateMode;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * The Dialect for integrating with MyBatis.
  * <br>
- * This dialect provides the {@link MyBatisExpressionUtilityObject}.
- * It can be access using {@code #mybatis}) as expression utility object.
+ * This dialect provides following features.
+ *
+ * <ul>
+ *   <li>{@code #mybatis} : {@link MyBatisExpression}</li>
+ *   <li>{@code mybatis:bind} : {@link MyBatisBindTagProcessor}</li>
+ * </ul>
  *
  * @author Kazuki Shimizu
  * @version 1.0.0
@@ -61,7 +69,10 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
    */
   @Override
   public Set<IProcessor> getProcessors(String dialectPrefix) {
-    return Collections.emptySet();
+    return new HashSet<>(Arrays.asList(
+        new MyBatisBindTagProcessor(TemplateMode.TEXT, dialectPrefix)
+        , new MyBatisBindTagProcessor(TemplateMode.CSS, dialectPrefix)
+    ));
   }
 
   /**
@@ -74,7 +85,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
 
   private static class MyBatisExpressionObjectFactory implements IExpressionObjectFactory {
 
-    private static final MyBatisExpressionUtilityObject EXPRESSION_OBJECT = new MyBatisExpressionUtilityObject();
+    private static final MyBatisExpression EXPRESSION_OBJECT = new MyBatisExpression();
     private final Set<String> expressionNames;
 
     private MyBatisExpressionObjectFactory(String expressionName) {
@@ -103,33 +114,6 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
     @Override
     public boolean isCacheable(String expressionObjectName) {
       return true;
-    }
-
-  }
-
-  /**
-   * The expression utility object that provide helper method for generating SQL.
-   */
-  public static class MyBatisExpressionUtilityObject {
-
-    /**
-     * Return the comma if a current iteration status is not first.
-     *
-     * @param iterationStatus A current iteration status
-     * @return If iteration status is not first, return comma and otherwise return empty string
-     */
-    public String commaIfNotFirst(IterationStatusVar iterationStatus) {
-      return !iterationStatus.isFirst() ? "," : "";
-    }
-
-    /**
-     * Return the comma if a current iteration status is not last.
-     *
-     * @param iterationStatus A current iteration status
-     * @return If iteration status is not last, return comma and otherwise return empty string
-     */
-    public String commaIfNotLast(IterationStatusVar iterationStatus) {
-      return !iterationStatus.isLast() ? "," : "";
     }
 
   }

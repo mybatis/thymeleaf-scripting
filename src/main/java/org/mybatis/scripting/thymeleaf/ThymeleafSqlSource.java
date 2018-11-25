@@ -22,11 +22,13 @@ import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
 import org.thymeleaf.ITemplateEngine;
-import org.thymeleaf.context.Context;
 import org.thymeleaf.context.IContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -37,6 +39,9 @@ import java.util.Set;
  *
  * @author Kazuki Shimizu
  * @version 1.0.0
+ *
+ * @see ThymeleafLanguageDriver
+ * @see org.mybatis.scripting.thymeleaf.processor.MyBatisBindTagProcessor
  */
 class ThymeleafSqlSource implements SqlSource {
   private final Configuration configuration;
@@ -64,46 +69,47 @@ class ThymeleafSqlSource implements SqlSource {
   public BoundSql getBoundSql(Object parameterObject) {
     Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
     DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);
-    IContext context;
+    CustomBindVariablesContext context;
     if (parameterObject instanceof Map) {
       @SuppressWarnings(value = "unchecked")
       Map<String, Object> parameterMap = (Map<String, Object>) parameterObject;
-      parameterMap.putAll(dynamicContext.getBindings());
-      context = new Context(Locale.getDefault(), parameterMap);
+      context = new MapBasedContext(parameterMap, dynamicContext);
     } else {
-      context = createMetaClassBasedContext(parameterObject, parameterType, dynamicContext);
+      MetaClass metaClass = MetaClass.forClass(parameterType, configuration.getReflectorFactory());
+      context = new MetaClassBasedContext(parameterObject, metaClass, parameterType, dynamicContext);
     }
 
     String sql = templateEngine.process(sqlTemplate, context);
 
+    context.getCustomBindVariables().forEach(dynamicContext::bind);
+
     SqlSource sqlSource = sqlSourceBuilder.parse(sql, parameterType, dynamicContext.getBindings());
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);
+
     return boundSql;
   }
 
-  private IContext createMetaClassBasedContext(
-      Object parameterObject, Class<?> parameterType, DynamicContext dynamicContext) {
-    MetaClass metaClass = MetaClass.forClass(parameterType, configuration.getReflectorFactory());
-    return new MetaClassBasedThymeleafContext(parameterObject, metaClass, parameterType, dynamicContext);
+  private interface CustomBindVariablesContext extends IContext {
+    Map<String, Object> getCustomBindVariables();
   }
 
-  private static class MetaClassBasedThymeleafContext implements IContext {
+  private static abstract class AbstractCustomBindVariablesContext implements CustomBindVariablesContext {
 
-    private final Object parameterObject;
-    private final MetaClass parameterMetaClass;
-    private final Class<?> parameterType;
     private final DynamicContext dynamicContext;
+    private final Map<String, Object> customBindVariable;
     private final Set<String> variableNames;
 
-    private MetaClassBasedThymeleafContext(
-        Object parameterObject, MetaClass parameterMetaClass, Class<?> parameterType, DynamicContext dynamicContext) {
-      this.parameterObject = parameterObject;
-      this.parameterMetaClass = parameterMetaClass;
-      this.parameterType = parameterType;
+    AbstractCustomBindVariablesContext(DynamicContext dynamicContext) {
       this.dynamicContext = dynamicContext;
-      this.variableNames = new HashSet<>(Arrays.asList(parameterMetaClass.getGetterNames()));
-      variableNames.addAll(dynamicContext.getBindings().keySet());
+      this.customBindVariable = new HashMap<>();
+      this.variableNames = new HashSet<>();
+      addVariableNames(dynamicContext.getBindings().keySet());
+      addVariableNames(Collections.singleton(ContextVariableNames.CUSTOM_BIND_VARS));
+    }
+
+    void addVariableNames(Collection<String> names) {
+      variableNames.addAll(names);
     }
 
     /**
@@ -135,9 +141,66 @@ class ThymeleafSqlSource implements SqlSource {
      */
     @Override
     public Object getVariable(String name) {
+      if (name.equals(ContextVariableNames.CUSTOM_BIND_VARS)) {
+        return customBindVariable;
+      }
       if (dynamicContext.getBindings().containsKey(name)) {
         return dynamicContext.getBindings().get(name);
       }
+      return getParameterValue(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, Object> getCustomBindVariables() {
+      return customBindVariable;
+    }
+
+    abstract Object getParameterValue(String name);
+
+  }
+
+  private static class MapBasedContext extends AbstractCustomBindVariablesContext {
+
+    private final Map<String,Object> variables;
+
+    private MapBasedContext(Map<String, Object> parameterMap, DynamicContext dynamicContext) {
+      super(dynamicContext);
+      this.variables = parameterMap;
+      addVariableNames(parameterMap.keySet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getParameterValue(String name) {
+      return variables.get(name);
+    }
+
+  }
+
+  private static class MetaClassBasedContext extends AbstractCustomBindVariablesContext {
+
+    private final Object parameterObject;
+    private final MetaClass parameterMetaClass;
+    private final Class<?> parameterType;
+
+    private MetaClassBasedContext(
+        Object parameterObject, MetaClass parameterMetaClass, Class<?> parameterType, DynamicContext dynamicContext) {
+      super(dynamicContext);
+      this.parameterObject = parameterObject;
+      this.parameterMetaClass = parameterMetaClass;
+      this.parameterType = parameterType;
+      addVariableNames(Arrays.asList(parameterMetaClass.getGetterNames()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getParameterValue(String name) {
       try {
         return parameterMetaClass.getGetInvoker(name).invoke(parameterObject, null);
       } catch (IllegalAccessException | InvocationTargetException e) {

@@ -102,4 +102,23 @@
     <select id="findDatabaseId" resultType="string" databaseId="h2">
         SELECT /*[('#{_databaseId}')]*/ 'test db'
     </select>
+
+    <select id="findByName" resultType="Name">
+      /*[# mybatis:bind="patternFirstName=|${firstName}%|, patternLastName=|${lastName}%|" /]*/
+
+      SELECT * FROM names
+        WHERE 1 = 1
+        /*[# th:if="${firstName} != null"]*/
+          AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro'
+        /*[/]*/
+        /*[# th:if="${lastName} != null"]*/
+          AND lastName LIKE /*[('#{patternLastName}')]*/ 'Yamada'
+        /*[/]*/
+    </select>
+
+    <select id="findByNameBindNameIsEmpty" resultType="Name">
+      /*[# mybatis:bind="${''}=1" /]*/
+      SELECT * FROM names
+    </select>
+
 </mapper>

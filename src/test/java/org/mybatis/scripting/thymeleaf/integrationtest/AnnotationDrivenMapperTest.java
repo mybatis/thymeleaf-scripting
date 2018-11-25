@@ -36,7 +36,9 @@ import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import java.io.Reader;
 import java.sql.Connection;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class AnnotationDrivenMapperTest {
   private static SqlSessionFactory sqlSessionFactory;
@@ -209,6 +211,18 @@ class AnnotationDrivenMapperTest {
 
       List<Name> names = mapper.findById(name.getId());
       Assertions.assertEquals(0, names.size());
+    }
+  }
+
+  @Test
+  void testCustomBindVariables() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      NameParam param = new NameParam();
+      param.setFirstName("B");
+      param.setLastName("Rub");
+      List<Name> names = mapper.findByName(param);
+      Assertions.assertEquals(2, names.size());
     }
   }
 

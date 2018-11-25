@@ -45,7 +45,7 @@ using template engine provide by Thymeleaf.
 * Can write a 2-way SQL
 * Can specify a 2-way SQL on an annotation and mapper xml
 * Can read a 2-way SQL from a template file on classpath
-* Can use a custom expression utility object at a template
+* Can use a custom dialect(attribute tag and expression utility object) at a template
 * Can fully customize a template engine configuration
 
 === Using simple SQL
@@ -436,6 +436,15 @@ SELECT * FROM names
 
 <1> A bind value specify by `/\*[('#{variable name}')]*/` format
 
+[NOTE]
+====
+**What can you bind?**
+
+Basically, you can bind a parameter object(Mapper method arguments or `SqlSession` method arguments).
+In addition, the mybatis-thymeleaf allow to be bind a registered value using `mybatis:bind` tag.
+About usage of `mybatis:bind`, please see <<Using attribute tag>>.
+====
+
 === Using dynamic SQL
 
 The Thymeleaf supports to create an any string dynamically using conditional evaluation
@@ -710,6 +719,56 @@ UPDATE names
 The mybatis-thymeleaf provide the custom dialect class(`org.mybatis.scripting.thymeleaf.MyBatisDialect`)
 that help for generating SQL.
 
+=== Using attribute tag
+
+By default, you can use it using `mybatis` dialect prefix.
+
+[cols="2,4,4",options="header"]
+.Supported method list
+|===
+^|Attribute Name
+^|Description
+^|Attribute Value Format
+
+|<<mybatis-bind>>
+|Register an any value to the MyBatis's bind variables.
+a|{variable name}={variable value}(,...) +
+ +
+ Valid format is same with `th:with` provided by Thymeleaf.
+|===
+
+[[mybatis-bind]]
+==== bind
+
+[source,sql]
+.Basic usage
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  /*[# th:if="${firstName} != null"]*/
+    /*[# mybatis:bind="patternFirstName=|${firstName}%|" /]*/ -- <1>
+    AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro' -- <2>
+  /*[/]*/
+----
+
+[source,sql]
+.Register multiple variables
+----
+/*[# mybatis:bind="patternFirstName=|${firstName}%|, patternLastName=|${lastName}%|" /]*/ -- <3>
+----
+
+<1> Register an any value(e.g. editing value at template) as custom bind variables
+<2> Bind a custom bind variable
+<3> Also, you can register multiple custom bind variables separating with comma at the same time
+
+[NOTE]
+====
+*Why need the bind tag?*
+
+The binding feature provide by MyBatis cannot access a variable that shared by the `th:with`
+because it can only access within a template. Hence, the mybatis-thymeleaf provide the `bind` tag.
+====
+
 === Using expression utility object
 
 By default, you can access it using `#mybatis` expression.
@@ -721,7 +780,7 @@ By default, you can access it using `#mybatis` expression.
 ^|Arguments
 ^|Description
 
-|commaIfNotFirst
+|<<mybatis-commaIfNotFirst>>
 |
 
 [cols="^1,4,5",options="header"]
@@ -737,7 +796,7 @@ By default, you can access it using `#mybatis` expression.
 
 |Return the comma if a current iteration status is not first
 
-|commaIfNotLast
+|<<mybatis-commaIfNotLast>>
 |
 
 [cols="^1,4,5",options="header"]
@@ -754,28 +813,36 @@ By default, you can access it using `#mybatis` expression.
 |Return the comma if a current iteration status is not last
 |===
 
+[[mybatis-commaIfNotFirst]]
+==== commaIfNotFirst
 
 [source,sql]
-.Usage of commaIfNotFirst
 ----
 id IN (
 /*[# th:each="id : ${ids}"]*/
-  /*[(${#mybatis.commaIfNotFirst(idStat)})]*/
+  /*[(${#mybatis.commaIfNotFirst(idStat)})]*/ -- <1>
   /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
 /*[/]*/
 )
 ----
 
+<1> Avoid adding comma at the first element
+
+[[mybatis-commaIfNotLast]]
+==== commaIfNotLast
+
 [source,sql]
-.Usage of commaIfNotLast
 ----
 id IN (
 /*[# th:each="id : ${ids}"]*/
   /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
-  /*[(${#mybatis.commaIfNotLast(idStat)})]*/
+  /*[(${#mybatis.commaIfNotLast(idStat)})]*/ -- <1>
 /*[/]*/
 )
 ----
+
+<1> Avoid adding comma at the last element
+
 
 == Usage on framework
 
