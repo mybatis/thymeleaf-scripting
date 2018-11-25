@@ -139,4 +139,4 @@ If you cannot find a same report or request, please post new issue to the [issue
 
 > **IMPORTANT:**
 >
-> When you found a security vulnerability, at first please report it to the [mybatis organization owners](https://github.com/orgs/mybatis/people?&query=+role%3Aowner) instead of issue tracker.
+> When you found a security vulnerability, at first please report it to the [mybatis organization members](https://github.com/orgs/mybatis/people) instead of issue tracker.
