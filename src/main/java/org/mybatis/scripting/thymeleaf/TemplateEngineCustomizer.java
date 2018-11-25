@@ -40,7 +40,7 @@ import java.util.function.Consumer;
  * </pre>
  * e.g.) Configuration file (mybatis-thymeleaf.properties):
  * <pre>
- * template.customizer=com.example.MyTemplateEngineCustomizer
+ * customizer=com.example.MyTemplateEngineCustomizer
  * </pre>
  *
  * @author Kazuki Shimizu
