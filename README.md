@@ -137,3 +137,6 @@ When you found a bug or want to submit a feature request(new feature or current 
 
 If you cannot find a same report or request, please post new issue to the [issue tracker](https://github.com/mybatis/thymeleaf-scripting/issues/new).
 
+> **IMPORTANT:**
+>
+> When you found a security vulnerability, at first please report it to the [mybatis organization owners](https://github.com/orgs/mybatis/people?&query=+role%3Aowner) instead of issue tracker.
