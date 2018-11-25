@@ -73,6 +73,46 @@ SELECT * FROM names
   * MyBatis 3.4.3+
   * Thymeleaf 3.0+
 
+
+## Installation
+
+The mybatis-thymeleaf is not available in Maven Central yet.
+So, if you want to use, you should be install to the local repository as follow:
+
+```text
+$ git clone https://github.com/mybatis/thymeleaf-scripting.git
+$ cd thymeleaf-scripting
+$ ./mvnw clean install
+```
+
+### Maven
+
+If you are using the Maven as build tool, you can add as follow:
+
+```xml
+<dependency>
+  <groupId>org.mybatis</groupId>
+  <artifactId>mybatis</artifactId>
+  <version>3.4.6</version> <!-- Adjust to your application -->
+</dependency>
+<dependency>
+  <groupId>org.mybatis.scripting</groupId>
+  <artifactId>mybatis-thymeleaf</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+### Gradle
+
+If you are using the Gradle as build tool, you can add as follow:
+
+```groovy
+dependencies {
+  compile("org.mybatis:mybatis:3.4.6") // Adjust version to your application
+  compile("org.mybatis.scripting:mybatis-thymeleaf:1.0.0-SNAPSHOT")
+}
+```
+
 ## Documentation
 
 * [User's Guide](src/main/asciidoc/user-guide.adoc)
