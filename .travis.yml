@@ -4,6 +4,7 @@ sudo: false
 jdk:
   - openjdk11
   - oraclejdk11
+  - openjdk8
   - oraclejdk8
 
 matrix:
@@ -15,14 +16,12 @@ matrix:
         - jdk_switcher use openjdk8
         - ./mvnw -U install -q -DskipTests=true -Dmaven.test.redirectTestOutputToFile=true -Dmybatis.version=3.5.0-SNAPSHOT
         - export JAVA_HOME=$ORIGINAL_JAVA_HOME
-    - jdk: openjdk8
-      env: REPORT_GOALS="jacoco:report coveralls:report"
 
 install: true
 
 script:
   # build using mybatis latest version
-  - ./mvnw clean verify ${REPORT_GOALS}
+  - ./mvnw clean verify
   # build using mybatis 3.5.x line (under development version)
   - ./mvnw clean verify -Dmybatis.version=3.5.0-SNAPSHOT
 
