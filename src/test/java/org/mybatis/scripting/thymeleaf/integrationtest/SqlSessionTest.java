@@ -75,7 +75,7 @@ class SqlSessionTest {
   void testNoParam() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.getAllNames");
-      Assertions.assertEquals(5, names.size());
+      Assertions.assertEquals(7, names.size());
     }
   }
 

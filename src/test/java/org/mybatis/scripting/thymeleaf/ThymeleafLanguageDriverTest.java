@@ -27,11 +27,8 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.hsqldb.jdbc.JDBCDataSource;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.mybatis.scripting.thymeleaf.expression.MyBatisExpression;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
@@ -121,6 +118,12 @@ class ThymeleafLanguageDriverTest {
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
     Assertions.assertNull(stringTemplateResolver.getCacheTTLMs());
 
+    templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
+        .map(MyBatisDialect.class::cast).ifPresent(v -> {
+      MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
+          .buildObject(null, null);
+      Assertions.assertEquals(" ESCAPE '\\' ", expression.likeEscapeClause());
+    });
   }
 
   @Test
@@ -143,13 +146,19 @@ class ThymeleafLanguageDriverTest {
     Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
     Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")), classLoaderTemplateResolver.getResolvablePatterns());
 
-
     StringTemplateResolver stringTemplateResolver =
         TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
             .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
     Assertions.assertEquals(TemplateMode.TEXT, stringTemplateResolver.getTemplateMode());
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
 
+    templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
+        .map(MyBatisDialect.class::cast).ifPresent(v -> {
+      MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
+          .buildObject(null, null);
+      Assertions.assertEquals("escape '~'", expression.likeEscapeClause());
+      Assertions.assertEquals("a~％~＿~~b", expression.escapeLikeWildcard("a％＿~b"));
+    });
   }
 
   @Test
@@ -183,7 +192,7 @@ class ThymeleafLanguageDriverTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       NameMapper mapper = sqlSession.getMapper(NameMapper.class);
       List<Name> names = mapper.getAllNames();
-      Assertions.assertEquals(5, names.size());
+      Assertions.assertEquals(7, names.size());
     }
   }
 

@@ -350,6 +350,17 @@ the special system properties(`mybatis-thymeleaf.config`) as follow:
 $ java -Dmybatis-thymeleaf.config=mybatis-thymeleaf_production.properties ...
 ----
 
+===== Using an any file encoding
+
+You can use an any file encoding instead of the default file encoding(`UTF-8`).
+If you use an any file encoding, please specify a file encoding using
+the special system properties(`mybatis-thymeleaf.config.encoding`) as follow:
+
+[source,text]
+----
+$ java -Dmybatis-thymeleaf.config.encoding=Windows-31J ...
+----
+
 ==== Using functional interface
 
 The mybatis-thymeleaf provide the special functional
@@ -741,20 +752,20 @@ a|{variable name}={variable value}(,...) +
 ==== bind
 
 [source,sql]
-.Basic usage
+.Basic usage:
 ----
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${firstName} != null"]*/
-    /*[# mybatis:bind="patternFirstName=|${firstName}%|" /]*/ -- <1>
+    /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
     AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro' -- <2>
   /*[/]*/
 ----
 
 [source,sql]
-.Register multiple variables
+.Usage for registering multiple variables:
 ----
-/*[# mybatis:bind="patternFirstName=|${firstName}%|, patternLastName=|${lastName}%|" /]*/ -- <3>
+/*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|, patternLastName=|${#mybatis.escapeLikeWildcard(lastName)}%|" /]*/ -- <3>
 ----
 
 <1> Register an any value(e.g. editing value at template) as custom bind variables
@@ -773,7 +784,7 @@ because it can only access within a template. Hence, the mybatis-thymeleaf provi
 
 By default, you can access it using `#mybatis` expression.
 
-[cols="2,5a,3",options="header"]
+[cols="1,5a,4",options="header"]
 .Supported method list
 |===
 ^|Method
@@ -811,12 +822,35 @@ By default, you can access it using `#mybatis` expression.
 !===
 
 |Return the comma if a current iteration status is not last
+
+|<<mybatis-escapeLikeWildcard>>
+|
+
+[cols="^1,4,5",options="header"]
+!===
+^!No
+^!Type
+^!Description
+
+!1
+!String
+!A target value
+!===
+
+|Escape a wildcard character of LIKE condition
+(By default behavior, this method escape the `"%"` and `"_"` using `"\"`)
+
+|<<mybatis-likeEscapeClause>>
+| -
+|Return a escape clause string of LIKE condition
+( By default behavior, this method return `" ESCAPE '\' "`)
 |===
 
 [[mybatis-commaIfNotFirst]]
 ==== commaIfNotFirst
 
 [source,sql]
+.Basic usage:
 ----
 id IN (
 /*[# th:each="id : ${ids}"]*/
@@ -828,10 +862,22 @@ id IN (
 
 <1> Avoid adding comma at the first element
 
+[source,sql]
+.For example, above template translate to as follow:
+----
+id IN (
+
+  #{ids[0]}
+  ,
+  #{ids[1]}
+)
+----
+
 [[mybatis-commaIfNotLast]]
 ==== commaIfNotLast
 
 [source,sql]
+.Basic usage:
 ----
 id IN (
 /*[# th:each="id : ${ids}"]*/
@@ -842,6 +888,59 @@ id IN (
 ----
 
 <1> Avoid adding comma at the last element
+
+[source,sql]
+.For example, above template translate to as follow:
+----
+id IN (
+  #{ids[0]}
+  ,
+  #{ids[1]}
+
+)
+----
+
+
+[[mybatis-escapeLikeWildcard]]
+==== escapeLikeWildcard
+
+[source,sql]
+.Basic usage:
+----
+/*[# th:if="${firstName} != null"]*/
+  /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
+  AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%'
+/*[/]*/
+----
+
+<1> Register a value that escaped wildcard character of LIKE condition as custom bind variables
+
+[source,sql]
+.For example, above template translate to as follow:
+----
+  AND firstName LIKE #{patternFirstName}
+----
+
+
+[[mybatis-likeEscapeClause]]
+==== likeEscapeClause
+
+[source,sql]
+.Basic usage:
+----
+/*[# th:if="${firstName} != null"]*/
+  /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
+  AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /*[(${#mybatis.likeEscapeClause()})]*/ -- <1>
+/*[/]*/
+----
+
+<1> Add `ESCAPE` clause
+
+[source,sql]
+.For example, above template translate to as follow:
+----
+  AND firstName LIKE #{patternFirstName} ESCAPE '\'
+----
 
 
 == Usage on framework
@@ -923,7 +1022,7 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`file.character-encoding`
 |The character encoding for reading template resource file
 |`String`
-|`UTF-8`
+|`"UTF-8"`
 
 |`file.base-dir`
 |The base directory for reading template resource file
@@ -934,7 +1033,24 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |The patterns for reading as template resource file
 (Can specify multiple patterns using comma(`","`) as separator character)
 |`String`
-|`*.sql`
+|`"*.sql"`
+
+|`like.escapeChar`
+|The escape character for wildcard of LIKE condition
+|`Character`
+|`'\'` (backslash)
+
+|`like.escapeClauseFormat`
+|The format of escape clause for LIKE condition
+(Can specify format that can be allowed by `String#format` method)
+|`String`
+|`" ESCAPE '%s' "`
+
+|`like.additionalEscapeTargetChars`
+|Additional escape target characters(custom wildcard characters) for LIKE condition
+(Can specify multiple characters using comma(`","`) as separator character)
+|`String`
+|`""` (no specify)
 
 |`customizer`
 |The FQCN of class that implements the `TemplateEngineCustomizer`
@@ -951,6 +1067,9 @@ cache.enabled = true
 cache.ttl = 3600000
 file.character-encoding = UTF-8
 file.base-dir = /templates/sqls
-file.patterns = *.sql.template
+file.patterns = *sql, *.sql.template
+like.escapeChar = ~
+like.escapeClauseFormat = escape '%s'
+like.additionalEscapeTargetChars = ％, ＿
 customizer = com.example.MyTemplateEngineCustomizer
 ----

@@ -45,7 +45,7 @@ import java.util.Set;
  */
 public class MyBatisDialect extends AbstractProcessorDialect implements IExpressionObjectDialect {
 
-  private final IExpressionObjectFactory expressionObjectFactory;
+  private static final MyBatisExpression.Builder expressionBuilder = MyBatisExpression.newBuilder();
 
   /**
    * Default constructor.
@@ -61,7 +61,38 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
    */
   public MyBatisDialect(String prefix) {
     super("MyBatis Dialect", prefix, StandardDialect.PROCESSOR_PRECEDENCE);
-    this.expressionObjectFactory = new MyBatisExpressionObjectFactory(getPrefix());
+  }
+
+  /**
+   * Set an escape character for wildcard of LIKE.
+   * <br>
+   * The default value is {@code '\'} (backslash)
+   * @param escapeChar A escape character
+   */
+  public void setLikeEscapeChar(Character escapeChar) {
+    expressionBuilder.likeEscapeChar(escapeChar);
+  }
+
+  /**
+   * Set a format of escape clause.
+   * <br>
+   * The default value is {@code " ESCAPE '%s' "}.
+   *
+   * @param escapeClauseFormat a format of escape clause
+   */
+  public void setLikeEscapeClauseFormat(String escapeClauseFormat) {
+    expressionBuilder.likeEscapeClauseFormat(escapeClauseFormat);
+  }
+
+  /**
+   * Set additional escape target characters(custom wildcard characters) for LIKE condition.
+   * <br>
+   * The default value is nothing.
+   *
+   * @param additionalEscapeTargetChars escape target characters(custom wildcard characters)
+   */
+  public void setLikeAdditionalEscapeTargetChars(Set<Character> additionalEscapeTargetChars) {
+    expressionBuilder.likeAdditionalEscapeTargetChars(additionalEscapeTargetChars);
   }
 
   /**
@@ -80,24 +111,17 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
    */
   @Override
   public IExpressionObjectFactory getExpressionObjectFactory() {
-    return expressionObjectFactory;
+    return new MyBatisExpressionObjectFactory();
   }
 
-  private static class MyBatisExpressionObjectFactory implements IExpressionObjectFactory {
-
-    private static final MyBatisExpression EXPRESSION_OBJECT = new MyBatisExpression();
-    private final Set<String> expressionNames;
-
-    private MyBatisExpressionObjectFactory(String expressionName) {
-      this.expressionNames = Collections.singleton(expressionName);
-    }
+  private class MyBatisExpressionObjectFactory implements IExpressionObjectFactory {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Set<String> getAllExpressionObjectNames() {
-      return expressionNames;
+      return Collections.singleton(getPrefix());
     }
 
     /**
@@ -105,7 +129,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
      */
     @Override
     public Object buildObject(IExpressionContext context, String expressionObjectName) {
-      return EXPRESSION_OBJECT;
+      return expressionBuilder.build();
     }
 
     /**

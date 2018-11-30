@@ -31,15 +31,17 @@ import org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The {@code LanguageDriver} for integrating with Thymeleaf.
@@ -62,6 +64,12 @@ import java.util.Set;
  *            The base directory for reading template resources. Default is ''(just under class path)</li>
  *   <li>file.patterns:
  *            The patterns for reading as template resources. Default is '*.sql'</li>
+ *   <li>like.escapeChar:
+ *            The escape character for wildcard of LIKE. Default is {@code '\'} (backslash)</li>
+ *   <li>like.escapeClauseFormat:
+ *            The format of escape clause. Default is {@code " ESCAPE '%s' "}</li>
+ *   <li>like.additionalEscapeTargetChars:
+ *            The additional escape target characters(custom wildcard characters) for LIKE condition. Default is nothing</li>
  *   <li>customizer:
  *            The implementation class for customizing a default {@code TemplateEngine}
  *            instanced by the MyBatis Thymeleaf.</li>
@@ -95,7 +103,11 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     try (InputStream in = Resources.getResourceAsStream(
         System.getProperty("mybatis-thymeleaf.config", "mybatis-thymeleaf.properties"))) {
       if (in != null) {
-        properties.load(in);
+        String encoding = System.getProperty("mybatis-thymeleaf.config.encoding", StandardCharsets.UTF_8.name());
+        try (InputStreamReader inReader = new InputStreamReader(in, encoding);
+             BufferedReader bufReader = new BufferedReader(inReader)) {
+          properties.load(bufReader);
+        }
       }
     } catch (IOException e) {
       throw new IllegalStateException(e);
@@ -113,11 +125,22 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     String characterEncoding = Optional.ofNullable(properties.getProperty("file.character-encoding"))
         .map(String::trim).orElse(StandardCharsets.UTF_8.name());
 
-    String baseDir = Optional.ofNullable(properties.getProperty("file.base-dir"))
+    String fileBaseDir = Optional.ofNullable(properties.getProperty("file.base-dir"))
         .map(String::trim).orElse("");
 
-    Set<String> patterns = new LinkedHashSet<>(Arrays.asList(Optional.ofNullable(
-        properties.getProperty("file.patterns")).orElse("*.sql").trim().split(",")));
+    Character likeEscapeChar = Optional.ofNullable(properties.getProperty("like.escapeChar"))
+        .map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0)).orElse(null);
+
+    String likeEscapeClauseFormat = Optional.ofNullable(properties.getProperty("like.escapeClauseFormat"))
+        .map(String::trim).orElse(null);
+
+    Set<Character> likeAdditionalEscapeTargetChars =
+        Stream.of(properties.getProperty("like.additionalEscapeTargetChars","").split(","))
+            .map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0)).collect(Collectors.toSet());
+
+    Set<String> filePatterns =
+        Stream.of(properties.getProperty("file.patterns","*.sql").split(","))
+            .map(String::trim).collect(Collectors.toSet());
 
     final TemplateEngineCustomizer customizer = Optional.ofNullable(properties.getProperty("customizer"))
         .map(String::trim).map(v -> {
@@ -135,14 +158,19 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
           }
         }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.DEFAULT);
 
+    MyBatisDialect dialect = new MyBatisDialect();
+    dialect.setLikeEscapeChar(likeEscapeChar);
+    dialect.setLikeEscapeClauseFormat(likeEscapeClauseFormat);
+    dialect.setLikeAdditionalEscapeTargetChars(likeAdditionalEscapeTargetChars);
+
     ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();
     classLoaderTemplateResolver.setOrder(1);
     classLoaderTemplateResolver.setTemplateMode(mode);
-    classLoaderTemplateResolver.setResolvablePatterns(patterns);
+    classLoaderTemplateResolver.setResolvablePatterns(filePatterns);
     classLoaderTemplateResolver.setCharacterEncoding(characterEncoding);
     classLoaderTemplateResolver.setCacheable(cacheEnabled);
     classLoaderTemplateResolver.setCacheTTLMs(cacheTtl);
-    classLoaderTemplateResolver.setPrefix(baseDir);
+    classLoaderTemplateResolver.setPrefix(fileBaseDir);
 
     StringTemplateResolver stringTemplateResolver = new StringTemplateResolver();
     stringTemplateResolver.setOrder(2);
@@ -151,7 +179,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     TemplateEngine templateEngine = new TemplateEngine();
     templateEngine.addTemplateResolver(classLoaderTemplateResolver);
     templateEngine.addTemplateResolver(stringTemplateResolver);
-    templateEngine.addDialect(new MyBatisDialect());
+    templateEngine.addDialect(dialect);
 
     customizer.accept(templateEngine);
     return templateEngine;

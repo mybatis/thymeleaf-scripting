@@ -36,9 +36,7 @@ import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import java.io.Reader;
 import java.sql.Connection;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class AnnotationDrivenMapperTest {
   private static SqlSessionFactory sqlSessionFactory;
@@ -76,7 +74,7 @@ class AnnotationDrivenMapperTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       NameMapper mapper = sqlSession.getMapper(NameMapper.class);
       List<Name> names = mapper.getAllNames();
-      Assertions.assertEquals(5, names.size());
+      Assertions.assertEquals(7, names.size());
     }
   }
 
@@ -223,6 +221,47 @@ class AnnotationDrivenMapperTest {
       param.setLastName("Rub");
       List<Name> names = mapper.findByName(param);
       Assertions.assertEquals(2, names.size());
+    }
+  }
+
+  @Test
+  void testEscapeLikeWildcard() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      NameParam param = new NameParam();
+      param.setFirstName("Be%");
+      List<Name> names = mapper.findByName(param);
+      Assertions.assertEquals(1, names.size());
+      Assertions.assertEquals(names.get(0).getId(), 6);
+      Assertions.assertEquals(names.get(0).getFirstName(), "Be%ty");
+      Assertions.assertEquals(names.get(0).getLastName(), "Ab_le");
+    }
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      NameParam param = new NameParam();
+      param.setLastName("Ab_");
+      List<Name> names = mapper.findByName(param);
+      Assertions.assertEquals(1, names.size());
+      Assertions.assertEquals(names.get(0).getId(), 6);
+      Assertions.assertEquals(names.get(0).getFirstName(), "Be%ty");
+      Assertions.assertEquals(names.get(0).getLastName(), "Ab_le");
+    }
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      NameParam param = new NameParam();
+      param.setFirstName("Be\\");
+      List<Name> names = mapper.findByName(param);
+      Assertions.assertEquals(1, names.size());
+      Assertions.assertEquals(names.get(0).getId(), 7);
+      Assertions.assertEquals(names.get(0).getFirstName(), "Be\\ty");
+      Assertions.assertEquals(names.get(0).getLastName(), "Abble");
+    }
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      NameParam param = new NameParam();
+      param.setFirstName("");
+      List<Name> names = mapper.findByName(param);
+      Assertions.assertEquals(7, names.size());
     }
   }
 

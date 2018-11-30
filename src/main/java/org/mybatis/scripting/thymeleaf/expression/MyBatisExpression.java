@@ -17,6 +17,10 @@ package org.mybatis.scripting.thymeleaf.expression;
 
 import org.thymeleaf.engine.IterationStatusVar;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+
 /**
  * The expression utility object that provide helper method for generating SQL.
  * <br>
@@ -26,6 +30,19 @@ import org.thymeleaf.engine.IterationStatusVar;
  * @version 1.0.0
  */
 public class MyBatisExpression {
+
+  private char escapeChar = '\\';
+
+  private Set<Character> additionalEscapeTargetChars = Collections.emptySet();
+
+  private String escapeClauseFormat = " ESCAPE '%s' ";
+
+  /**
+   * Construct new instance that corresponds with specified configuration.
+   */
+  private MyBatisExpression() {
+    // NOP
+  }
 
   /**
    * Return the comma if a current iteration status is not first.
@@ -45,6 +62,104 @@ public class MyBatisExpression {
    */
   public String commaIfNotLast(IterationStatusVar iterationStatus) {
     return iterationStatus.isLast() ? "" : ",";
+  }
+
+  /**
+   * Escape for LIKE condition value.
+   * <br>
+   * By default configuration, this method escape the {@code "%"} and {@code "_"} using {@code "\"}.
+   * @param value A target condition value
+   * @return A escaped value
+   */
+  public String escapeLikeWildcard(String value) {
+    if (value == null || value.isEmpty()) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder(value.length() + 16);
+    for (char c : value.toCharArray()) {
+      if (c == escapeChar) {
+        sb.append(escapeChar);
+      } else if (c == '%' || c == '_') {
+        sb.append(escapeChar);
+      } else if (!additionalEscapeTargetChars.isEmpty() && additionalEscapeTargetChars.contains(c)) {
+        sb.append(escapeChar);
+      }
+      sb.append(c);
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Return a escape clause string of LIKE.
+   * <br>
+   * By default configuration, this method return {@code " ESCAPE '\' "}.
+   * @return A escape clause string of LIKE
+   */
+  public String likeEscapeClause() {
+    return String.format(escapeClauseFormat, escapeChar);
+  }
+
+  /**
+   * Creates a new builder instance for {@link MyBatisExpression}.
+   * @return a new builder instance
+   */
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+
+  /**
+   * The builder class for {@link MyBatisExpression}.
+   */
+  public static class Builder {
+
+    private final MyBatisExpression expression = new MyBatisExpression();
+
+    /**
+     * Set an escape character for wildcard of LIKE.
+     * <br>
+     * The default value is {@code '\'} (backslash)
+     * @param escapeChar A escape character
+     * @return A self instance
+     */
+    public Builder likeEscapeChar(Character escapeChar) {
+      Optional.ofNullable(escapeChar).ifPresent(v -> expression.escapeChar = v);
+      return this;
+    }
+
+    /**
+     * Set additional escape target characters(custom wildcard characters) for LIKE condition.
+     * <br>
+     * The default value is nothing.
+     *
+     * @param additionalEscapeTargetChars escape target characters(custom wildcard characters)
+     * @return A self instance
+     */
+    public Builder likeAdditionalEscapeTargetChars(Set<Character> additionalEscapeTargetChars) {
+      Optional.ofNullable(additionalEscapeTargetChars).ifPresent(v -> expression.additionalEscapeTargetChars = v);
+      return this;
+    }
+
+    /**
+     * Set a format of escape clause.
+     * <br>
+     * The default value is {@code " ESCAPE '%s' "}.
+     *
+     * @param escapeClauseFormat a format of escape clause
+     * @return A self instance
+     */
+    public Builder likeEscapeClauseFormat(String escapeClauseFormat) {
+      Optional.ofNullable(escapeClauseFormat).ifPresent(v -> expression.escapeClauseFormat = v);
+      return this;
+    }
+
+    /**
+     * Return a {@link MyBatisExpression} instance .
+     * @return A {@link MyBatisExpression} instance corresponding with specified option
+     */
+    public MyBatisExpression build() {
+      return expression;
+    }
+
   }
 
 }
