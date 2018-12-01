@@ -648,6 +648,40 @@ SELECT * FROM names
 
 <1> Insert a fragment SQL template file
 
+=== About special variables
+
+The mybatis and mybatis-thymeleaf provides special variables that prefixed with `_` as follows:
+
+[cols="2,7,1",options="header"]
+.Special variables
+|===
+^|Variable Name
+^|Description
+^|Type
+
+|`_parameter`
+|The parameter object that passed to the MyBatis
+|Any type
+
+|`_databaseId`
+|The id for identifying the database
+(If you want to this variable, you should be enabled the link:{mybatis-doc-url}/configuration.html#databaseIdProvider[`DatabaseIdProvider` feature^] on MyBatis)
+|`String`
+
+|`_customBindVariables`
+a|The custom bind variables that registered using <<mybatis-bind>>
+
+[CAUTION]
+====
+This variable used by internal processing on the mybatis-thymeleaf.
+Therefore, we *don't recommend* using this variable within the your application.
+====
+
+|`Map<String, Object>`
+|===
+
+
+
 == Cautions for usage
 
 [CAUTION]
@@ -737,12 +771,13 @@ By default, you can use it using `mybatis` dialect prefix.
 [cols="2,4,4",options="header"]
 .Supported method list
 |===
-^|Attribute Name
+^|Attribute Tag Name
 ^|Description
 ^|Attribute Value Format
 
 |<<mybatis-bind>>
-|Register an any value to the MyBatis's bind variables.
+|Register an any value to the MyBatis's bind variables
+(Provides a feature similar to that of the link:{mybatis-doc-url}/dynamic-sql.html#bind[`<bind>`^] provided by MyBatis core module)
 a|{variable name}={variable value}(,...) +
  +
  Valid format is same with `th:with` provided by Thymeleaf.
