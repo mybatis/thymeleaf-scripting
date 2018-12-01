@@ -47,7 +47,8 @@ import java.util.List;
 class ThymeleafLanguageDriverTest {
 
   private static SqlSessionFactory sqlSessionFactory;
-  private String currentConfig;
+  private String currentConfigFile;
+  private String currentConfigEncoding;
 
   @BeforeAll
   static void setUp() throws Exception {
@@ -80,15 +81,21 @@ class ThymeleafLanguageDriverTest {
 
   @BeforeEach
   void saveCurrentConfig() {
-    currentConfig = System.getProperty("mybatis-thymeleaf.config");
+    currentConfigFile = System.getProperty("mybatis-thymeleaf.config");
+    currentConfigEncoding = System.getProperty("mybatis-thymeleaf.config.encoding");
   }
 
   @AfterEach
   void restoreConfig() {
-    if (currentConfig == null) {
-      System.clearProperty("mybatis-thymeleaf.config");
+    if (currentConfigFile == null) {
+      System.clearProperty("mybatis-thymeleaf.config.file");
     } else {
-      System.setProperty("mybatis-thymeleaf.config", currentConfig);
+      System.setProperty("mybatis-thymeleaf.config.file", currentConfigFile);
+    }
+    if (currentConfigEncoding == null) {
+      System.clearProperty("mybatis-thymeleaf.config.encoding");
+    } else {
+      System.setProperty("mybatis-thymeleaf.config.encoding", currentConfigEncoding);
     }
   }
 
@@ -128,7 +135,7 @@ class ThymeleafLanguageDriverTest {
 
   @Test
   void testCustomWithCustomConfigFile() {
-    System.setProperty("mybatis-thymeleaf.config", "mybatis-thymeleaf-custom.properties");
+    System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-custom.properties");
     Configuration configuration = new Configuration();
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
@@ -163,7 +170,7 @@ class ThymeleafLanguageDriverTest {
 
   @Test
   void testCustomizerNotFound() {
-    System.setProperty("mybatis-thymeleaf.config", "mybatis-thymeleaf-customizer-not-found.properties");
+    System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-customizer-not-found.properties");
     Configuration configuration = new Configuration();
     try {
       configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
@@ -176,7 +183,7 @@ class ThymeleafLanguageDriverTest {
 
   @Test
   void testCustomizerNotCreation() {
-    System.setProperty("mybatis-thymeleaf.config", "mybatis-thymeleaf-customizer-no-default-constructor.properties");
+    System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-customizer-no-default-constructor.properties");
     Configuration configuration = new Configuration();
     try {
       configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);

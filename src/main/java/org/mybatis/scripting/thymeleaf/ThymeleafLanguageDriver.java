@@ -48,7 +48,7 @@ import java.util.stream.Stream;
  * <br>
  * If you want to customize a default {@code TemplateEngine},
  * you can configure some property using mybatis-thymeleaf.properties.
- * Also, you can change the properties file that will read using system property(-Dmybatis-thymeleaf.config=...).
+ * Also, you can change the properties file that will read using system property(-Dmybatis-thymeleaf.config.file=...).
  * <br>
  * Supported properties are as follows:
  * <ul>
@@ -101,7 +101,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
 
   private ITemplateEngine createDefaultTemplateEngine() {
     try (InputStream in = Resources.getResourceAsStream(
-        System.getProperty("mybatis-thymeleaf.config", "mybatis-thymeleaf.properties"))) {
+        System.getProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf.properties"))) {
       if (in != null) {
         String encoding = System.getProperty("mybatis-thymeleaf.config.encoding", StandardCharsets.UTF_8.name());
         try (InputStreamReader inReader = new InputStreamReader(in, encoding);

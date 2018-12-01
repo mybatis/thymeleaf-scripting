@@ -343,11 +343,11 @@ About supported properties, please see the <<Configuration properties>>.
 
 You can use an any properties file instead of the default properties file.
 If you use an any properties file, please specify a properties file using
-the special system properties(`mybatis-thymeleaf.config`) as follow:
+the special system properties(`mybatis-thymeleaf.config.file`) as follow:
 
 [source,text]
 ----
-$ java -Dmybatis-thymeleaf.config=mybatis-thymeleaf_production.properties ...
+$ java -Dmybatis-thymeleaf.config.file=mybatis-thymeleaf_production.properties ...
 ----
 
 ===== Using an any file encoding
