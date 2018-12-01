@@ -24,10 +24,13 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.InvalidNameParam;
 
 import java.io.Reader;
 import java.sql.Connection;
+import java.util.List;
+import java.util.Properties;
 
 class ThymeleafSqlSourceTest {
 
@@ -39,6 +42,7 @@ class ThymeleafSqlSourceTest {
     try (Reader reader = Resources.getResourceAsReader("mapper-config.xml")) {
       sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
     }
+    sqlSessionFactory.getConfiguration().setVariables(new Properties());
 
     try (Connection conn = sqlSessionFactory.getConfiguration().getEnvironment().getDataSource().getConnection()) {
       try (Reader reader = Resources.getResourceAsReader("create-db.sql")) {
@@ -60,6 +64,21 @@ class ThymeleafSqlSourceTest {
       } catch (PersistenceException e) {
         Assertions.assertEquals("Cannot get a value for property named 'id' in 'class org.mybatis.scripting.thymeleaf.integrationtest.mapper.InvalidNameParam'", e.getCause().getCause().getMessage());
       }
+    }
+  }
+
+  @Test
+  void testConfigurationProperties() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      sqlSessionFactory.getConfiguration().getVariables().setProperty("tableNameOfNames", "names2");
+      List<Name> list = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findAllFormSpecifiedTable");
+      Assertions.assertEquals(1, list.size());
+    } finally {
+      sqlSessionFactory.getConfiguration().getVariables().remove("tableNameOfNames");
+    }
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      List<Name> list = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findAllFormSpecifiedTable");
+      Assertions.assertEquals(7, list.size());
     }
   }
 

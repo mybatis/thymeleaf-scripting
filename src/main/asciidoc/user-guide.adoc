@@ -712,7 +712,50 @@ Therefore, we *don't recommend* using this variable within the your application.
 |`Map<String, Object>`
 |===
 
+=== Using configuration properties
 
+You can access the configuration properties of MyBatis from your SQL template.
+About configuration properties, please see the link:{mybatis-doc-url}/configuration.html#properties[MyBatis reference documentation^].
+
+[source,java]
+.Java based configuration
+----
+Configuration configuration = new Configuration();
+Properties variables = new Properties();
+variables.setProperty("tableNameOfUser", "accounts"); // <1>
+configuration.setVariables(variables);
+----
+
+[source,xml]
+.XML based configuration (mybatis-config.xml)
+----
+<properties>
+  <property name="tableNameOfUser" value="accounts"/> <!--1-->
+</properties>
+----
+
+[source,sql]
+.SQL template
+----
+SELECT * FROM /*[(${tableNameOfUser} ?: 'users')]*/ users -- <2>
+----
+
+<1> Define an any property as MyBatis's configuration properties
+<2> Access a configuration property using Thymeleaf's expression
+
+Above SQL template translate to as follows:
+
+[source,sql]
+.Translated SQL (when `tableNameOfUser` is defined)
+----
+SELECT * FROM accounts
+----
+
+[source,sql]
+.Translated SQL (when `tableNameOfUser` is not defined)
+----
+SELECT * FROM users
+----
 
 == Cautions for usage
 

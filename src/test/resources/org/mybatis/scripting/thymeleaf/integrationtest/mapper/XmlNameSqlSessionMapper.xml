@@ -121,4 +121,8 @@
       SELECT * FROM names
     </select>
 
+    <select id="findAllFormSpecifiedTable" resultType="Name">
+      SELECT * FROM /*[(${tableNameOfNames} ?: 'names')]*/ foo
+    </select>
+
 </mapper>
