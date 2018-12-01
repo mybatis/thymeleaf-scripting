@@ -14,6 +14,7 @@
 :nofooter:
 :sectlinks:
 :linkcss:
+:xrefstyle: full
 
 // Define variable for urls
 :mybatis-doc-url: http://www.mybatis.org/mybatis-3
@@ -417,7 +418,7 @@ In this section, we explain standard usage of 2-way SQL.
 
 [CAUTION]
 ====
-About cautions for usage 2-way SQL, please see the "<<Cautions for usage>>" chapter.
+About cautions for usage 2-way SQL, please see the "<<Cautions for usage>>".
 ====
 
 
@@ -669,7 +670,7 @@ The mybatis and mybatis-thymeleaf provides special variables that prefixed with 
 |`String`
 
 |`_customBindVariables`
-a|The custom bind variables that registered using <<mybatis-bind>>
+a|The custom bind variables that registered using <<mybatis-bind,bind>>
 
 [CAUTION]
 ====
@@ -690,7 +691,7 @@ The Thymeleaf 3 does not provide the template mode for SQL.
 Therefore there are some cautions for usage.
 ====
 
-=== 2-way SQL format
+=== About 2-way SQL format
 
 If you use a binding value using 2-way SQL format,
 there is case that cannot translate correctly 2-way SQL when specify multiple item on one line as follow:
@@ -757,6 +758,31 @@ UPDATE names
 <1> Cannot specify the `WHERE` phrase after the 2-way SQL on same line
     (Even in this case, you can resolve it that specify the empty comment(`/**/`) before the `WHERE` phrase)
 
+====
+
+=== About using '\'(backslash)
+
+If you are using 2-way SQL format, there is case that cannot parse a 2-way SQL when specify `'\'`(backslash) within static template parts.
+We know that following case cannot be parsed 2-way sql.
+
+==== ESCAPE clause for LIKE
+
+If you specify the `ESCAPE '\'` directly as static template parts, the Thymeleaf cannot parse it.
+
+[source,sql]
+.Invalid usage
+----
+/*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
+AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /**/ ESCAPE '\'
+----
+
+<1> Specify the `ESCAPE '\'` directly as static template parts
+
+[TIP]
+====
+As a solution for avoiding this behavior,
+the mybatis-thymeleaf provide the expression utility method for adding the `ESCAPE` clause.
+For detail, please see <<likeEscapeClause>>.
 ====
 
 == Custom Dialect
@@ -826,7 +852,7 @@ By default, you can access it using `#mybatis` expression.
 ^|Arguments
 ^|Description
 
-|<<mybatis-commaIfNotFirst>>
+|<<mybatis-commaIfNotFirst,commaIfNotFirst>>
 |
 
 [cols="^1,4,5",options="header"]
@@ -842,7 +868,7 @@ By default, you can access it using `#mybatis` expression.
 
 |Return the comma if a current iteration status is not first
 
-|<<mybatis-commaIfNotLast>>
+|<<mybatis-commaIfNotLast,commaIfNotLast>>
 |
 
 [cols="^1,4,5",options="header"]
@@ -858,7 +884,7 @@ By default, you can access it using `#mybatis` expression.
 
 |Return the comma if a current iteration status is not last
 
-|<<mybatis-escapeLikeWildcard>>
+|<<mybatis-escapeLikeWildcard,escapeLikeWildcard>>
 |
 
 [cols="^1,4,5",options="header"]
@@ -875,7 +901,7 @@ By default, you can access it using `#mybatis` expression.
 |Escape a wildcard character of LIKE condition
 (By default behavior, this method escape the `"%"` and `"_"` using `"\"`)
 
-|<<mybatis-likeEscapeClause>>
+|<<mybatis-likeEscapeClause,likeEscapeClause>>
 | -
 |Return a escape clause string of LIKE condition
 ( By default behavior, this method return `" ESCAPE '\' "`)
@@ -969,7 +995,7 @@ id IN (
 /*[/]*/
 ----
 
-<1> Add `ESCAPE` clause
+<1> Add `ESCAPE` clause at template processing time
 
 [source,sql]
 .For example, above template translate to as follow:
