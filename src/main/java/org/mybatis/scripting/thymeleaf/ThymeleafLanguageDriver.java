@@ -47,13 +47,17 @@ import java.util.stream.Stream;
  * The {@code LanguageDriver} for integrating with Thymeleaf.
  * <br>
  * If you want to customize a default {@code TemplateEngine},
- * you can configure some property using mybatis-thymeleaf.properties.
- * Also, you can change the properties file that will read using system property(-Dmybatis-thymeleaf.config.file=...).
+ * you can configure some property using mybatis-thymeleaf.properties that encoded by UTF-8.
+ * Also, you can change the properties file that will read using system property
+ * (-Dmybatis-thymeleaf.config.file=... -Dmybatis-thymeleaf.config.encoding=...).
  * <br>
  * Supported properties are as follows:
  * <ul>
  *   <li>use-2way:
  *            Whether use the 2-way SQL. Default is true</li>
+ *   <li>customizer:
+ *            The implementation class for customizing a default {@code TemplateEngine}
+ *            instanced by the MyBatis Thymeleaf.</li>
  *   <li>cache.enabled:
  *            Whether use the cache feature. Default is true</li>
  *   <li>cache.ttl:
@@ -64,15 +68,12 @@ import java.util.stream.Stream;
  *            The base directory for reading template resources. Default is ''(just under class path)</li>
  *   <li>file.patterns:
  *            The patterns for reading as template resources. Default is '*.sql'</li>
- *   <li>like.escapeChar:
+ *   <li>dialect.like.escape-char:
  *            The escape character for wildcard of LIKE. Default is {@code '\'} (backslash)</li>
- *   <li>like.escapeClauseFormat:
+ *   <li>dialect.like.escape-clause-format:
  *            The format of escape clause. Default is {@code " ESCAPE '%s' "}</li>
- *   <li>like.additionalEscapeTargetChars:
+ *   <li>dialect.like.additional-escape-target-chars:
  *            The additional escape target characters(custom wildcard characters) for LIKE condition. Default is nothing</li>
- *   <li>customizer:
- *            The implementation class for customizing a default {@code TemplateEngine}
- *            instanced by the MyBatis Thymeleaf.</li>
  * </ul>
  * @author Kazuki Shimizu
  * @version 1.0.0
@@ -128,15 +129,16 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     String fileBaseDir = Optional.ofNullable(properties.getProperty("file.base-dir"))
         .map(String::trim).orElse("");
 
-    Character likeEscapeChar = Optional.ofNullable(properties.getProperty("like.escapeChar"))
+    Character likeEscapeChar = Optional.ofNullable(properties.getProperty("dialect.like.escape-char"))
         .map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0)).orElse(null);
 
-    String likeEscapeClauseFormat = Optional.ofNullable(properties.getProperty("like.escapeClauseFormat"))
+    String likeEscapeClauseFormat = Optional.ofNullable(properties.getProperty("dialect.like.escape-clause-format"))
         .map(String::trim).orElse(null);
 
     Set<Character> likeAdditionalEscapeTargetChars =
-        Stream.of(properties.getProperty("like.additionalEscapeTargetChars","").split(","))
-            .map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0)).collect(Collectors.toSet());
+        Stream.of(properties.getProperty("dialect.like.additional-escape-target-chars", "")
+            .split(",")).map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0))
+            .collect(Collectors.toSet());
 
     Set<String> filePatterns =
         Stream.of(properties.getProperty("file.patterns","*.sql").split(","))

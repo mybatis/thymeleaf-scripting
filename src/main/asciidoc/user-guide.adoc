@@ -18,6 +18,7 @@
 
 // Define variable for urls
 :mybatis-doc-url: http://www.mybatis.org/mybatis-3
+:travis-ci-url: https://travis-ci.org/mybatis/thymeleaf-scripting
 :mybatis-spring-boot-doc-url: http://www.mybatis.org/spring-boot-starter
 :thymeleaf-doc-url: https://www.thymeleaf.org/doc/tutorials/3.0
 :github-organization-url: https://github.com/mybatis
@@ -26,32 +27,24 @@
 
 === What is MyBatis Thymeleaf ?
 
-The mybatis-thymeleaf is a plugin that helps applying a 2-way SQL to the MyBatis 3
-using natural template provided by Thymeleaf 3.
-
-If you are not familiar with MyBatis, you can see the MyBatis documentations.
+The mybatis-thymeleaf is a plugin that helps applying a 2-way SQL feature to the MyBatis 3
+using the natural template mechanism provided by Thymeleaf 3.
+If you are not familiar with MyBatis and Thymeleaf, you can see following official documentations.
 
 * {mybatis-doc-url}[MyBatis 3 REFERENCE DOCUMENTATION^]
-
-If you are not familiar with Thymeleaf 3 syntax, you can see the Thymeleaf documentations.
-
 * {thymeleaf-doc-url}/usingthymeleaf.html[Tutorial: Using Thymeleaf^]
 * {thymeleaf-doc-url}/usingthymeleaf.html#textual-template-modes[Tutorial: Using Thymeleaf -13 Textual template modes-^]
 
-=== Mainly Features
+=== What is 2-way SQL ?
 
-The mybatis-thymeleaf provide class that implements the `LanguageDriver` interface for generating a SQL
-using template engine provide by Thymeleaf.
+The 2-way SQL can be used by following *two way*.
 
-* Can write a 2-way SQL
-* Can specify a 2-way SQL on an annotation and mapper xml
-* Can read a 2-way SQL from a template file on classpath
-* Can use a custom dialect(attribute tag and expression utility object) at a template
-* Can fully customize a template engine configuration
+* It can be executed as-is in SQL execution tool (such as psql, mysql, sqlplus, plugins for IDE, etc...)
+* It can be used as a sql template for creating a bindable and dynamically SQL on your application
 
-=== Using simple SQL
+==== Simple bindable 2-way SQL
 
-The mybatis-thymeleaf translate a simple sql that specified by natural template to as follow:
+The mybatis-thymeleaf translate a simple bindable 2-way SQL that specified by natural template to as follow:
 
 [source,sql]
 .Natural template
@@ -67,9 +60,9 @@ SELECT * FROM names
   WHERE id = #{id}
 ----
 
-=== Using dynamic SQL
+==== Dynamically bindable 2-way SQL
 
-The mybatis-thymeleaf translate a dynamic sql that specified by natural template to as follow:
+The mybatis-thymeleaf translate a dynamically bindable 2-way SQL that specified by natural template to as follow:
 
 [source,sql]
 .Natural template
@@ -87,20 +80,16 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-If `ids` is empty, it translate to as follow:
-
 [source,sql]
-.Translated sql for processing in MyBatis
+.Translated sql for processing in MyBatis (when `ids` is empty)
 ----
 SELECT * FROM names
   WHERE 1 = 1
   ORDER BY id
 ----
 
-If `ids` has 3 elements, it translate to as follow:
-
 [source,sql]
-.Translated sql for processing in MyBatis
+.Translated sql for processing in MyBatis (when `ids` has 3 elements)
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -114,13 +103,55 @@ SELECT * FROM names
   ORDER BY id
 ----
 
+=== Mainly Features
+
+The mybatis-thymeleaf provide following features using class that implements
+the link:{mybatis-doc-url}/dynamic-sql.html#Pluggable_Scripting_Languages_For_Dynamic_SQL[`LanguageDriver` interface^]
+for integrating with template engine provide by Thymeleaf.
+
+* Can write a 2-way SQL
+* Can use a 2-way SQL via an annotation and mapper xml
+* Can read a 2-way SQL from a template file on classpath
+* Can use a custom dialect(attribute tag and expression utility method) at a template
+* Can fully customize a template engine configuration
+
+
 == Requirements
 
 The mybatis-thymeleaf supports using on following Java and artifacts version.
 
+=== Java
+
 * Java 8, Java 11+
+
+[NOTE]
+====
+About tested versions see the latest link:{travis-ci-url}[Travi CI^] build result.
+====
+
+=== MyBatis
+
 * MyBatis 3.4.3+
+
+[NOTE]
+====
+As basically policy, we do test using following versions.
+
+* latest release version on 3.4.x line
+* latest release version on 3.5.x line (not released yet)
+* latest snapshot version on 3.5.x line
+====
+
+=== Thymeleaf
+
 * Thymeleaf 3.0+
+
+[NOTE]
+====
+As basically policy, we do test using following versions.
+
+* latest release version on 3.0.x line
+====
 
 == Getting Started
 
@@ -251,7 +282,7 @@ Also, you can specify a 2-way SQL on template file(e.g. `/NameMapper/findById.sq
 Name findById(@Param("id") Integer id);
 ----
 
-By default setting, the mybatis-thymeleaf read a specified template file from just under classpath.
+By default behavior, the mybatis-thymeleaf read a specified template file from just under classpath.
 
 [[_getting-started-template-sql]]
 [source,sql]
@@ -418,7 +449,7 @@ In this section, we explain standard usage of 2-way SQL.
 
 [CAUTION]
 ====
-About cautions for usage 2-way SQL, please see the "<<Cautions for usage>>".
+About cautions for usage 2-way SQL, please see the <<Cautions for usage>>.
 ====
 
 
@@ -467,7 +498,7 @@ and iterating evaluation feature. By using this feature, you can write a dynamic
 
 ==== Using tag for specifying condition
 
-If you add a SQL part when any condition is matches or not, you can use following tags.
+If you add a SQL part when any condition is matches or not, you can use following attribute tags.
 
 * `th:if`
 * `th:unless` (denial version for `th:if`)
@@ -475,7 +506,7 @@ If you add a SQL part when any condition is matches or not, you can use followin
 * `th:case`
 
 [source,sql]
-.Usage of conditional tag on WHERE
+.Usage of conditional attribute tag on WHERE
 ----
 SELECT * FROM names
   WHERE 1 = 1 -- <1>
@@ -486,7 +517,7 @@ SELECT * FROM names
 ----
 
 [source,sql]
-.Usage of conditional tag on SET
+.Usage of conditional attribute tag on SET
 ----
 UPDATE names
   SET id = id -- <5>
@@ -556,7 +587,7 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-<1> Use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method (For details, please see <<Using expression utility object>>)
+<1> Use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method (For details, please see <<Using expression utility method>>)
 
 
 === Using fragment
@@ -607,8 +638,8 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-Probably looking at above SQLs many developers will look for a way to share the `WHERE` phrase.
-In such case, you can share any SQL phrase by multiple SQL using fragment feature.
+Probably looking at above SQLs many developers will look for a way to share the `WHERE` clause.
+In such case, you can share any SQL part by multiple SQL using fragment feature.
 
 ==== Creating a fragment SQL
 
@@ -728,7 +759,7 @@ SELECT * FROM names
 
 [NOTE]
 ====
-We known that threre is no problem using on `VALUES` and `SET` phrase as follows:
+We known that threre is no problem using on `VALUES` and `SET` clause as follows:
 
 [source,sql]
 .Valid format on VALUES
@@ -755,8 +786,8 @@ UPDATE names
      ,lastName = /*[('#{lastName}')]*/ 'Yamada' WHERE id = /*[('#{id}')]*/ 1 -- <1>
 ----
 
-<1> Cannot specify the `WHERE` phrase after the 2-way SQL on same line
-    (Even in this case, you can resolve it that specify the empty comment(`/**/`) before the `WHERE` phrase)
+<1> Cannot specify the `WHERE` clause after the 2-way SQL on same line
+    (Even in this case, you can resolve it that specify the empty comment(`/**/`) before the `WHERE` clause)
 
 ====
 
@@ -801,7 +832,7 @@ By default, you can use it using `mybatis` dialect prefix.
 ^|Description
 ^|Attribute Value Format
 
-|<<mybatis-bind>>
+|<<mybatis-bind,bind>>
 |Register an any value to the MyBatis's bind variables
 (Provides a feature similar to that of the link:{mybatis-doc-url}/dynamic-sql.html#bind[`<bind>`^] provided by MyBatis core module)
 a|{variable name}={variable value}(,...) +
@@ -838,10 +869,10 @@ SELECT * FROM names
 *Why need the bind tag?*
 
 The binding feature provide by MyBatis cannot access a variable that shared by the `th:with`
-because it can only access within a template. Hence, the mybatis-thymeleaf provide the `bind` tag.
+because it can only access within a template. Hence, the mybatis-thymeleaf provide the `bind` attribute tag.
 ====
 
-=== Using expression utility object
+=== Using expression utility method
 
 By default, you can access it using `#mybatis` expression.
 
@@ -898,14 +929,21 @@ By default, you can access it using `#mybatis` expression.
 !A target value
 !===
 
-|Escape a wildcard character of LIKE condition
-(By default behavior, this method escape the `"%"` and `"_"` using `"\"`)
+|Return a value that escaped a wildcard character of LIKE condition
+(By default behavior, this method escape the `"%"`, `"_"` and `"\"`(escape character itself) using `"\"`)
 
 |<<mybatis-likeEscapeClause,likeEscapeClause>>
 | -
 |Return a escape clause string of LIKE condition
 ( By default behavior, this method return `" ESCAPE '\' "`)
 |===
+
+[TIP]
+====
+You can customize the default behavior for the `escapeLikeWildcard` and `likeEscapeClause`
+using <<Configuration properties, Configuration properties>>.
+====
+
 
 [[mybatis-commaIfNotFirst]]
 ==== commaIfNotFirst
@@ -1057,18 +1095,28 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
 
 The mybatis-thymeleaf provides following properties for customizing configurations.
 
-[cols="2,5,^1,2",options="header"]
-.Supported properties list
+[cols="1,6,^1,2",options="header"]
+.Supported property list
 |===
 ^|Property Key
 ^|Description
 ^|Type
 ^|Default value
 
+4+|*General configuration*
+
 |`use-2way`
 |Whether use the 2-way SQL feature
 |`Boolean`
 |`true` (enable the 2-way SQL feature)
+
+|`customizer`
+|The FQCN of class that implements the `TemplateEngineCustomizer`
+(interface for customizing a default TemplateEngine instanced by the mybatis-thymeleaf)
+|`Class`
+|`null` (This instance is do-nothing)
+
+4+|*Template cache configuration*
 
 |`cache.enabled`
 |Whether use the cache feature when load template resource file
@@ -1079,6 +1127,8 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |The cache TTL(millisecond) for resolved templates
 |`Long`
 |`null` (no TTL)
+
+4+|*Template file configuration*
 
 |`file.character-encoding`
 |The character encoding for reading template resource file
@@ -1096,41 +1146,37 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`String`
 |`"*.sql"`
 
-|`like.escapeChar`
+4+|*Dialect configuration*
+
+|`dialect.like.escape-char`
 |The escape character for wildcard of LIKE condition
 |`Character`
 |`'\'` (backslash)
 
-|`like.escapeClauseFormat`
+|`dialect.like.escape-clause-format`
 |The format of escape clause for LIKE condition
 (Can specify format that can be allowed by `String#format` method)
 |`String`
 |`" ESCAPE '%s' "`
 
-|`like.additionalEscapeTargetChars`
+|`dialect.like.additional-escape-target-chars`
 |Additional escape target characters(custom wildcard characters) for LIKE condition
 (Can specify multiple characters using comma(`","`) as separator character)
 |`String`
 |`""` (no specify)
-
-|`customizer`
-|The FQCN of class that implements the `TemplateEngineCustomizer`
-(interface for customizing a default TemplateEngine instanced by the mybatis-thymeleaf)
-|`String`
-|`TemplateEngineCustomizer#DEFAULT` instance (This instance is do-nothing)
 |===
 
 [source,properties]
 .src/main/resources/mybatis-thymeleaf.properties
 ----
 use-2way = true
+customizer = com.example.MyTemplateEngineCustomizer
 cache.enabled = true
 cache.ttl = 3600000
 file.character-encoding = UTF-8
 file.base-dir = /templates/sqls
 file.patterns = *sql, *.sql.template
-like.escapeChar = ~
-like.escapeClauseFormat = escape '%s'
-like.additionalEscapeTargetChars = ％, ＿
-customizer = com.example.MyTemplateEngineCustomizer
+dialect.like.escape-char = ~
+dialect.like.escape-clause-format = escape '%s'
+dialect.like.additional-escape-target-chars = ％, ＿
 ----
