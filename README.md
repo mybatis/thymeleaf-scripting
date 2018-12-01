@@ -15,10 +15,7 @@ MyBatis Thymeleaf 3 Scripting Support.
 The mybatis-thymeleaf is a plugin that helps applying a 2-way SQL using natural template provided by Thymeleaf 3.
 If you are not familiar with Thymeleaf 3 syntax, you can see the Thymeleaf documentations.
 
-* [Tutorial: Using Thymeleaf](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
-* [Tutorial: Using Thymeleaf -13 Textual template modes-](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#textual-template-modes)
-
-### Simple SQL
+### Simple bindable 2-way SQL
 
 ```sql
 SELECT * FROM names
@@ -32,7 +29,7 @@ SELECT * FROM names
   WHERE id = #{id}
 ```
 
-### Dynamic SQL
+### Dynamic bindable 2-way SQL
 
 ```sql
 SELECT * FROM names
@@ -74,60 +71,6 @@ SELECT * FROM names
   * Java 8, Java 11+
   * MyBatis 3.4.3+
   * Thymeleaf 3.0+
-
-
-## Installation
-
-### Maven
-
-If you are using the Maven as build tool, you can add as follow:
-
-```xml
-<dependency>
-  <groupId>org.mybatis</groupId>
-  <artifactId>mybatis</artifactId>
-  <version>3.4.6</version> <!-- Adjust to your application -->
-</dependency>
-<dependency>
-  <groupId>org.mybatis.scripting</groupId>
-  <artifactId>mybatis-thymeleaf</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-</dependency>
-```
-
-If you use a snapshot version, you need add the configuration for using the "Sonatype OSS Snapshots Repository" as follow:
-
-```xml
-<repositories>
-  <!-- ... -->
-  <repository>
-    <id>sonatype-oss-snapshots</id>
-    <name>Sonatype OSS Snapshots Repository</name>
-    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-  </repository>
-</repositories>
-```
-
-### Gradle
-
-If you are using the Gradle as build tool, you can add as follow:
-
-```groovy
-dependencies {
-  // ...
-  compile("org.mybatis:mybatis:3.4.6") // Adjust version to your application
-  compile("org.mybatis.scripting:mybatis-thymeleaf:1.0.0-SNAPSHOT")
-}
-```
-
-If you use a snapshot version, you need add the configuration for using the "Sonatype OSS Snapshots Repository" as follow:
-
-```groovy
-repositories {
-  // ...
-  maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-```
 
 ## Documentation
 
