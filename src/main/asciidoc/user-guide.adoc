@@ -453,7 +453,7 @@ About cautions for usage 2-way SQL, please see the <<Cautions for usage>>.
 ====
 
 
-=== Using binding value
+=== Binding value
 
 The mybatis-thymeleaf use the default binding feature provided by MyBatis core module.
 
@@ -485,10 +485,10 @@ SELECT * FROM names
 
 Basically, you can bind a parameter object(Mapper method arguments or `SqlSession` method arguments).
 In addition, the mybatis-thymeleaf allow to be bind a registered value using `mybatis:bind` tag.
-About usage of `mybatis:bind`, please see <<Using attribute tag>>.
+About usage of `mybatis:bind`, please see <<Attribute tag>>.
 ====
 
-=== Using dynamic SQL
+=== Dynamic SQL
 
 The Thymeleaf supports to create an any string dynamically using conditional evaluation
 and iterating evaluation feature. By using this feature, you can write a dynamic 2-way SQL.
@@ -587,10 +587,10 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-<1> Use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method (For details, please see <<Using expression utility method>>)
+<1> Use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method (For details, please see <<Expression utility method>>)
 
 
-=== Using fragment
+=== Fragment
 
 The Thymeleaf supports to insert template string from an another template file.
 By using this feature, you can share a 2-way SQL on multiple SQL template.
@@ -680,7 +680,7 @@ SELECT * FROM names
 
 <1> Insert a fragment SQL template file
 
-=== About special variables
+=== Special variables
 
 The mybatis and mybatis-thymeleaf provides special variables that prefixed with `_` as follows:
 
@@ -722,7 +722,7 @@ The Thymeleaf 3 does not provide the template mode for SQL.
 Therefore there are some cautions for usage.
 ====
 
-=== About 2-way SQL format
+=== 2-way SQL format
 
 If you use a binding value using 2-way SQL format,
 there is case that cannot translate correctly 2-way SQL when specify multiple item on one line as follow:
@@ -791,7 +791,7 @@ UPDATE names
 
 ====
 
-=== About using '\'(backslash)
+=== Using '\'(backslash)
 
 If you are using 2-way SQL format, there is case that cannot parse a 2-way SQL when specify `'\'`(backslash) within static template parts.
 We know that following case cannot be parsed 2-way sql.
@@ -821,7 +821,7 @@ For detail, please see <<likeEscapeClause>>.
 The mybatis-thymeleaf provide the custom dialect class(`org.mybatis.scripting.thymeleaf.MyBatisDialect`)
 that help for generating SQL.
 
-=== Using attribute tag
+=== Attribute tag
 
 By default, you can use it using `mybatis` dialect prefix.
 
@@ -872,7 +872,7 @@ The binding feature provide by MyBatis cannot access a variable that shared by t
 because it can only access within a template. Hence, the mybatis-thymeleaf provide the `bind` attribute tag.
 ====
 
-=== Using expression utility method
+=== Expression utility method
 
 By default, you can access it using `#mybatis` expression.
 
@@ -933,7 +933,7 @@ By default, you can access it using `#mybatis` expression.
 (By default behavior, this method escape the `"%"`, `"_"` and `"\"`(escape character itself) using `"\"`)
 
 |<<mybatis-likeEscapeClause,likeEscapeClause>>
-| -
+| N/A
 |Return a escape clause string of LIKE condition
 ( By default behavior, this method return `" ESCAPE '\' "`)
 |===
