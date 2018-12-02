@@ -17,11 +17,6 @@
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${not #lists.isEmpty(ids)}"]*/
-    AND id in (
-    /*[# th:each="id : ${ids}"]*/
-      /*[+ [# th:if="${not idStat.first}"][(',')][/] +]*/
-      /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
-    /*[/]*/
-    )
+    AND id IN (/*[(${#mybatis.inClauseVariables('ids', ids.size())})]*/ 1)
   /*[/]*/
   ORDER BY id

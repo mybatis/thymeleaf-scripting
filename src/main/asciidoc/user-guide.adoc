@@ -40,7 +40,7 @@ If you are not familiar with MyBatis and Thymeleaf, you can see following offici
 The 2-way SQL can be used by following *two way*.
 
 * It can be executed as-is in SQL execution tool (such as psql, mysql, sqlplus, plugins for IDE, etc...)
-* It can be used as a sql template for creating a bindable and dynamically SQL on your application
+* It can be used as a SQL template for creating a bindable and dynamically SQL on your application
 
 ==== Simple bindable 2-way SQL
 
@@ -54,7 +54,7 @@ SELECT * FROM names
 ----
 
 [source,sql]
-.Translated sql for processing in MyBatis
+.Translated SQL for processing in MyBatis
 ----
 SELECT * FROM names
   WHERE id = #{id}
@@ -81,7 +81,7 @@ SELECT * FROM names
 ----
 
 [source,sql]
-.Translated sql for processing in MyBatis (when `ids` is empty)
+.Translated SQL for processing in MyBatis (when `ids` is empty)
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -89,7 +89,7 @@ SELECT * FROM names
 ----
 
 [source,sql]
-.Translated sql for processing in MyBatis (when `ids` has 3 elements)
+.Translated SQL for processing in MyBatis (when `ids` has 3 elements)
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -569,10 +569,10 @@ SELECT * FROM names
 <4> Specify an end tag of iteration
 
 Also, you can use the custom expression utility method provided by the mybatis-thymeleaf
-instead of standard dialect for appending the comma.
+instead of standard dialect. For details, please see <<Expression utility method>>.
 
 [source,sql]
-.Usage of custom expression utility method provided by the mybatis-thymeleaf
+.Use the custom expression utility method for appending comma
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -587,7 +587,19 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-<1> Use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method (For details, please see <<Expression utility method>>)
+[source,sql]
+.Use the custom expression utility method for creating bind variables string of IN clause
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
+    AND id IN (/*[(${#mybatis.inClauseBindVariables('ids', ids.size())})]*/ 1) -- <2>
+  /*[/]*/
+  ORDER BY id
+----
+
+<1> Can use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method instead of standard dialect
+<1> Can use the `#mybatis.inClauseBindVariables(String, int)` method instead of standard dialect or above utility method
 
 
 === Fragment
@@ -798,7 +810,7 @@ SELECT * FROM names
   WHERE id = /*[('#{id}')]*/ 1 /**/ AND version = /*[('#{version}')]*/ 1 -- <1>
 ----
 
-<1> Add the empty sql comment(`/**/`) between each conditions
+<1> Add the empty SQL comment(`/**/`) between each conditions
 
 [NOTE]
 ====
@@ -837,7 +849,7 @@ UPDATE names
 === Using '\'(backslash)
 
 If you are using 2-way SQL format, there is case that cannot parse a 2-way SQL when specify `'\'`(backslash) within static template parts.
-We know that following case cannot be parsed 2-way sql.
+We know that following case cannot be parsed 2-way SQL.
 
 ==== ESCAPE clause for LIKE
 
@@ -958,6 +970,34 @@ By default, you can access it using `#mybatis` expression.
 
 |Return the comma if a current iteration status is not last
 
+|<<mybatis-inClauseBindVariables,inClauseBindVariables>>
+|
+
+[cols="^1,4,5",options="header"]
+!===
+^!No
+^!Type
+^!Description
+
+!1
+!String
+!A bind variable name for target iteration object
+
+!2
+!int
+!A element size of target iteration object
+
+!3
+!boolean
+!Whether enclose with "(" and ")"
+(If this argument is omit, it become result same with specifying `false`)
+!===
+
+a|Return a bind variables string for IN clause
+
+* If enclose is `true`, return a string like `"(#{ids[0]}, #{ids[1]})"`
+* If enclose is `false`(or omit), return a string like `"#{ids[0]}, #{ids[1]}"`
+
 |<<mybatis-escapeLikeWildcard,escapeLikeWildcard>>
 |
 
@@ -980,6 +1020,7 @@ By default, you can access it using `#mybatis` expression.
 |Return a escape clause string of LIKE condition
 ( By default behavior, this method return `" ESCAPE '\' "`)
 |===
+
 
 [TIP]
 ====
@@ -1005,7 +1046,7 @@ id IN (
 <1> Avoid adding comma at the first element
 
 [source,sql]
-.For example, above template translate to as follow:
+.Translate to:
 ----
 id IN (
 
@@ -1032,7 +1073,7 @@ id IN (
 <1> Avoid adding comma at the last element
 
 [source,sql]
-.For example, above template translate to as follow:
+.Translate to:
 ----
 id IN (
   #{ids[0]}
@@ -1040,6 +1081,26 @@ id IN (
   #{ids[1]}
 
 )
+----
+
+
+[[mybatis-inClauseBindVariables]]
+==== inClauseBindVariables
+
+[source,sql]
+.Basic usage:
+----
+/*[# th:if="${not #lists.isEmpty(ids)}"]*/
+  AND id IN (/*[(${#mybatis.inClauseBindVariables('ids', ids.size())})]*/ 1) -- <1>
+/*[/]*/
+----
+
+<1> Create bind variables string for IN clause with specifying target iteration object
+
+[source,sql]
+.Translate to:
+----
+  AND id IN (#{ids[0]}, #{ids[1]})
 ----
 
 
@@ -1058,7 +1119,7 @@ id IN (
 <1> Register a value that escaped wildcard character of LIKE condition as custom bind variables
 
 [source,sql]
-.For example, above template translate to as follow:
+.Translate to:
 ----
   AND firstName LIKE #{patternFirstName}
 ----
@@ -1079,7 +1140,7 @@ id IN (
 <1> Add `ESCAPE` clause at template processing time
 
 [source,sql]
-.For example, above template translate to as follow:
+.Translate to:
 ----
   AND firstName LIKE #{patternFirstName} ESCAPE '\'
 ----

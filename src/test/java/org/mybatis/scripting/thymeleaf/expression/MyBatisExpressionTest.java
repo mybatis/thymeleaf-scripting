@@ -35,4 +35,28 @@ class MyBatisExpressionTest {
             .build().escapeLikeWildcard("a％＿\\b"));
   }
 
+  @Test
+  void testInClauseVariablesSizeIs0() {
+    MyBatisExpression expression = MyBatisExpression.newBuilder().build();
+    Assertions.assertEquals("null", expression.inClauseVariables("ids", 0));
+    Assertions.assertEquals("(null)",
+        expression.inClauseVariables("ids", 0, true));
+  }
+
+  @Test
+  void testInClauseVariablesSizeIs1() {
+    MyBatisExpression expression = MyBatisExpression.newBuilder().build();
+    Assertions.assertEquals("#{ids[0]}", expression.inClauseVariables("ids", 1));
+    Assertions.assertEquals("(#{ids[0]})",
+        expression.inClauseVariables("ids", 1, true));
+  }
+
+  @Test
+  void testInClauseVariablesSizeIs2() {
+    MyBatisExpression expression = MyBatisExpression.newBuilder().build();
+    Assertions.assertEquals("#{ids[0]}, #{ids[1]}", expression.inClauseVariables("ids", 2));
+    Assertions.assertEquals("(#{ids[0]}, #{ids[1]})",
+        expression.inClauseVariables("ids", 2, true));
+  }
+
 }

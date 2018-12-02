@@ -65,6 +65,43 @@ public class MyBatisExpression {
   }
 
   /**
+   * Return a bind variables string for IN clause.
+   *
+   * @param variableName A variable name for target iteration object
+   * @param size A element size for target iteration object
+   * @param enclosing Whether enclose with {@code "("} and {@code ")"}
+   * @return A bind variables string for IN clause (e.g. "#{ids[0]}, #{ids[1]}" or "(#{ids[0]}, #{ids[1]})")
+   */
+  public String inClauseVariables(String variableName, int size, boolean enclosing) {
+    if (size == 0) {
+      return enclosing ? "(null)" : "null";
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < size; i++) {
+      if (i != 0) {
+        sb.append(", ");
+      }
+      sb.append("#{").append(variableName).append("[").append(i).append("]}");
+    }
+    if (enclosing) {
+      sb.insert(0, "(");
+      sb.append(")");
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Return bind variables string for IN clause without enclosing.
+   *
+   * @param variableName A target variable name
+   * @param size A target list size
+   * @return A bind variables string for IN clause (e.g. "#{ids[0]}, #{ids[1]}")
+   */
+  public String inClauseVariables(String variableName, int size) {
+    return inClauseVariables(variableName, size, false);
+  }
+
+  /**
    * Escape for LIKE condition value.
    * <br>
    * By default configuration, this method escape the {@code "%"} and {@code "_"} using {@code "\"}.
