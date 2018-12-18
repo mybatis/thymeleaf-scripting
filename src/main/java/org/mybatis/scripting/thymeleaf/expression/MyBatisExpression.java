@@ -20,6 +20,7 @@ import org.thymeleaf.engine.IterationStatusVar;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * The expression utility object that provide helper method for generating SQL.
@@ -35,7 +36,7 @@ public class MyBatisExpression {
 
   private Set<Character> additionalEscapeTargetChars = Collections.emptySet();
 
-  private String escapeClauseFormat = " ESCAPE '%s' ";
+  private Function<Character, String> escapeClauseSupplier = escapeChar -> " ESCAPE '" + escapeChar + "' ";
 
   /**
    * Construct new instance that corresponds with specified configuration.
@@ -133,7 +134,7 @@ public class MyBatisExpression {
    * @return A escape clause string of LIKE
    */
   public String likeEscapeClause() {
-    return String.format(escapeClauseFormat, escapeChar);
+    return escapeClauseSupplier.apply(escapeChar);
   }
 
   /**
@@ -185,7 +186,8 @@ public class MyBatisExpression {
      * @return A self instance
      */
     public Builder likeEscapeClauseFormat(String escapeClauseFormat) {
-      Optional.ofNullable(escapeClauseFormat).ifPresent(v -> expression.escapeClauseFormat = v);
+      Optional.ofNullable(escapeClauseFormat)
+          .ifPresent(v -> expression.escapeClauseSupplier = escapeChar -> String.format(v, escapeChar));
       return this;
     }
 
