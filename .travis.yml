@@ -4,8 +4,6 @@ jdk:
   - oraclejdk11
   - oraclejdk8
 
-install: true
-
 script:
   # build using mybatis latest version
   - ./mvnw clean verify
