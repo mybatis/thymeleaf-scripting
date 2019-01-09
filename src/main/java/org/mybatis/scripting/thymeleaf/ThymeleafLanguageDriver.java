@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Properties;
@@ -104,7 +105,9 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     try (InputStream in = Resources.getResourceAsStream(
         System.getProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf.properties"))) {
       if (in != null) {
-        String encoding = System.getProperty("mybatis-thymeleaf.config.encoding", StandardCharsets.UTF_8.name());
+        Charset encoding = Optional.ofNullable(System.getProperty("mybatis-thymeleaf.config.encoding"))
+            .map(Charset::forName)
+            .orElse(StandardCharsets.UTF_8);
         try (InputStreamReader inReader = new InputStreamReader(in, encoding);
              BufferedReader bufReader = new BufferedReader(inReader)) {
           properties.load(bufReader);
