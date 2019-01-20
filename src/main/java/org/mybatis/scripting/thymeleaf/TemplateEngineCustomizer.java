@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -50,12 +50,6 @@ import java.util.function.Consumer;
 public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
 
   /**
-   * The default implementation that do nothing.
-   */
-  TemplateEngineCustomizer DEFAULT = defaultTemplateEngine -> {
-  };
-
-  /**
    * {@inheritDoc}
    */
   @Override
@@ -82,6 +76,15 @@ public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
       TemplateEngine templateEngine, Class<T> type) {
     return templateEngine.getTemplateResolvers().stream()
         .filter(type::isInstance).map(type::cast).findFirst();
+  }
+
+  enum BuiltIn implements TemplateEngineCustomizer {
+    DEFAULT() {
+      @Override
+      public void customize(TemplateEngine defaultTemplateEngine) {
+        // NOP
+      }
+    };
   }
 
 }

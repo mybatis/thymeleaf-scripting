@@ -161,7 +161,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
               | InvocationTargetException | NoSuchMethodException e) {
             throw new IllegalStateException("Cannot create an instance for class: " + v, e);
           }
-        }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.DEFAULT);
+        }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.BuiltIn.DEFAULT);
 
     MyBatisDialect dialect = new MyBatisDialect();
     dialect.setLikeEscapeChar(likeEscapeChar);
@@ -181,13 +181,13 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     stringTemplateResolver.setOrder(2);
     stringTemplateResolver.setTemplateMode(mode);
 
-    TemplateEngine templateEngine = new TemplateEngine();
-    templateEngine.addTemplateResolver(classLoaderTemplateResolver);
-    templateEngine.addTemplateResolver(stringTemplateResolver);
-    templateEngine.addDialect(dialect);
+    TemplateEngine targetTemplateEngine = new TemplateEngine();
+    targetTemplateEngine.addTemplateResolver(classLoaderTemplateResolver);
+    targetTemplateEngine.addTemplateResolver(stringTemplateResolver);
+    targetTemplateEngine.addDialect(dialect);
 
-    customizer.accept(templateEngine);
-    return templateEngine;
+    customizer.accept(targetTemplateEngine);
+    return targetTemplateEngine;
   }
 
   /**

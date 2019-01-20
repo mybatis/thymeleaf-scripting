@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class MyBatisExpression {
 
   private Set<Character> additionalEscapeTargetChars = Collections.emptySet();
 
-  private Function<Character, String> escapeClauseSupplier = escapeChar -> " ESCAPE '" + escapeChar + "' ";
+  private Function<Character, String> escapeClauseSupplier = targetEscapeChar -> " ESCAPE '" + targetEscapeChar + "' ";
 
   /**
    * Construct new instance that corresponds with specified configuration.
@@ -115,11 +115,10 @@ public class MyBatisExpression {
     }
     StringBuilder sb = new StringBuilder(value.length() + 16);
     for (char c : value.toCharArray()) {
-      if (c == escapeChar) {
-        sb.append(escapeChar);
-      } else if (c == '%' || c == '_') {
-        sb.append(escapeChar);
-      } else if (!additionalEscapeTargetChars.isEmpty() && additionalEscapeTargetChars.contains(c)) {
+      if (c == escapeChar ||
+          c == '%' ||
+          c == '_' ||
+          (!additionalEscapeTargetChars.isEmpty() && additionalEscapeTargetChars.contains(c))) {
         sb.append(escapeChar);
       }
       sb.append(c);
