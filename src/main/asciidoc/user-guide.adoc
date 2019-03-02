@@ -27,8 +27,8 @@
 
 === What is MyBatis Thymeleaf ?
 
-The mybatis-thymeleaf is a plugin that helps applying a 2-way SQL feature to the MyBatis 3
-using the natural template mechanism provided by Thymeleaf 3.
+The mybatis-thymeleaf is a plugin that helps applying the dynamic sql and 2-way SQL feature to the MyBatis 3
+using the template(or natural template) mechanism provided by Thymeleaf 3.
 If you are not familiar with MyBatis and Thymeleaf, you can see following official documentations.
 
 * {mybatis-doc-url}[MyBatis 3 REFERENCE DOCUMENTATION^]
@@ -54,10 +54,17 @@ SELECT * FROM names
 ----
 
 [source,sql]
-.Translated SQL for processing in MyBatis
+.Translated to SQL that can parse in MyBatis by Thymeleaf processing
 ----
 SELECT * FROM names
   WHERE id = #{id}
+----
+
+[source,sql]
+.Translated to SQL that can parse by JDBC driver in MyBatis processing
+----
+SELECT * FROM names
+  WHERE id = ?
 ----
 
 ==== Dynamically bindable 2-way SQL
@@ -81,7 +88,7 @@ SELECT * FROM names
 ----
 
 [source,sql]
-.Translated SQL for processing in MyBatis (when `ids` is empty)
+.Translated to SQL in Thymeleaf processing (when `ids` is empty)
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -89,7 +96,7 @@ SELECT * FROM names
 ----
 
 [source,sql]
-.Translated SQL for processing in MyBatis (when `ids` has 3 elements)
+.Translated to SQL in Thymeleaf processing (when `ids` has 3 elements)
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -109,9 +116,9 @@ The mybatis-thymeleaf provide following features using class that implements
 the link:{mybatis-doc-url}/dynamic-sql.html#Pluggable_Scripting_Languages_For_Dynamic_SQL[`LanguageDriver` interface^]
 for integrating with template engine provide by Thymeleaf.
 
-* Can write a 2-way SQL
-* Can use a 2-way SQL via an annotation and mapper xml
-* Can read a 2-way SQL from a template file on classpath
+* Can write a dynamic sql and 2-way SQL
+* Can use a dynamic sql and 2-way SQL via an annotation and mapper xml
+* Can read an SQL template from a template file on classpath
 * Can use a custom dialect(attribute tag and expression utility method) at a template
 * Can fully customize a template engine configuration
 
@@ -138,7 +145,7 @@ About tested versions see the latest link:{travis-ci-url}[Travi CI^] build resul
 As basically policy, we do test using following versions.
 
 * latest release version on 3.4.x line
-* latest release version on 3.5.x line (not released yet)
+* latest release version on 3.5.x line
 * latest snapshot version on 3.5.x line
 ====
 
@@ -260,7 +267,7 @@ public class NameMapper {
 [TIP]
 ====
 
-Since JDK 12, you can specify a 2-way SQL using "Raw String Literals" feature as follow:
+You can specify a 2-way SQL in annotation using "link:https://openjdk.java.net/jeps/326[Raw String Literals^]" feature that support by future JDK version as follow:
 
 [source,java]
 ----
@@ -474,7 +481,7 @@ that can be parsed by MyBatis core module as follow:
 .2-way SQL template for generating string that can be parsed by MyBatis core module
 ----
 SELECT * FROM names
-  WHERE id = /*[('#{id}')]*/ -- <1>
+  WHERE id = /*[('#{id}')]*/ 1 -- <1>
 ----
 
 <1> A bind value specify by `/\*[('#{variable name}')]*/` format
@@ -722,6 +729,17 @@ Therefore, we *don't recommend* using this variable within the your application.
 ====
 
 |`Map<String, Object>`
+
+|`_fallbackParameterObject`
+a|Whether can access by any variable name for value object that specified as parameter object.
+
+[CAUTION]
+====
+This variable used by internal processing on the mybatis-thymeleaf.
+Therefore, we *don't recommend* using this variable within the your application.
+====
+
+|`boolean`
 |===
 
 === Using configuration properties
@@ -1179,6 +1197,7 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
   return configuration -> {
     TemplateEngine templateEngine = new TemplateEngine(); // <1>
     templateEngine.addDialect(new MyBatisDialect());
+    templateEngine.setEngineContextFactory(new MyBatisDelegatingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
     // ...
     configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(templateEngine)); // <2>
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>

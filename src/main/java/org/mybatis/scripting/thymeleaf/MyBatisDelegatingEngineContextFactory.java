@@ -1,0 +1,65 @@
+/**
+ *    Copyright 2018-2019 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package org.mybatis.scripting.thymeleaf;
+
+import org.apache.ibatis.scripting.xmltags.DynamicContext;
+import org.thymeleaf.IEngineConfiguration;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.IEngineContext;
+import org.thymeleaf.context.IEngineContextFactory;
+import org.thymeleaf.engine.TemplateData;
+
+import java.lang.reflect.Proxy;
+import java.util.Map;
+
+/**
+ *
+ * @author Kazuki Shimizu
+ * @version 1.0.0
+ */
+public class MyBatisDelegatingEngineContextFactory implements IEngineContextFactory {
+  private final IEngineContextFactory delegate;
+  private ClassLoader classLoader = MyBatisDelegatingEngineContextFactory.class.getClassLoader();
+
+  public MyBatisDelegatingEngineContextFactory(IEngineContextFactory delegate) {
+    this.delegate = delegate;
+  }
+
+  public void setClassLoader(ClassLoader classLoader) {
+    this.classLoader = classLoader;
+  }
+
+  @Override
+  public IEngineContext createEngineContext(IEngineConfiguration configuration, TemplateData templateData, Map<String, Object> templateResolutionAttributes, IContext context) {
+    IEngineContext engineContext = delegate.createEngineContext(configuration, templateData, templateResolutionAttributes, context);
+    return (IEngineContext) Proxy.newProxyInstance(classLoader, new Class[]{IEngineContext.class}, (proxy, method, args) -> {
+      if (method.getName().equals("getVariable")) {
+        String name = (String) args[0];
+        Object value;
+        if (engineContext.containsVariable(ContextVariableNames.FALLBACK_PARAMETER_OBJECT) &&
+            (boolean) engineContext.getVariable(ContextVariableNames.FALLBACK_PARAMETER_OBJECT)) {
+          value = engineContext.containsVariable(name) ?
+              engineContext.getVariable(name) : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);
+        } else {
+          value = engineContext.getVariable(name);
+        }
+        return value;
+      }
+      return method.invoke(engineContext, args);
+    });
+  }
+
+}

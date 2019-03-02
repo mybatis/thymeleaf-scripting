@@ -72,6 +72,8 @@ class ThymeleafSqlSource implements SqlSource {
   public BoundSql getBoundSql(Object parameterObject) {
     Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
     DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);
+    dynamicContext.bind(ContextVariableNames.FALLBACK_PARAMETER_OBJECT,
+        parameterObject != null && configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass()));
 
     CustomBindVariablesContext context;
     if (parameterObject instanceof Map) {
@@ -113,7 +115,7 @@ class ThymeleafSqlSource implements SqlSource {
       this.variableNames = new HashSet<>();
       addVariableNames(dynamicContext.getBindings().keySet());
       Optional.ofNullable(configurationProperties).ifPresent(v -> addVariableNames(v.stringPropertyNames()));
-      addVariableNames(Collections.singleton(ContextVariableNames.CUSTOM_BIND_VARS));
+      addVariableNames(Collections.singletonList(ContextVariableNames.CUSTOM_BIND_VARS));
     }
 
     void addVariableNames(Collection<String> names) {

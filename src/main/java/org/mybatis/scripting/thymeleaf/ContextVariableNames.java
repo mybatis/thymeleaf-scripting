@@ -34,4 +34,9 @@ public class ContextVariableNames {
    */
   public static final String CUSTOM_BIND_VARS = "_customBindVariables";
 
+  /**
+   * Variable name for holding whether use fallback parameter object when parameter is value object.
+   */
+  public static final String FALLBACK_PARAMETER_OBJECT = "_fallbackParameterObject";
+
 }
