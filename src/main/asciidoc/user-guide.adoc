@@ -1522,8 +1522,18 @@ These properties can be specified via builder class of `ThymeleafLanguageDriver`
 [source,java]
 ----
 // ...
-configuration.getLanguageRegistry()
-    .register(ThymeleafLanguageDriver.newBuilder().use2way(false).build());
+configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder()
+    .use2way(true)
+    .customizer(CustomTemplateEngineCustomizer.class)
+    .cacheEnabled(true)
+    .cacheTtl(3600000)
+    .fileCharacterEncoding(StandardCharsets.UTF_8)
+    .fileBaseDir("/templates/sqls")
+    .filePatterns("*.sql", "*.sql.template")
+    .dialectLikeEscapeChar('~')
+    .dialectLikeEscapeClauseFormat("escape '%s'")
+    .dialectLikeAdditionalEscapeTargetChars('％' , '＿')
+    .build());
 // ...
 ----
 
