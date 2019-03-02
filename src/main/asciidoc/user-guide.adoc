@@ -1505,7 +1505,6 @@ These properties can be specified via builder class of `ThymeleafLanguageDriver`
 
 [source,java]
 ----
-// ...
 configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder()
     .use2way(true)
     .customizer(CustomTemplateEngineCustomizer.class)
@@ -1518,7 +1517,6 @@ configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder(
     .dialectLikeEscapeClauseFormat("escape '%s'")
     .dialectLikeAdditionalEscapeTargetChars('％' , '＿')
     .build());
-// ...
 ----
 
 If you specify the value both with properties file and builder option, the properties file value applied.
