@@ -34,9 +34,11 @@ import org.mybatis.scripting.thymeleaf.integrationtest.mapper.OneWayNameMapper;
 
 import java.io.Reader;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 class OneWayMapperTest {
   private static SqlSessionFactory sqlSessionFactory;
@@ -172,6 +174,37 @@ class OneWayMapperTest {
       Name loadedName = names.get(0);
       Assertions.assertEquals(name.getFirstName(), loadedName.getFirstName());
       Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testInsertByBulk() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      OneWayNameMapper mapper = sqlSession.getMapper(OneWayNameMapper.class);
+      List<Name> names = new ArrayList<>();
+      {
+        Name name = new Name();
+        name.setFirstName("Thymeleaf001");
+        name.setLastName("MyBatis001");
+        names.add(name);
+      }
+      {
+        Name name = new Name();
+        name.setFirstName("Thymeleaf002");
+        name.setLastName("MyBatis002");
+        names.add(name);
+      }
+      {
+        Name name = new Name();
+        name.setFirstName("Thymeleaf003");
+        name.setLastName("MyBatis003");
+        names.add(name);
+      }
+
+      mapper.insertByBulk(names);
+
+      Assertions.assertEquals(3, mapper.findByIds(names.stream().map(Name::getId).collect(Collectors.toList())).size());
+
     }
   }
 

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,8 +35,10 @@ import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 
 import java.io.Reader;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class AnnotationDrivenMapperTest {
   private static SqlSessionFactory sqlSessionFactory;
@@ -171,6 +173,37 @@ class AnnotationDrivenMapperTest {
       Name loadedName = names.get(0);
       Assertions.assertEquals(name.getFirstName(), loadedName.getFirstName());
       Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
+    }
+  }
+
+  @Test
+  void testInsertByBulk() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      List<Name> names = new ArrayList<>();
+      {
+        Name name = new Name();
+        name.setFirstName("Thymeleaf001");
+        name.setLastName("MyBatis001");
+        names.add(name);
+      }
+      {
+        Name name = new Name();
+        name.setFirstName("Thymeleaf002");
+        name.setLastName("MyBatis002");
+        names.add(name);
+      }
+      {
+        Name name = new Name();
+        name.setFirstName("Thymeleaf003");
+        name.setLastName("MyBatis003");
+        names.add(name);
+      }
+
+      mapper.insertByBulk(names);
+
+      Assertions.assertEquals(3, mapper.findByIds(names.stream().map(Name::getId).collect(Collectors.toList())).size());
+
     }
   }
 

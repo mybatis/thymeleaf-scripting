@@ -26,6 +26,10 @@ public interface OneWayNameMapper {
   @Insert("sql/OneWayNameMapper/insert.sql")
   void insert(Name name);
 
+  @Options(useGeneratedKeys = true, keyProperty = "id")
+  @Insert("sql/OneWayNameMapper/insertByBulk.sql")
+  void insertByBulk(List<Name> names);
+
   @Update("sql/OneWayNameMapper/update.sql")
   void update(Name name);
 
