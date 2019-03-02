@@ -215,7 +215,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     targetTemplateEngine.addTemplateResolver(classLoaderTemplateResolver);
     targetTemplateEngine.addTemplateResolver(stringTemplateResolver);
     targetTemplateEngine.addDialect(dialect);
-    targetTemplateEngine.setEngineContextFactory(new MyBatisDelegatingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
+    targetTemplateEngine.setEngineContextFactory(new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
 
     customizer.accept(targetTemplateEngine);
     return targetTemplateEngine;

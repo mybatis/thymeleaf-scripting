@@ -37,7 +37,7 @@ public class ContextVariableNames {
   /**
    * Variable name for holding whether use fallback parameter object when parameter is value object.
    *
-   * @see org.mybatis.scripting.thymeleaf.MyBatisDelegatingEngineContextFactory
+   * @see MyBatisIntegratingEngineContextFactory
    */
   public static final String FALLBACK_PARAMETER_OBJECT = "_fallbackParameterObject";
 

@@ -26,22 +26,36 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 /**
+ * The implementation of {@link IEngineContextFactory} for integrating with MyBatis.
  *
  * @author Kazuki Shimizu
  * @version 1.0.0
  */
-public class MyBatisDelegatingEngineContextFactory implements IEngineContextFactory {
+public class MyBatisIntegratingEngineContextFactory implements IEngineContextFactory {
   private final IEngineContextFactory delegate;
-  private ClassLoader classLoader = MyBatisDelegatingEngineContextFactory.class.getClassLoader();
+  private ClassLoader classLoader = MyBatisIntegratingEngineContextFactory.class.getClassLoader();
 
-  public MyBatisDelegatingEngineContextFactory(IEngineContextFactory delegate) {
+  /**
+   * Constructor.
+   *
+   * @param delegate A target context factory for delegating
+   */
+  public MyBatisIntegratingEngineContextFactory(IEngineContextFactory delegate) {
     this.delegate = delegate;
   }
 
+  /**
+   * Set a class loader.
+   *
+   * @param classLoader a class loader
+   */
   public void setClassLoader(ClassLoader classLoader) {
     this.classLoader = classLoader;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public IEngineContext createEngineContext(IEngineConfiguration configuration, TemplateData templateData, Map<String, Object> templateResolutionAttributes, IContext context) {
     IEngineContext engineContext = delegate.createEngineContext(configuration, templateData, templateResolutionAttributes, context);

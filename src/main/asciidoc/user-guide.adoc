@@ -470,7 +470,7 @@ you can apply a user-defined template engine(full managed template engine) to th
 ----
 TemplateEngine templateEngine = new TemplateEngine(); // <1>
 templateEngine.addDialect(new MyBatisDialect());
-templateEngine.setEngineContextFactory(new MyBatisDelegatingEngineContextFactory(
+templateEngine.setEngineContextFactory(new MyBatisIntegratingEngineContextFactory(
     targetTemplateEngine.getEngineContextFactory()));
 // ...
 
@@ -1405,7 +1405,7 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
   return configuration -> {
     TemplateEngine templateEngine = new TemplateEngine(); // <1>
     templateEngine.addDialect(new MyBatisDialect());
-    templateEngine.setEngineContextFactory(new MyBatisDelegatingEngineContextFactory(
+    templateEngine.setEngineContextFactory(new MyBatisIntegratingEngineContextFactory(
       targetTemplateEngine.getEngineContextFactory()));
     // ...
     configuration.getLanguageRegistry().register(
