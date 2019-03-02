@@ -1328,22 +1328,6 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-[source,sql]
-.Use the custom expression utility method for appending comma
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
-    AND id IN (
-    /*[# th:each="id : ${ids}"]*/
-      /*[(${#mybatis.commaIfNotFirst(idStat)})]*/ -- <1>
-      /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
-    /*[/]*/
-    )
-  /*[/]*/
-  ORDER BY id
-----
-
 ==== Using custom expression utility method
 
 [source,sql]
