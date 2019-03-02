@@ -27,7 +27,7 @@
 
 === What is MyBatis Thymeleaf ?
 
-The mybatis-thymeleaf is a plugin that helps applying the dynamic sql and 2-way SQL feature to the MyBatis 3
+The mybatis-thymeleaf is a plugin that helps applying the 2-way SQL/dynamic SQL feature to the MyBatis 3
 using the template(or natural template) mechanism provided by Thymeleaf 3.
 If you are not familiar with MyBatis and Thymeleaf, you can see following official documentations.
 
@@ -35,7 +35,7 @@ If you are not familiar with MyBatis and Thymeleaf, you can see following offici
 * {thymeleaf-doc-url}/usingthymeleaf.html[Tutorial: Using Thymeleaf^]
 * {thymeleaf-doc-url}/usingthymeleaf.html#textual-template-modes[Tutorial: Using Thymeleaf -13 Textual template modes-^]
 
-=== What is 2-way SQL ?
+=== What is 2-way SQL/Dynamic SQL ?
 
 The 2-way SQL can be used by following *two way*.
 
@@ -110,14 +110,37 @@ SELECT * FROM names
   ORDER BY id
 ----
 
+==== Dynamically bindable SQL
+
+The mybatis-thymeleaf translate a dynamically bindable SQL(non 2-way SQL) that specified by template to as follow:
+
+[source,sql]
+.Template
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${not #lists.isEmpty(ids)}"]
+    AND id IN (
+      [# th:each="id : ${ids}"]
+        [(${idStat.first} ? '' : ',')]
+        [('#{ids[' + ${idStat.index} + ']}')]
+      [/]
+    )
+  [/]
+  ORDER BY id
+----
+
+This template is simple compare with 2-way SQL, but it cannot execute as-is in SQL execution tool (such as psql, mysql, sqlplus, plugins for IDE, etc...).
+
+
 === Mainly Features
 
 The mybatis-thymeleaf provide following features using class that implements
 the link:{mybatis-doc-url}/dynamic-sql.html#Pluggable_Scripting_Languages_For_Dynamic_SQL[`LanguageDriver` interface^]
 for integrating with template engine provide by Thymeleaf.
 
-* Can write a dynamic sql and 2-way SQL
-* Can use a dynamic sql and 2-way SQL via an annotation and mapper xml
+* Can write 2-way SQL/dynamic SQL
+* Can use a 2-way SQL/dynamic SQL via an annotation and mapper xml
 * Can read an SQL template from a template file on classpath
 * Can use a custom dialect(attribute tag and expression utility method) at a template
 * Can fully customize a template engine configuration
@@ -347,6 +370,8 @@ You configure to use the `org.mybatis.scripting.thymeleaf.ThymeleafLanguageDrive
 ----
 Configuration configuration = new Configuration();
 configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <1>
+// ...
+SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
 ----
 
 <1> Set the `ThymeleafLanguageDriver` class to a `Configuration` instance as default scripting language driver
@@ -360,6 +385,14 @@ configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <1>
   <setting name="defaultScriptingLanguage"
            value="org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver"/> // <1>
 </settings>
+----
+
+[source,java]
+----
+SqlSessionFactory sqlSessionFactory;
+try (Reader configReader = Resources.getResourceAsReader("mybatis-config.xml")) {
+  sqlSessionFactory = new SqlSessionFactoryBuilder().build(configReader);
+}
 ----
 
 <1> Set the `ThymeleafLanguageDriver` class to the `defaultScriptingLanguage` of setting item in configuration XML file
@@ -437,10 +470,13 @@ you can apply a user-defined template engine(full managed template engine) to th
 ----
 TemplateEngine templateEngine = new TemplateEngine(); // <1>
 templateEngine.addDialect(new MyBatisDialect());
+templateEngine.setEngineContextFactory(new MyBatisDelegatingEngineContextFactory(
+    targetTemplateEngine.getEngineContextFactory()));
 // ...
 
 Configuration configuration = new Configuration();
-configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(templateEngine)); // <2>
+configuration.getLanguageRegistry()
+    .register(ThymeleafLanguageDriver.newBuilder().templateEngine(templateEngine).build()); // <2>
 configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
 ----
 
@@ -606,7 +642,7 @@ SELECT * FROM names
 ----
 
 <1> Can use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method instead of standard dialect
-<1> Can use the `#mybatis.inClauseBindVariables(String, int)` method instead of standard dialect or above utility method
+<2> Can use the `#mybatis.inClauseBindVariables(String, int)` method instead of standard dialect or above utility method
 
 
 === Fragment
@@ -787,6 +823,7 @@ SELECT * FROM accounts
 SELECT * FROM users
 ----
 
+
 == Cautions for usage
 
 [CAUTION]
@@ -866,8 +903,8 @@ UPDATE names
 
 === Using '\'(backslash)
 
-If you are using 2-way SQL format, there is case that cannot parse a 2-way SQL when specify `'\'`(backslash) within static template parts.
-We know that following case cannot be parsed 2-way SQL.
+If you are using 2-way SQL mode, there is case that cannot parse a 2-way SQL when specify `'\'`(backslash) within static template parts.
+We know that following case cannot be parsed 2-way SQL. If you are not using 2-way SQL mode, this limitation can be ignore.
 
 ==== ESCAPE clause for LIKE
 
@@ -892,7 +929,7 @@ For detail, please see <<likeEscapeClause>>.
 == Custom Dialect
 
 The mybatis-thymeleaf provide the custom dialect class(`org.mybatis.scripting.thymeleaf.MyBatisDialect`)
-that help for generating SQL.
+that help for generating dynamic SQL.
 
 === Attribute tag
 
@@ -1163,6 +1200,177 @@ id IN (
   AND firstName LIKE #{patternFirstName} ESCAPE '\'
 ----
 
+== Using non 2-way SQL mode
+
+The non 2-way SQL is simple a little compare with 2-way SQL and limitations not found at now.
+
+=== Configuration
+
+By default, the mybatis-thymeleaf will be use the 2-way SQL mode.
+Therefore you should be configure explicitly to use the non 2-way SQL mode using configuration properties file or builder option as follow:
+
+[source,properties]
+.How to configure using configuration properties file(src/main/resources/mybatis-thymeleaf.properties)
+----
+use-2way = false # <1>
+----
+
+<1> Set the `use-2way` to `false`
+
+[source,java]
+.How to configure using builder option
+----
+// ...
+configuration.getLanguageRegistry()
+    .register(ThymeleafLanguageDriver.newBuilder().use2way(false).build()); // <1>
+// ...
+----
+
+<1> Set the `use2way` builder option to `false`
+
+
+=== Binding value
+
+In the non 2-way SQL mode, you use the MyBatis's standard bind variable expression such as `#{...}` as follow:
+
+[source,sql]
+.MyBatis's standard bind variable expression
+----
+SELECT * FROM names WHERE id = #{id}
+----
+
+If you bind a iteration object(List etc..) using dynamic SQL,
+you need to generate MyBatis's standard bind variable expression using inlined expression of Thymeleaf as follow:
+
+[source,sql]
+.Template
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${not #lists.isEmpty(ids)}"]
+    AND id IN (
+      [# th:each="id : ${ids}"]
+        [(${idStat.first} ? '' : ',')]
+        [('#{ids[' + ${idStat.index} + ']}')] -- <1>
+      [/]
+    )
+  [/]
+  ORDER BY id
+----
+
+<1> Generate bind variable expression.
+
+An above template will be translate to following SQL in Thymeleaf processing.
+
+[source,sql]
+.Translated to SQL (when `ids` has 3 elements)
+----
+SELECT * FROM names
+  WHERE 1 = 1
+    AND id IN (
+      #{ids[0]}
+      ,
+      #{ids[1]}
+      ,
+      #{ids[2]}
+    )
+  ORDER BY id
+----
+
+=== Different with 2-way SQL mode
+
+The different with 2-way SQL mode is that will be unnecessary to enclose the thymeleaf expressions as SQL comment(`/\*[...]*/`).
+In this section, some samples are provide the non 2-way SQL.
+
+==== Using tag for specifying condition
+
+If you add a SQL part when any condition is matches or not, you can use following attribute tags (`th:if`, `th:unless`, `th:switch` and `th:case`).
+
+[source,sql]
+.Usage of conditional attribute tag on WHERE
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${firstName} != null"]
+    AND firstName = #{firstName}
+  [/]
+  ORDER BY id
+----
+
+[source,sql]
+.Usage of conditional attribute tag on SET
+----
+UPDATE names
+  SET id = id
+  [# th:if="${firstName} != null"]
+    , firstName = #{firstName}
+  [/]
+  WHERE id = #{id}
+----
+
+==== Using tag for iteration
+
+The Thymeleaf supports to process for iteration object(`List` etc..) using `th:each`.
+
+[source,sql]
+.Usage of iteration
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${not #lists.isEmpty(ids)}"]
+    AND id IN (
+      [# th:each="id : ${ids}"]
+        [(${idStat.first} ? '' : ',')]
+        [('#{ids[' + ${idStat.index} + ']}')]
+      [/]
+    )
+  [/]
+  ORDER BY id
+----
+
+[source,sql]
+.Use the custom expression utility method for appending comma
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
+    AND id IN (
+    /*[# th:each="id : ${ids}"]*/
+      /*[(${#mybatis.commaIfNotFirst(idStat)})]*/ -- <1>
+      /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
+    /*[/]*/
+    )
+  /*[/]*/
+  ORDER BY id
+----
+
+==== Using custom expression utility method
+
+[source,sql]
+.Use the custom expression utility method for creating bind variables string of IN clause
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${not #lists.isEmpty(ids)}"]
+    AND id IN (
+      [(${#mybatis.inClauseBindVariables('ids', ids.size())})]
+    )
+  [/]
+  ORDER BY id
+----
+
+==== Using custom attribute tag
+
+[source,sql]
+.Use the custom attribute tag
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${firstName} != null"]
+    [# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]
+    AND firstName LIKE #{patternFirstName}
+  [/]
+----
 
 == Usage on framework
 
@@ -1197,9 +1405,11 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
   return configuration -> {
     TemplateEngine templateEngine = new TemplateEngine(); // <1>
     templateEngine.addDialect(new MyBatisDialect());
-    templateEngine.setEngineContextFactory(new MyBatisDelegatingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
+    templateEngine.setEngineContextFactory(new MyBatisDelegatingEngineContextFactory(
+      targetTemplateEngine.getEngineContextFactory()));
     // ...
-    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(templateEngine)); // <2>
+    configuration.getLanguageRegistry().register(
+        ThymeleafLanguageDriver.newBuilder().templateEngine(templateEngine).build()); // <2>
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
   };
 }
@@ -1211,6 +1421,7 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
 
 <3> Set the `ThymeleafLanguageDriver` class as default scripting language driver instead of
     specifying as configuration properties
+
 
 == Appendix
 
@@ -1303,3 +1514,18 @@ dialect.like.escape-char = ~
 dialect.like.escape-clause-format = escape '%s'
 dialect.like.additional-escape-target-chars = ％, ＿
 ----
+
+[TIP]
+====
+These properties can be specified via builder class of `ThymeleafLanguageDriver` as follow:
+
+[source,java]
+----
+// ...
+configuration.getLanguageRegistry()
+    .register(ThymeleafLanguageDriver.newBuilder().use2way(false).build());
+// ...
+----
+
+If you specify the value both with properties file and builder option, the properties file value applied.
+====

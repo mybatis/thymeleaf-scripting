@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collections;
@@ -166,6 +167,61 @@ class ThymeleafLanguageDriverTest {
       Assertions.assertEquals("escape '~'", expression.likeEscapeClause());
       Assertions.assertEquals("a~％~＿~~b", expression.escapeLikeWildcard("a％＿~b"));
     });
+  }
+
+  @Test
+  void testCustomWithBuilder() {
+    System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-empty.properties");
+    Configuration configuration = new Configuration();
+    configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder()
+        .use2way(false)
+        .cacheEnabled(false)
+        .cacheTtl(30000)
+        .fileCharacterEncoding(StandardCharsets.ISO_8859_1)
+        .fileBaseDir("/templates/sqls/")
+        .filePatterns("*.sql", "*.sql.template")
+        .dialectLikeEscapeChar('~')
+        .dialectLikeEscapeClauseFormat("escape '%s'")
+        .dialectLikeAdditionalEscapeTargetChars('％' , '＿')
+        .customizer(CustomTemplateEngineCustomizer.class)
+        .build());
+    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
+
+    new SqlSessionFactoryBuilder().build(configuration);
+
+    TemplateEngine templateEngine = CustomTemplateEngineCustomizer.templateEngine;
+    ClassLoaderTemplateResolver classLoaderTemplateResolver =
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
+
+    Assertions.assertEquals(TemplateMode.TEXT, classLoaderTemplateResolver.getTemplateMode());
+    Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
+    Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
+    Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
+    Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
+    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")), classLoaderTemplateResolver.getResolvablePatterns());
+
+    StringTemplateResolver stringTemplateResolver =
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
+    Assertions.assertEquals(TemplateMode.TEXT, stringTemplateResolver.getTemplateMode());
+    Assertions.assertFalse(stringTemplateResolver.isCacheable());
+
+    templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
+        .map(MyBatisDialect.class::cast).ifPresent(v -> {
+      MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
+          .buildObject(null, null);
+      Assertions.assertEquals("escape '~'", expression.likeEscapeClause());
+      Assertions.assertEquals("a~％~＿~~b", expression.escapeLikeWildcard("a％＿~b"));
+    });
+  }
+
+  @Test
+  void testConfigFileNotFound() {
+    System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-dummy.properties");
+    Configuration configuration = new Configuration();
+    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
+    Assertions.assertEquals(ThymeleafLanguageDriver.class, configuration.getLanguageRegistry().getDefaultDriverClass());
   }
 
   @Test

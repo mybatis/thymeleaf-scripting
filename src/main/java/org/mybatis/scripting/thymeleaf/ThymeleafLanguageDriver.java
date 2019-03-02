@@ -24,6 +24,7 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
+import org.mybatis.scripting.thymeleaf.expression.MyBatisExpression;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -41,6 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,32 +56,47 @@ import java.util.stream.Stream;
  * <br>
  * Supported properties are as follows:
  * <ul>
- *   <li>use-2way:
- *            Whether use the 2-way SQL. Default is true</li>
- *   <li>customizer:
- *            The implementation class for customizing a default {@code TemplateEngine}
- *            instanced by the MyBatis Thymeleaf.</li>
- *   <li>cache.enabled:
- *            Whether use the cache feature. Default is true</li>
- *   <li>cache.ttl:
- *            The cache TTL for resolved templates. Default is null(no TTL)</li>
- *   <li>file.character-encoding:
- *            The character encoding for reading template resources. Default is 'UTF-8'</li>
- *   <li>file.base-dir:
- *            The base directory for reading template resources. Default is ''(just under class path)</li>
- *   <li>file.patterns:
- *            The patterns for reading as template resources. Default is '*.sql'</li>
- *   <li>dialect.like.escape-char:
- *            The escape character for wildcard of LIKE. Default is {@code '\'} (backslash)</li>
- *   <li>dialect.like.escape-clause-format:
- *            The format of escape clause. Default is {@code " ESCAPE '%s' "}</li>
- *   <li>dialect.like.additional-escape-target-chars:
- *            The additional escape target characters(custom wildcard characters) for LIKE condition. Default is nothing</li>
+ * <li>use-2way:
+ * Whether use the 2-way SQL. Default is true</li>
+ * <li>customizer:
+ * The implementation class for customizing a default {@code TemplateEngine}
+ * instanced by the MyBatis Thymeleaf.</li>
+ * <li>cache.enabled:
+ * Whether use the cache feature. Default is true</li>
+ * <li>cache.ttl:
+ * The cache TTL for resolved templates. Default is null(no TTL)</li>
+ * <li>file.character-encoding:
+ * The character encoding for reading template resources. Default is 'UTF-8'</li>
+ * <li>file.base-dir:
+ * The base directory for reading template resources. Default is ''(just under class path)</li>
+ * <li>file.patterns:
+ * The patterns for reading as template resources. Default is '*.sql'</li>
+ * <li>dialect.like.escape-char:
+ * The escape character for wildcard of LIKE. Default is {@code '\'} (backslash)</li>
+ * <li>dialect.like.escape-clause-format:
+ * The format of escape clause. Default is {@code " ESCAPE '%s' "}</li>
+ * <li>dialect.like.additional-escape-target-chars:
+ * The additional escape target characters(custom wildcard characters) for LIKE condition. Default is nothing</li>
  * </ul>
+ *
  * @author Kazuki Shimizu
  * @version 1.0.0
+ * @see Builder
  */
 public class ThymeleafLanguageDriver implements LanguageDriver {
+
+  private static final String KEY_CONFIG_FILE = "mybatis-thymeleaf.config.file";
+  private static final String KEY_CONFIG_ENCODING = "mybatis-thymeleaf.config.encoding";
+  private static final String KEY_USE_2WAY = "use-2way";
+  private static final String KEY_CACHE_ENABLED = "cache.enabled";
+  private static final String KEY_CACHE_TTL = "cache.ttl";
+  private static final String KEY_FILE_CHARACTER_ENCODING = "file.character-encoding";
+  private static final String KEY_FILE_BASE_DIR = "file.base-dir";
+  private static final String KEY_FILE_PATTERNS = "file.patterns";
+  private static final String KEY_DIALECT_LIKE_ESCAPE_CHAR = "dialect.like.escape-char";
+  private static final String KEY_DIALECT_LIKE_ESCAPE_CLAUSE_FORMAT = "dialect.like.escape-clause-format";
+  private static final String KEY_DIALECT_LIKE_ESCAPE_TARGET_CHARS = "dialect.like.additional-escape-target-chars";
+  private static final String KEY_CUSTOMIZER = "customizer";
 
   private final Properties properties = new Properties();
 
@@ -89,7 +106,16 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    * Constructor for creating instance with default {@code TemplateEngine}.
    */
   public ThymeleafLanguageDriver() {
-    this.templateEngine = createDefaultTemplateEngine();
+    this.templateEngine = createDefaultTemplateEngine(new Properties());
+  }
+
+  /**
+   * Constructor for creating instance with user specified {@code Properties}.
+   *
+   * @param customProperties A user defined {@code ITemplateEngine} instance
+   */
+  protected ThymeleafLanguageDriver(Properties customProperties) {
+    this.templateEngine = createDefaultTemplateEngine(customProperties);
   }
 
   /**
@@ -97,57 +123,61 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    *
    * @param templateEngine A user defined {@code ITemplateEngine} instance
    */
-  public ThymeleafLanguageDriver(ITemplateEngine templateEngine) {
+  protected ThymeleafLanguageDriver(ITemplateEngine templateEngine) {
     this.templateEngine = templateEngine;
   }
 
-  private ITemplateEngine createDefaultTemplateEngine() {
-    try (InputStream in = Resources.getResourceAsStream(
-        System.getProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf.properties"))) {
-      if (in != null) {
-        Charset encoding = Optional.ofNullable(System.getProperty("mybatis-thymeleaf.config.encoding"))
-            .map(Charset::forName)
-            .orElse(StandardCharsets.UTF_8);
-        try (InputStreamReader inReader = new InputStreamReader(in, encoding);
-             BufferedReader bufReader = new BufferedReader(inReader)) {
-          properties.load(bufReader);
-        }
-      }
+  private ITemplateEngine createDefaultTemplateEngine(Properties customProperties) {
+    properties.putAll(customProperties);
+    InputStream in;
+    try {
+      in = Resources.getResourceAsStream(System.getProperty(KEY_CONFIG_FILE, "mybatis-thymeleaf.properties"));
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      in = null;
+    }
+    if (in != null) {
+      Charset encoding = Optional.ofNullable(System.getProperty(KEY_CONFIG_ENCODING))
+          .map(Charset::forName)
+          .orElse(StandardCharsets.UTF_8);
+      try (InputStreamReader inReader = new InputStreamReader(in, encoding);
+           BufferedReader bufReader = new BufferedReader(inReader)) {
+        properties.load(bufReader);
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
     }
 
-    TemplateMode mode = Optional.ofNullable(properties.getProperty("use-2way"))
+    TemplateMode mode = Optional.ofNullable(properties.getProperty(KEY_USE_2WAY))
         .map(String::trim).map(Boolean::valueOf).orElse(Boolean.TRUE) ? TemplateMode.CSS : TemplateMode.TEXT;
 
-    boolean cacheEnabled = Optional.ofNullable(properties.getProperty("cache.enabled"))
+    boolean cacheEnabled = Optional.ofNullable(properties.getProperty(KEY_CACHE_ENABLED))
         .map(String::trim).map(Boolean::parseBoolean).orElse(AbstractConfigurableTemplateResolver.DEFAULT_CACHEABLE);
 
-    Long cacheTtl = Optional.ofNullable(properties.getProperty("cache.ttl"))
+    Long cacheTtl = Optional.ofNullable(properties.getProperty(KEY_CACHE_TTL))
         .map(String::trim).map(Long::parseLong).orElse(AbstractConfigurableTemplateResolver.DEFAULT_CACHE_TTL_MS);
 
-    String characterEncoding = Optional.ofNullable(properties.getProperty("file.character-encoding"))
+    String characterEncoding = Optional.ofNullable(properties.getProperty(KEY_FILE_CHARACTER_ENCODING))
         .map(String::trim).orElse(StandardCharsets.UTF_8.name());
 
-    String fileBaseDir = Optional.ofNullable(properties.getProperty("file.base-dir"))
+    String fileBaseDir = Optional.ofNullable(properties.getProperty(KEY_FILE_BASE_DIR))
         .map(String::trim).orElse("");
 
-    Character likeEscapeChar = Optional.ofNullable(properties.getProperty("dialect.like.escape-char"))
+    Set<String> filePatterns =
+        Stream.of(properties.getProperty(KEY_FILE_PATTERNS, "*.sql").split(","))
+            .map(String::trim).collect(Collectors.toSet());
+
+    Character likeEscapeChar = Optional.ofNullable(properties.getProperty(KEY_DIALECT_LIKE_ESCAPE_CHAR))
         .map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0)).orElse(null);
 
-    String likeEscapeClauseFormat = Optional.ofNullable(properties.getProperty("dialect.like.escape-clause-format"))
+    String likeEscapeClauseFormat = Optional.ofNullable(properties.getProperty(KEY_DIALECT_LIKE_ESCAPE_CLAUSE_FORMAT))
         .map(String::trim).orElse(null);
 
     Set<Character> likeAdditionalEscapeTargetChars =
-        Stream.of(properties.getProperty("dialect.like.additional-escape-target-chars", "")
+        Stream.of(properties.getProperty(KEY_DIALECT_LIKE_ESCAPE_TARGET_CHARS, "")
             .split(",")).map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0))
             .collect(Collectors.toSet());
 
-    Set<String> filePatterns =
-        Stream.of(properties.getProperty("file.patterns","*.sql").split(","))
-            .map(String::trim).collect(Collectors.toSet());
-
-    final TemplateEngineCustomizer customizer = Optional.ofNullable(properties.getProperty("customizer"))
+    final TemplateEngineCustomizer customizer = Optional.ofNullable(properties.getProperty(KEY_CUSTOMIZER))
         .map(String::trim).map(v -> {
           try {
             return Resources.classForName(v);
@@ -214,6 +244,171 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
   @Override
   public SqlSource createSqlSource(Configuration configuration, String script, Class<?> parameterType) {
     return new ThymeleafSqlSource(configuration, templateEngine, script.trim());
+  }
+
+  /**
+   * Creates a new builder instance for {@link MyBatisExpression}.
+   * @return a new builder instance
+   */
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder class for {@link ThymeleafLanguageDriver}.
+   */
+  public static class Builder {
+
+    private final Properties customProperties = new Properties();
+    private ITemplateEngine templateEngine;
+
+    private Builder() {
+      // NOP
+    }
+
+    /**
+     * Whether use the 2-way SQL.
+     *
+     * @param user2way If use the 2-way SQL, set {@code true}
+     * @return a self instance
+     */
+    public Builder use2way(boolean user2way) {
+      customProperties.setProperty(KEY_USE_2WAY, String.valueOf(user2way));
+      return this;
+    }
+
+    /**
+     * Whether use the cache feature.
+     *
+     * @param cacheEnabled If use cache feature, set {@code true}
+     * @return a self instance
+     */
+    public Builder cacheEnabled(boolean cacheEnabled) {
+      customProperties.setProperty(KEY_CACHE_ENABLED, String.valueOf(cacheEnabled));
+      return this;
+    }
+
+    /**
+     * The cache TTL for resolved templates.
+     *
+     * @param ttl TTL (millisecond)
+     * @return a self instance
+     */
+    public Builder cacheTtl(long ttl) {
+      customProperties.setProperty(KEY_CACHE_TTL, String.valueOf(ttl));
+      return this;
+    }
+
+    /**
+     * The character encoding for reading template resources.
+     *
+     * @param charset encoding charset
+     * @return a self instance
+     */
+    public Builder fileCharacterEncoding(Charset charset) {
+      Optional.ofNullable(charset)
+          .ifPresent(v -> customProperties.setProperty(KEY_FILE_CHARACTER_ENCODING, v.toString()));
+      return this;
+    }
+
+    /**
+     * The base directory for reading template resources
+     *
+     * @param dir base directory path
+     * @return a self instance
+     */
+    public Builder fileBaseDir(String dir) {
+      Optional.ofNullable(dir)
+          .ifPresent(v -> customProperties.setProperty(KEY_FILE_BASE_DIR, v));
+      return this;
+    }
+
+    /**
+     * The patterns for reading as template resources.
+     *
+     * @param patterns patterns for reading as template resources
+     * @return a self instance
+     */
+    public Builder filePatterns(String... patterns) {
+      customProperties.setProperty(KEY_FILE_PATTERNS, String.join(",", patterns));
+      return this;
+    }
+
+    /**
+     * The escape character for wildcard of LIKE.
+     *
+     * @param escapeChar escape character
+     * @return a self instance
+     */
+    public Builder dialectLikeEscapeChar(char escapeChar) {
+      customProperties.setProperty(KEY_DIALECT_LIKE_ESCAPE_CHAR, String.valueOf(escapeChar));
+      return this;
+    }
+
+    /**
+     * The format of escape clause.
+     *
+     * @param escapeClauseFormat format of escape clause
+     * @return a self instance
+     */
+    public Builder dialectLikeEscapeClauseFormat(String escapeClauseFormat) {
+      Optional.ofNullable(escapeClauseFormat)
+          .ifPresent(v -> customProperties.setProperty(KEY_DIALECT_LIKE_ESCAPE_CLAUSE_FORMAT, v));
+      return this;
+    }
+
+    /**
+     * The additional escape target characters(custom wildcard characters) for LIKE condition.
+     *
+     * @param targetChars format of escape clause
+     * @return a self instance
+     */
+    public Builder dialectLikeAdditionalEscapeTargetChars(char... targetChars) {
+      StringJoiner joiner = new StringJoiner(",");
+      joiner.setEmptyValue("");
+      for (char targetChar : targetChars) {
+        joiner.add(String.valueOf(targetChar));
+      }
+      customProperties.setProperty(KEY_DIALECT_LIKE_ESCAPE_TARGET_CHARS, joiner.toString());
+      return this;
+    }
+
+    /**
+     * The implementation class for customizing a default {@code TemplateEngine}.
+     *
+     * @param customizer customizer class
+     * @return a self instance
+     */
+    public Builder customizer(Class<? extends TemplateEngineCustomizer> customizer) {
+      Optional.ofNullable(customizer)
+          .ifPresent(v -> customProperties.setProperty(KEY_CUSTOMIZER, customizer.getName()));
+      return this;
+    }
+
+    /**
+     * A user defined {@code ITemplateEngine} instance.
+     *
+     * @param templateEngine user defined {@code ITemplateEngine} instance
+     * @return a self instance
+     */
+    public Builder templateEngine(ITemplateEngine templateEngine) {
+      this.templateEngine = templateEngine;
+      return this;
+    }
+
+    /**
+     * Build a {@link ThymeleafLanguageDriver} instance.
+     *
+     * @return a {@link ThymeleafLanguageDriver} instance
+     */
+    public ThymeleafLanguageDriver build() {
+      if (templateEngine == null) {
+        return new ThymeleafLanguageDriver(customProperties);
+      } else {
+        return new ThymeleafLanguageDriver(templateEngine);
+      }
+    }
+
   }
 
 }

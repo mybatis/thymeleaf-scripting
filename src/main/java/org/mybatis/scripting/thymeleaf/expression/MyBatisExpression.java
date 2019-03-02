@@ -151,6 +151,10 @@ public class MyBatisExpression {
 
     private final MyBatisExpression expression = new MyBatisExpression();
 
+    private Builder() {
+      // NOP
+    }
+
     /**
      * Set an escape character for wildcard of LIKE.
      * <br>
