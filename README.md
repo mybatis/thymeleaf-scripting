@@ -19,14 +19,7 @@ If you are not familiar with Thymeleaf 3 syntax, you can see the Thymeleaf docum
 
 ```sql
 SELECT * FROM names
-  WHERE id = /*[('#{id}')]*/ 1
-```
-
-The mybatis-thymeleaf translate to as follow:
-
-```sql
-SELECT * FROM names
-  WHERE id = #{id}
+  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
 ```
 
 ### Dynamic bindable 2-way SQL
@@ -38,31 +31,10 @@ SELECT * FROM names
     AND id IN (
     /*[# th:each="id : ${ids}"]*/
       /*[+ [# th:if="${not idStat.first}"][(',')][/] +]*/
-      /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
+      /*[# mybatis:p="id"]*/ 1 /*[/]*/
     /*[/]*/
     )
   /*[/]*/
-  ORDER BY id
-```
-
-If `ids` is empty, the mybatis-thymeleaf translate to as follow:
-```sql
-SELECT * FROM names
-  WHERE 1 = 1
-  ORDER BY id
-```
-
-If `ids` has 3 elements, the mybatis-thymeleaf translate to as follow:
-```sql
-SELECT * FROM names
-  WHERE 1 = 1
-    AND id IN (
-      #{ids[0]}
-       , 
-      #{ids[1]}
-       , 
-      #{ids[2]}
-    )
   ORDER BY id
 ```
 
