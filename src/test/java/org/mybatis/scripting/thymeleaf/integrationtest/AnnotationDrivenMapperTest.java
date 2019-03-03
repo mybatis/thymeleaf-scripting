@@ -317,7 +317,7 @@ class AnnotationDrivenMapperTest {
   }
 
   @Test
-  void a() {
+  void testBulkInsert() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
       List<Person> persons = new ArrayList<>();

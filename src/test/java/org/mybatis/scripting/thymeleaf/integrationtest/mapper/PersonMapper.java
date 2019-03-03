@@ -29,7 +29,6 @@ public interface PersonMapper {
   @Insert("sql/PersonMapper/insertByBulk.sql")
   void insertByBulk(List<Person> persons);
 
-  @Options(useGeneratedKeys = true, keyProperty = "id")
   @Insert("sql/PersonMapper/insertMailsByBulk.sql")
   void insertMailsByBulk(List<Person> persons);
 
