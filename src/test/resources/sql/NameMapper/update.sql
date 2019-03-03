@@ -1,5 +1,5 @@
 --
---    Copyright 2018 the original author or authors.
+--    Copyright 2018-2019 the original author or authors.
 --
 --    Licensed under the Apache License, Version 2.0 (the "License");
 --    you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 UPDATE names
   SET id = id
   /*[# th:if="${firstName} != null"]*/
-    ,firstName = /*[('#{firstName}')]*/ 'Taro'
+    ,firstName = /*[# mybatis:p="firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
   /*[# th:if="${lastName} != null"]*/
-    ,lastName = /*[('#{lastName}')]*/ 'Yamada'
+    ,lastName = /*[# mybatis:p="lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
-  WHERE id = /*[('#{id}')]*/ 1
+  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/

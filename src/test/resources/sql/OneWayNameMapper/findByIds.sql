@@ -18,10 +18,10 @@ SELECT * FROM names
   WHERE 1 = 1
   [# th:if="${not #lists.isEmpty(ids)}"]
     AND id IN (
-      [# th:each="id : ${ids}"]
-        [(${idStat.first} ? '' : ',')]
-        [('#{ids[' + ${idStat.index} + ']}')]
-      [/]
+    [# th:each="id : ${ids}"]
+      [(${idStat.first} ? '' : ',')]
+      [# mybatis:p="id" /]
+    [/]
     )
   [/]
   ORDER BY id

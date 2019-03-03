@@ -65,4 +65,8 @@ public interface NameMapper {
 
   @Select("sql/NameMapper/findByName.sql")
   List<Name> findByName(NameParam param);
+
+  @Select("sql/NameMapper/findByIdsWithinParam.sql")
+  List<Name> findByIdsWithinParam(NameParam param);
+
 }

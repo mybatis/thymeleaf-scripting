@@ -20,7 +20,7 @@ SELECT * FROM names
     AND id IN (
     [# th:each="id : ${list}"]
       [(${#mybatis.commaIfNotFirst(idStat)})]
-      [('#{list[' + ${idStat.index} + ']}')]
+      [# mybatis:p="id" /]
     [/]
     )
   [/]

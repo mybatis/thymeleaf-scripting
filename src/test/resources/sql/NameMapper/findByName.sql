@@ -1,5 +1,5 @@
 --
---    Copyright 2018 the original author or authors.
+--    Copyright 2018-2019 the original author or authors.
 --
 --    Licensed under the Apache License, Version 2.0 (the "License");
 --    you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${firstName} != null"]*/
     /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
-    AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /*[(${#mybatis.likeEscapeClause()})]*/
+    AND firstName LIKE /*[# mybatis:p="patternFirstName"]*/ 'Taro%' /*[/]*/ /*[(${#mybatis.likeEscapeClause()})]*/
   /*[/]*/
   /*[# th:if="${lastName} != null"]*/
     /*[# mybatis:bind="patternLastName=|${#mybatis.escapeLikeWildcard(lastName)}%|" /]*/
-    AND lastName LIKE /*[('#{patternLastName}')]*/ 'Yamada%' /*[(${#mybatis.likeEscapeClause()})]*/
+    AND lastName LIKE /*[# mybatis:p="patternLastName"]*/ 'Yamada%' /*[/]*/ /*[(${#mybatis.likeEscapeClause()})]*/
   /*[/]*/

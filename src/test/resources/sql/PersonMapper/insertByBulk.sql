@@ -14,8 +14,10 @@
 --    limitations under the License.
 --
 
-SELECT * FROM names
-  WHERE 1 = 1
-  /*[# th:if="${id} != null"]*/
-    AND id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
-  /*[/]*/
+INSERT INTO persons (name) VALUES
+/*[# th:each="person : ${list}"]*/
+  (
+    /*[# mybatis:p="person.name"]*/ 'Taro Yamada' /*[/]*/
+  )
+  /*[(${#mybatis.commaIfNotLast(personStat)})]*/
+/*[/]*/

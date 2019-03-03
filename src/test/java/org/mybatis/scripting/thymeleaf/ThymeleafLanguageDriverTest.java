@@ -73,7 +73,8 @@ class ThymeleafLanguageDriverTest {
     Environment environment = new Environment("development", transactionFactory, dataSource);
 
     Configuration configuration = new Configuration(environment);
-    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(new TemplateEngine()));
+    configuration.getLanguageRegistry().register(
+        ThymeleafLanguageDriver.newBuilder().templateEngine(new TemplateEngine()).build());
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     configuration.addMapper(NameMapper.class);

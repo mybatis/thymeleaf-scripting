@@ -30,14 +30,25 @@ public class ContextVariableNames {
   /**
    * Variable name for holding custom bind variables.
    *
+   * @see org.mybatis.scripting.thymeleaf.ThymeleafSqlSource
    * @see org.mybatis.scripting.thymeleaf.processor.MyBatisBindTagProcessor
+   * @see org.mybatis.scripting.thymeleaf.processor.MyBatisParamTagProcessor
    */
   public static final String CUSTOM_BIND_VARS = "_customBindVariables";
 
   /**
+   * Variable name for managing iteration status.
+   *
+   * @see org.mybatis.scripting.thymeleaf.ThymeleafSqlSource
+   * @see org.mybatis.scripting.thymeleaf.processor.MyBatisParamTagProcessor
+   */
+  public static final String ITERATION_STATUS_MANAGER = "_iterationStatusManager";
+
+  /**
    * Variable name for holding whether use fallback parameter object when parameter is value object.
    *
-   * @see MyBatisIntegratingEngineContextFactory
+   * @see org.mybatis.scripting.thymeleaf.ThymeleafSqlSource
+   * @see org.mybatis.scripting.thymeleaf.MyBatisIntegratingEngineContextFactory
    */
   public static final String FALLBACK_PARAMETER_OBJECT = "_fallbackParameterObject";
 

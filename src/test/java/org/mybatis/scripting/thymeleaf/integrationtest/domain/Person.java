@@ -13,25 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.scripting.thymeleaf.integrationtest.mapper;
+package org.mybatis.scripting.thymeleaf.integrationtest.domain;
 
 import java.util.List;
 
-public class NameParam {
+public class Person {
   private int id;
-
-  private String firstName;
-
-  private String lastName;
-
-  private List<Integer> ids;
-
-  public NameParam() {
-  }
-
-  public NameParam(int id) {
-    this.id = id;
-  }
+  private String name;
+  private List<Mail> mails;
 
   public int getId() {
     return id;
@@ -41,28 +30,19 @@ public class NameParam {
     this.id = id;
   }
 
-  public String getFirstName() {
-    return firstName;
+  public String getName() {
+    return name;
   }
 
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public String getLastName() {
-    return lastName;
+  public List<Mail> getMails() {
+    return mails;
   }
 
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
+  public void setMails(List<Mail> mails) {
+    this.mails = mails;
   }
-
-  public List<Integer> getIds() {
-    return ids;
-  }
-
-  public void setIds(List<Integer> ids) {
-    this.ids = ids;
-  }
-
 }

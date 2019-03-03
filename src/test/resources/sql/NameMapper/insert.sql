@@ -1,5 +1,5 @@
 --
---    Copyright 2018 the original author or authors.
+--    Copyright 2018-2019 the original author or authors.
 --
 --    Licensed under the Apache License, Version 2.0 (the "License");
 --    you may not use this file except in compliance with the License.
@@ -15,6 +15,4 @@
 --
 
 INSERT INTO names (firstName, lastName)
-  VALUES (
-    /*[('#{firstName}')]*/ 'Taro', /*[('#{lastName}')]*/ 'Yamada'
-  )
+  VALUES (/*[# mybatis:p="firstName"]*/ 'Taro' /*[/]*/, /*[# mybatis:p="lastName"]*/ 'Yamada' /*[/]*/)

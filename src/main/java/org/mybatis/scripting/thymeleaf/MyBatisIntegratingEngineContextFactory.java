@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class MyBatisIntegratingEngineContextFactory implements IEngineContextFactory {
   private final IEngineContextFactory delegate;
-  private ClassLoader classLoader = MyBatisIntegratingEngineContextFactory.class.getClassLoader();
+  private final ClassLoader classLoader = getClass().getClassLoader();
 
   /**
    * Constructor.
@@ -45,35 +45,29 @@ public class MyBatisIntegratingEngineContextFactory implements IEngineContextFac
   }
 
   /**
-   * Set a class loader.
-   *
-   * @param classLoader a class loader
-   */
-  public void setClassLoader(ClassLoader classLoader) {
-    this.classLoader = classLoader;
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
-  public IEngineContext createEngineContext(IEngineConfiguration configuration, TemplateData templateData, Map<String, Object> templateResolutionAttributes, IContext context) {
-    IEngineContext engineContext = delegate.createEngineContext(configuration, templateData, templateResolutionAttributes, context);
-    return (IEngineContext) Proxy.newProxyInstance(classLoader, new Class[]{IEngineContext.class}, (proxy, method, args) -> {
-      if (method.getName().equals("getVariable")) {
-        String name = (String) args[0];
-        Object value;
-        if (engineContext.containsVariable(ContextVariableNames.FALLBACK_PARAMETER_OBJECT) &&
-            (boolean) engineContext.getVariable(ContextVariableNames.FALLBACK_PARAMETER_OBJECT)) {
-          value = engineContext.containsVariable(name) ?
-              engineContext.getVariable(name) : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);
-        } else {
-          value = engineContext.getVariable(name);
-        }
-        return value;
-      }
-      return method.invoke(engineContext, args);
-    });
+  public IEngineContext createEngineContext(IEngineConfiguration configuration, TemplateData templateData,
+          Map<String, Object> templateResolutionAttributes, IContext context) {
+    IEngineContext engineContext =
+        delegate.createEngineContext(configuration, templateData, templateResolutionAttributes, context);
+    return (IEngineContext) Proxy.newProxyInstance(classLoader, new Class[]{IEngineContext.class},
+        (proxy, method, args) -> {
+          if (method.getName().equals("getVariable")) {
+            String name = (String) args[0];
+            Object value;
+            if (engineContext.getTemplateResolutionAttributes().containsKey(ContextVariableNames.FALLBACK_PARAMETER_OBJECT) &&
+                (boolean) engineContext.getTemplateResolutionAttributes().get(ContextVariableNames.FALLBACK_PARAMETER_OBJECT)) {
+              value = engineContext.containsVariable(name) ?
+                  engineContext.getVariable(name) : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);
+            } else {
+              value = engineContext.getVariable(name);
+            }
+            return value;
+          }
+          return method.invoke(engineContext, args);
+        });
   }
 
 }

@@ -16,6 +16,6 @@
 
 SELECT * FROM names
   WHERE 1 = 1
-    [# th:if="${id} != null"]
+  [# th:if="${id} != null"]
     AND id = #{id}
-    [/]
+  [/]

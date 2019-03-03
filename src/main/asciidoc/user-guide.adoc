@@ -35,7 +35,7 @@ If you are not familiar with MyBatis and Thymeleaf, you can see following offici
 * {thymeleaf-doc-url}/usingthymeleaf.html[Tutorial: Using Thymeleaf^]
 * {thymeleaf-doc-url}/usingthymeleaf.html#textual-template-modes[Tutorial: Using Thymeleaf -13 Textual template modes-^]
 
-=== What is 2-way SQL/Dynamic SQL ?
+=== What is 2-way SQL?
 
 The 2-way SQL can be used by following *two way*.
 
@@ -46,25 +46,19 @@ The 2-way SQL can be used by following *two way*.
 
 The mybatis-thymeleaf translate a simple bindable 2-way SQL that specified by natural template to as follow:
 
+
 [source,sql]
-.Natural template
+.SQL Template
 ----
+-- Use the custom tag provided by mybatis-thymeleaf
+SELECT * FROM names
+  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+
+-- or
+
+-- Use only the Thymeleaf standard feature
 SELECT * FROM names
   WHERE id = /*[('#{id}')]*/ 1
-----
-
-[source,sql]
-.Translated to SQL that can parse in MyBatis by Thymeleaf processing
-----
-SELECT * FROM names
-  WHERE id = #{id}
-----
-
-[source,sql]
-.Translated to SQL that can parse by JDBC driver in MyBatis processing
-----
-SELECT * FROM names
-  WHERE id = ?
 ----
 
 ==== Dynamically bindable 2-way SQL
@@ -72,8 +66,24 @@ SELECT * FROM names
 The mybatis-thymeleaf translate a dynamically bindable 2-way SQL that specified by natural template to as follow:
 
 [source,sql]
-.Natural template
+.SQL Template
 ----
+-- Use the custom tag provided by mybatis-thymeleaf
+SELECT * FROM names
+  WHERE 1 = 1
+  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
+    AND id IN (
+    /*[# th:each="id : ${ids}"]*/
+      /*[(${#mybatis.commaIfNotFirst(idStat)})]*/
+      /*[# mybatis:p="id"]*/ 1 /*[/]*/
+    /*[/]*/
+    )
+  /*[/]*/
+  ORDER BY id
+
+-- or
+
+-- Use only the Thymeleaf standard feature
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${not #lists.isEmpty(ids)}"]*/
@@ -87,44 +97,37 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-[source,sql]
-.Translated to SQL in Thymeleaf processing (when `ids` is empty)
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  ORDER BY id
-----
-
-[source,sql]
-.Translated to SQL in Thymeleaf processing (when `ids` has 3 elements)
-----
-SELECT * FROM names
-  WHERE 1 = 1
-    AND id IN (
-      #{ids[0]}
-       ,
-      #{ids[1]}
-       ,
-      #{ids[2]}
-    )
-  ORDER BY id
-----
-
 ==== Dynamically bindable SQL
 
 The mybatis-thymeleaf translate a dynamically bindable SQL(non 2-way SQL) that specified by template to as follow:
 
 [source,sql]
-.Template
+.SQL Template
 ----
+-- Use the custom tag provided by mybatis-thymeleaf
 SELECT * FROM names
   WHERE 1 = 1
   [# th:if="${not #lists.isEmpty(ids)}"]
     AND id IN (
-      [# th:each="id : ${ids}"]
-        [(${idStat.first} ? '' : ',')]
-        [('#{ids[' + ${idStat.index} + ']}')]
-      [/]
+    [# th:each="id : ${ids}"]
+      [(${#mybatis.commaIfNotFirst(idStat)})]
+      [# mybatis:p="id" /]
+    [/]
+    )
+  [/]
+  ORDER BY id
+
+-- or
+
+-- Use only the Thymeleaf standard feature
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${not #lists.isEmpty(ids)}"]
+    AND id IN (
+    [# th:each="id : ${ids}"]
+      [(${idStat.first} ? '' : ',')]
+      [('#{ids[' + ${idStat.index} + ']}')]
+    [/]
     )
   [/]
   ORDER BY id
@@ -282,7 +285,7 @@ If you use the annotation driven mapper, you can specify a 2-way SQL as follow:
 .src/main/java/com/example/NameMapper.java
 ----
 public class NameMapper {
-  @Select("SELECT * FROM names WHERE id = /*[('#{id}')]*/ 1")
+  @Select("SELECT * FROM names WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/")
   Name findById(@Param("id") Integer id);
 }
 ----
@@ -296,7 +299,7 @@ You can specify a 2-way SQL in annotation using "link:https://openjdk.java.net/j
 ----
 @Select(``
   SELECT * FROM names
-    WHERE id = /*[('#{id}')]*/ 1
+    WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
 ``)
 Name findById(@Param("id") Integer id);
 ----
@@ -319,7 +322,7 @@ By default behavior, the mybatis-thymeleaf read a specified template file from j
 .src/main/resources/NameMapper/findById.sql
 ----
 SELECT * FROM names
-  WHERE id = /*[('#{id}')]*/ 1
+  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
 ----
 
 ==== XML driven mapper
@@ -339,7 +342,7 @@ public class NameMapper {
 ----
 <select id="findById" resultType="com.example.Name">
   SELECT * FROM names
-    WHERE id = /*[('#{id}')]*/ 1
+    WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
 </select>
 ----
 
@@ -517,10 +520,18 @@ that can be parsed by MyBatis core module as follow:
 .2-way SQL template for generating string that can be parsed by MyBatis core module
 ----
 SELECT * FROM names
-  WHERE id = /*[('#{id}')]*/ 1 -- <1>
+  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/ -- <1>
 ----
 
-<1> A bind value specify by `/\*[('#{variable name}')]*/` format
+<1> Can specify using custom tag(`mybatis:p="variable name"`) provided by mybatis-thymeleaf
+
+Also, you can specify using inlined expression such as `/\*[('#{variable name}')]*/` provided by Thymeleaf standard feature.
+
+[source,sql]
+----
+SELECT * FROM names
+  WHERE id = /*[('#{id}')]*/ 1
+----
 
 [NOTE]
 ====
@@ -554,8 +565,8 @@ If you add a SQL part when any condition is matches or not, you can use followin
 SELECT * FROM names
   WHERE 1 = 1 -- <1>
   /*[# th:if="${firstName} != null"]*/ -- <2>
-    AND firstName = /*[('#{firstName}')]*/ 'Taro' -- <3>
-  /*[/]*/ -- <4>
+    AND firstName = /*[# mybatis:p="firstName"]*/ 'Taro' /*[/]*/
+  /*[/]*/ -- <3>
   ORDER BY id
 ----
 
@@ -563,11 +574,11 @@ SELECT * FROM names
 .Usage of conditional attribute tag on SET
 ----
 UPDATE names
-  SET id = id -- <5>
+  SET id = id -- <4>
   /*[# th:if="${firstName} != null"]*/
-    , firstName = /*[('#{firstName}')]*/ 'Taro'
+    , firstName = /*[# mybatis:p="firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
-  WHERE id = /*[('#{id}')]*/ 1
+  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
 ----
 
 <1> Specify a non-dynamic condition at first position because the mybatis-thymeleaf does not provide
@@ -575,11 +586,9 @@ UPDATE names
 
 <2> Specify a condition on start tag using natural template
 
-<3> Specify a 2-way SQL of binding value
+<3> Specify an end tag of condition
 
-<4> Specify an end tag of condition
-
-<5> Specify a non-dynamic updating column at first position because the mybatis-thymeleaf does not provide
+<4> Specify a non-dynamic updating column at first position because the mybatis-thymeleaf does not provide
     the trimming feature such as `<set>` of XML based scripting language
 
 ==== Using tag for iteration
@@ -595,7 +604,7 @@ SELECT * FROM names
     AND id IN (
     /*[# th:each="id : ${ids}"]*/ -- <1>
       /*[+ [# th:if="${not idStat.first}"][(',')][/] +]*/ -- <2>
-      /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1 -- <3>
+      /*[# mybatis:p="id"]*/ 1 /*[/]*/ -- <3>
     /*[/]*/ -- <4>
     )
   /*[/]*/
@@ -604,12 +613,32 @@ SELECT * FROM names
 
 <1> Specify an iterable object on `th:each`
 
-<2> Append comma character when element position is not first
+<2> Append comma character when element position is not first.
+    You can access an iteration status object (`IterationStatusVar`) that named by `"{variable name of iterable element}Stat"` format.
 
 <3> Specify a 2-way SQL of binding value per iterable element.
-    A bind value specify by `/*[('#{variable name[index]}')]` format.
+    A bind value specify by `mybatis:p="{variable name of iterable element}"` format.
 
 <4> Specify an end tag of iteration
+
+
+Alternative, you can specify an inlined expression that output a bind variable per iterable element such as `[('#{variable name[index]}')]` format as follow:
+
+[source,sql]
+.Alternative usage of iteration
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
+    AND id IN (
+    /*[# th:each="id : ${ids}"]*/
+      /*[+ [# th:if="${not idStat.first}"][(',')][/] +]*/
+      /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
+    /*[/]*/
+    )
+  /*[/]*/
+  ORDER BY id
+----
 
 Also, you can use the custom expression utility method provided by the mybatis-thymeleaf
 instead of standard dialect. For details, please see <<Expression utility method>>.
@@ -623,7 +652,7 @@ SELECT * FROM names
     AND id IN (
     /*[# th:each="id : ${ids}"]*/
       /*[(${#mybatis.commaIfNotFirst(idStat)})]*/ -- <1>
-      /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
+      /*[# mybatis:p="id"]*/ 1 /*[/]*/
     /*[/]*/
     )
   /*[/]*/
@@ -670,10 +699,10 @@ List<Name> findPageByCriteria(@Param("criteria") NameCriteria criteria, @Param("
 SELECT COUNT(*) FROM names
   WHERE 1 = 1
   /*[# th:if="${criteria.firstName} != null"]*/
-    AND firstName = /*[('#{criteria.firstName}')]*/ 'Taro'
+    AND firstName = /*[# mybatis:p="criteria.firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
   /*[# th:if="${criteria.lastName} != null"]*/
-    AND lastName = /*[('#{criteria.lastName}')]*/ 'Yamada'
+    AND lastName = /*[# mybatis:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
 ----
 
@@ -683,13 +712,13 @@ SELECT COUNT(*) FROM names
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${criteria.firstName} != null"]*/
-    AND firstName = /*[('#{criteria.firstName}')]*/ 'Taro'
+    AND firstName = /*[# mybatis:p="criteria.firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
   /*[# th:if="${criteria.lastName} != null"]*/
-    AND lastName = /*[('#{criteria.lastName}')]*/ 'Yamada'
+    AND lastName = /*[# mybatis:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
-  LIMIT /*[('#{pageable.pageSize}')]*/ 20
-  OFFSET /*[('#{pageable.offset}')]*/ 0
+  LIMIT /*[# mybatis:p="pageable.pageSize"]*/ 20 /*[/]*/
+  OFFSET /*[# mybatis:p="pageable.offset"]*/ 0 /*[/]*/
   ORDER BY id
 ----
 
@@ -705,10 +734,10 @@ At first, you create a fragment SQL template file for sharing by multiple SQL as
 ----
   WHERE 1 = 1
   /*[# th:if="${criteria.firstName} != null"]*/
-    AND firstName = /*[('#{criteria.firstName}')]*/ 'Taro'
+    AND firstName = /*[# mybatis:p="criteria.firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
   /*[# th:if="${criteria.lastName} != null"]*/
-    AND lastName = /*[('#{criteria.lastName}')]*/ 'Yamada'
+    AND lastName = /*[# mybatis:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
 ----
 
@@ -728,8 +757,8 @@ SELECT COUNT(*) FROM names
 ----
 SELECT * FROM names
   /*[# th:insert="~{/NameMapper/whereByCriteria.sql}" /]*/ -- <1>
-  LIMIT /*[('#{pageable.pageSize}')]*/ 20
-  OFFSET /*[('#{pageable.offset}')]*/ 0
+  LIMIT /*[# mybatis:p="pageable.pageSize"]*/ 20 /*[/]*/
+  OFFSET /*[# mybatis:p="pageable.offset"]*/ 0 /*[/]*/
   ORDER BY id
 ----
 
@@ -754,28 +783,6 @@ The mybatis and mybatis-thymeleaf provides special variables that prefixed with 
 |The id for identifying the database
 (If you want to this variable, you should be enabled the link:{mybatis-doc-url}/configuration.html#databaseIdProvider[`DatabaseIdProvider` feature^] on MyBatis)
 |`String`
-
-|`_customBindVariables`
-a|The custom bind variables that registered using <<mybatis-bind,bind>>
-
-[CAUTION]
-====
-This variable used by internal processing on the mybatis-thymeleaf.
-Therefore, we *don't recommend* using this variable within the your application.
-====
-
-|`Map<String, Object>`
-
-|`_fallbackParameterObject`
-a|Whether can access by any variable name for value object that specified as parameter object.
-
-[CAUTION]
-====
-This variable used by internal processing on the mybatis-thymeleaf.
-Therefore, we *don't recommend* using this variable within the your application.
-====
-
-|`boolean`
 |===
 
 === Using configuration properties
@@ -834,7 +841,7 @@ Therefore there are some cautions for usage.
 
 === 2-way SQL format
 
-If you use a binding value using 2-way SQL format,
+If you use a binding value using 2-way SQL format without `mybatis:p` custom tag,
 there is case that cannot translate correctly 2-way SQL when specify multiple item on one line as follow:
 
 [source,sql]
@@ -942,6 +949,12 @@ By default, you can use it using `mybatis` dialect prefix.
 ^|Description
 ^|Attribute Value Format
 
+|<<mybatis-param,p>>
+|Render bind variable(`#{...}`) that can parsed MyBatis and register an iteration object to the MyBatis's bind variables.
+a|{variableName}(,{optionKey}={optionValue},...) +
+ +
+ Valid format is same with link:{mybatis-doc-url}/sqlmap-xml.html#Parameters[MyBatis's inline parameter format^].
+
 |<<mybatis-bind,bind>>
 |Register an any value to the MyBatis's bind variables
 (Provides a feature similar to that of the link:{mybatis-doc-url}/dynamic-sql.html#bind[`<bind>`^] provided by MyBatis core module)
@@ -949,6 +962,27 @@ a|{variable name}={variable value}(,...) +
  +
  Valid format is same with `th:with` provided by Thymeleaf.
 |===
+
+[[mybatis-param]]
+==== p
+
+[source,sql]
+.Basic usage:
+----
+SELECT * FROM names
+  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/ -- <1>
+----
+
+<1> Render bind variable(`#{...}`) that can parsed MyBatis
+
+[source,sql]
+.Usage with option:
+----
+SELECT * FROM names
+  WHERE id = /*[# mybatis:p="id,typeHandler=com.example.IdTypeHandler"]*/ 1 /*[/]*/ -- <1>
+----
+
+<1> Can specify parameter options(key=value) separate with comma
 
 [[mybatis-bind]]
 ==== bind
@@ -960,7 +994,7 @@ SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${firstName} != null"]*/
     /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
-    AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro' -- <2>
+    AND firstName LIKE /*[# mybatis:p="patternFirstName"]*/ 'Taro' /*[/]*/ -- <2>
   /*[/]*/
 ----
 
@@ -1093,23 +1127,12 @@ using <<Configuration properties, Configuration properties>>.
 id IN (
 /*[# th:each="id : ${ids}"]*/
   /*[(${#mybatis.commaIfNotFirst(idStat)})]*/ -- <1>
-  /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
+  /*[# mybatis:p="id"]*/ 1 /*[/]*/
 /*[/]*/
 )
 ----
 
 <1> Avoid adding comma at the first element
-
-[source,sql]
-.Translate to:
-----
-id IN (
-
-  #{ids[0]}
-  ,
-  #{ids[1]}
-)
-----
 
 [[mybatis-commaIfNotLast]]
 ==== commaIfNotLast
@@ -1119,24 +1142,13 @@ id IN (
 ----
 id IN (
 /*[# th:each="id : ${ids}"]*/
-  /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
+  /*[# mybatis:p="id"]*/ 1 /*[/]*/
   /*[(${#mybatis.commaIfNotLast(idStat)})]*/ -- <1>
 /*[/]*/
 )
 ----
 
 <1> Avoid adding comma at the last element
-
-[source,sql]
-.Translate to:
-----
-id IN (
-  #{ids[0]}
-  ,
-  #{ids[1]}
-
-)
-----
 
 
 [[mybatis-inClauseBindVariables]]
@@ -1167,7 +1179,7 @@ id IN (
 ----
 /*[# th:if="${firstName} != null"]*/
   /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
-  AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%'
+  AND firstName LIKE /*[# mybatis:p="patternFirstName"]*/ 'Taro%' /*[/]*/
 /*[/]*/
 ----
 
@@ -1188,7 +1200,7 @@ id IN (
 ----
 /*[# th:if="${firstName} != null"]*/
   /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
-  AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /*[(${#mybatis.likeEscapeClause()})]*/ -- <1>
+  AND firstName LIKE /*[# mybatis:p="patternFirstName"]*/ 'Taro%' /*[/]*/ /*[(${#mybatis.likeEscapeClause()})]*/ -- <1>
 /*[/]*/
 ----
 
@@ -1243,7 +1255,7 @@ If you bind a iteration object(List etc..) using dynamic SQL,
 you need to generate MyBatis's standard bind variable expression using inlined expression of Thymeleaf as follow:
 
 [source,sql]
-.Template
+.SQL Template
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -1251,29 +1263,10 @@ SELECT * FROM names
     AND id IN (
       [# th:each="id : ${ids}"]
         [(${idStat.first} ? '' : ',')]
-        [('#{ids[' + ${idStat.index} + ']}')] -- <1>
+        [# mybatis:p="id" /]
       [/]
     )
   [/]
-  ORDER BY id
-----
-
-<1> Generate bind variable expression.
-
-An above template will be translate to following SQL in Thymeleaf processing.
-
-[source,sql]
-.Translated to SQL (when `ids` has 3 elements)
-----
-SELECT * FROM names
-  WHERE 1 = 1
-    AND id IN (
-      #{ids[0]}
-      ,
-      #{ids[1]}
-      ,
-      #{ids[2]}
-    )
   ORDER BY id
 ----
 
@@ -1321,7 +1314,7 @@ SELECT * FROM names
     AND id IN (
       [# th:each="id : ${ids}"]
         [(${idStat.first} ? '' : ',')]
-        [('#{ids[' + ${idStat.index} + ']}')]
+        [# mybatis:p="id" /]
       [/]
     )
   [/]

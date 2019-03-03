@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.mybatis.scripting.thymeleaf;
 
 import org.mybatis.scripting.thymeleaf.expression.MyBatisExpression;
 import org.mybatis.scripting.thymeleaf.processor.MyBatisBindTagProcessor;
+import org.mybatis.scripting.thymeleaf.processor.MyBatisParamTagProcessor;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.dialect.IExpressionObjectDialect;
@@ -103,6 +104,8 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
     return new HashSet<>(Arrays.asList(
         new MyBatisBindTagProcessor(TemplateMode.TEXT, dialectPrefix)
         , new MyBatisBindTagProcessor(TemplateMode.CSS, dialectPrefix)
+        , new MyBatisParamTagProcessor(TemplateMode.TEXT, dialectPrefix)
+        , new MyBatisParamTagProcessor(TemplateMode.CSS, dialectPrefix)
     ));
   }
 

@@ -22,19 +22,12 @@ import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
 import org.thymeleaf.ITemplateEngine;
+import org.thymeleaf.TemplateSpec;
 import org.thymeleaf.context.IContext;
+import org.thymeleaf.engine.IterationStatusVar;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The {@code SqlSource} for integrating with Thymeleaf.
@@ -72,10 +65,8 @@ class ThymeleafSqlSource implements SqlSource {
   public BoundSql getBoundSql(Object parameterObject) {
     Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
     DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);
-    dynamicContext.bind(ContextVariableNames.FALLBACK_PARAMETER_OBJECT,
-        parameterObject != null && configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass()));
 
-    CustomBindVariablesContext context;
+    IContext context;
     if (parameterObject instanceof Map) {
       @SuppressWarnings(value = "unchecked")
       Map<String, Object> parameterMap = (Map<String, Object>) parameterObject;
@@ -86,10 +77,16 @@ class ThymeleafSqlSource implements SqlSource {
           parameterObject, metaClass, parameterType, dynamicContext, configuration.getVariables());
     }
 
-    String sql = templateEngine.process(sqlTemplate, context);
+    Map<String, Object> templateResolutionAttributes = new HashMap<>();
+    Map<String, Object> customBindVariables = new HashMap<>();
+    templateResolutionAttributes.put(ContextVariableNames.CUSTOM_BIND_VARS, customBindVariables);
+    templateResolutionAttributes.put(ContextVariableNames.ITERATION_STATUS_MANAGER, new IterationStatusManager());
+    templateResolutionAttributes.put(ContextVariableNames.FALLBACK_PARAMETER_OBJECT,
+        parameterObject != null && configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass()));
 
-    context.getCustomBindVariables().forEach(dynamicContext::bind);
+    String sql = templateEngine.process(new TemplateSpec(sqlTemplate, templateResolutionAttributes), context);
 
+    customBindVariables.forEach(dynamicContext::bind);
     SqlSource sqlSource = sqlSourceBuilder.parse(sql, parameterType, dynamicContext.getBindings());
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);
@@ -97,25 +94,18 @@ class ThymeleafSqlSource implements SqlSource {
     return boundSql;
   }
 
-  private interface CustomBindVariablesContext extends IContext {
-    Map<String, Object> getCustomBindVariables();
-  }
-
-  private abstract static class AbstractCustomBindVariablesContext implements CustomBindVariablesContext {
+  private abstract static class AbstractContext implements IContext {
 
     private final DynamicContext dynamicContext;
     private final Properties configurationProperties;
-    private final Map<String, Object> customBindVariable;
     private final Set<String> variableNames;
 
-    private AbstractCustomBindVariablesContext(DynamicContext dynamicContext, Properties configurationProperties) {
+    private AbstractContext(DynamicContext dynamicContext, Properties configurationProperties) {
       this.dynamicContext = dynamicContext;
       this.configurationProperties = configurationProperties;
-      this.customBindVariable = new HashMap<>();
       this.variableNames = new HashSet<>();
       addVariableNames(dynamicContext.getBindings().keySet());
       Optional.ofNullable(configurationProperties).ifPresent(v -> addVariableNames(v.stringPropertyNames()));
-      addVariableNames(Collections.singletonList(ContextVariableNames.CUSTOM_BIND_VARS));
     }
 
     void addVariableNames(Collection<String> names) {
@@ -151,9 +141,6 @@ class ThymeleafSqlSource implements SqlSource {
      */
     @Override
     public Object getVariable(String name) {
-      if (name.equals(ContextVariableNames.CUSTOM_BIND_VARS)) {
-        return customBindVariable;
-      }
       if (dynamicContext.getBindings().containsKey(name)) {
         return dynamicContext.getBindings().get(name);
       }
@@ -163,18 +150,11 @@ class ThymeleafSqlSource implements SqlSource {
       return getParameterValue(name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Map<String, Object> getCustomBindVariables() {
-      return customBindVariable;
-    }
-
     abstract Object getParameterValue(String name);
 
   }
 
-  private static class MapBasedContext extends AbstractCustomBindVariablesContext {
+  private static class MapBasedContext extends AbstractContext {
 
     private final Map<String,Object> variables;
 
@@ -195,7 +175,7 @@ class ThymeleafSqlSource implements SqlSource {
 
   }
 
-  private static class MetaClassBasedContext extends AbstractCustomBindVariablesContext {
+  private static class MetaClassBasedContext extends AbstractContext {
 
     private final Object parameterObject;
     private final MetaClass parameterMetaClass;

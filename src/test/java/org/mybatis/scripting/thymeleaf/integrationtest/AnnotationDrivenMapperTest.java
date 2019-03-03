@@ -29,9 +29,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
+import org.mybatis.scripting.thymeleaf.integrationtest.domain.Mail;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
+import org.mybatis.scripting.thymeleaf.integrationtest.domain.Person;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
+import org.mybatis.scripting.thymeleaf.integrationtest.mapper.PersonMapper;
 
 import java.io.Reader;
 import java.sql.Connection;
@@ -68,6 +71,7 @@ class AnnotationDrivenMapperTest {
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     configuration.addMapper(NameMapper.class);
+    configuration.addMapper(PersonMapper.class);
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
   }
 
@@ -295,6 +299,68 @@ class AnnotationDrivenMapperTest {
       param.setFirstName("");
       List<Name> names = mapper.findByName(param);
       Assertions.assertEquals(7, names.size());
+    }
+  }
+
+  @Test
+  void testListWithinParam() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      NameParam param = new NameParam();
+      param.setIds(Arrays.asList(1, 3, 4));
+      List<Name> names = mapper.findByIdsWithinParam(param);
+      Assertions.assertEquals(3, names.size());
+      Assertions.assertEquals(1, names.get(0).getId());
+      Assertions.assertEquals(3, names.get(1).getId());
+      Assertions.assertEquals(4, names.get(2).getId());
+    }
+  }
+
+  @Test
+  void a() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
+      List<Person> persons = new ArrayList<>();
+      {
+        Person person = new Person();
+        person.setName("MyBatis 1");
+        List<Mail> mails = new ArrayList<>();
+        person.setMails(mails);
+        {
+          Mail mail = new Mail();
+          mail.setAddress("mybatis1.main@test.com");
+          mails.add(mail);
+        }
+        {
+          Mail mail = new Mail();
+          mail.setAddress("mybatis1.sub@test.com");
+          mails.add(mail);
+        }
+        persons.add(person);
+      }
+      {
+        Person person = new Person();
+        person.setName("MyBatis 2");
+        List<Mail> mails = new ArrayList<>();
+        person.setMails(mails);
+        {
+          Mail mail = new Mail();
+          mail.setAddress("mybatis2.main@test.com");
+          mails.add(mail);
+        }
+        {
+          Mail mail = new Mail();
+          mail.setAddress("mybatis2.sub@test.com");
+          mails.add(mail);
+        }
+        persons.add(person);
+      }
+      mapper.insertByBulk(persons);
+      mapper.insertMailsByBulk(persons);
+
+      persons.stream().flatMap(p -> p.getMails().stream()).forEach(m -> System.out.println(m.getId()));
+
+      mapper.selectMails().forEach(m -> System.out.println(m.getId()));
     }
   }
 
