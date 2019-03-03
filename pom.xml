@@ -70,7 +70,7 @@
 
   <properties>
     <!-- Dependencies artifact version -->
-    <mybatis.version>3.4.6</mybatis.version>
+    <mybatis.version>3.5.0</mybatis.version>
     <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
 
     <!-- Dependencies plugin version -->
@@ -143,6 +143,14 @@
       </plugin>
     </plugins>
   </build>
+
+  <repositories>
+    <repository>
+      <id>sonatype-oss-snapshots</id>
+      <name>Sonatype OSS Snapshots Repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
 
   <profiles>
     <profile>

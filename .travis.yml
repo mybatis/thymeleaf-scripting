@@ -7,8 +7,10 @@ jdk:
 script:
   # build using mybatis latest version
   - ./mvnw clean verify
-  # build using mybatis 3.5.x line
-  - ./mvnw clean verify -Dmybatis.version=3.5.0
+  # build using mybatis 3.4.x line
+  - ./mvnw clean verify -Dmybatis.version=3.4.6
+  # build using mybatis 3.5.x snapshot
+  - ./mvnw clean verify -Dmybatis.version=3.5.1-SNAPSHOT
 
 after_success:
   - chmod -R 777 ./travis/after_success.sh
