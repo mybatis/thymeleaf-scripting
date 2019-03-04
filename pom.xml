@@ -129,6 +129,7 @@
           <outputDirectory>${project.build.directory}/site</outputDirectory>
           <attributes>
             <revnumber>${project.version}</revnumber>
+            <mybatis-version>${mybatis.version}</mybatis-version>
           </attributes>
         </configuration>
         <executions>

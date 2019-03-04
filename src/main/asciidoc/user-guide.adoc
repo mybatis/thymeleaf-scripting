@@ -1,7 +1,7 @@
 [[user-guide]]
 = MyBatis Thymeleaf User's Guide
 :author: The MyBatis Team
-:revnumber: 1.0.0-SNAPSHOT
+:revnumber: x.x.x
 :revdate: {localdate}
 :toc: left
 :icons: font
@@ -22,6 +22,9 @@
 :mybatis-spring-boot-doc-url: http://www.mybatis.org/spring-boot-starter
 :thymeleaf-doc-url: https://www.thymeleaf.org/doc/tutorials/3.0
 :github-organization-url: https://github.com/mybatis
+
+// Define dependency artifact versions
+:mybatis-version: y.y.y
 
 == Overview
 
@@ -202,7 +205,7 @@ If you are using the Maven as build tool, you can add as follow:
 <dependency>
   <groupId>org.mybatis</groupId>
   <artifactId>mybatis</artifactId>
-  <version>3.4.6</version> <!-- Adjust to your application -->
+  <version>{mybatis-version}</version> <!-- Adjust to your application -->
 </dependency>
 <dependency>
   <groupId>org.mybatis.scripting</groupId>
@@ -237,7 +240,7 @@ If you are using the Gradle as build tool, you can add as follow:
 ----
 dependencies {
   // ...
-  compile("org.mybatis:mybatis:3.4.6") // Adjust version to your application
+  compile("org.mybatis:mybatis:{mybatis-version}") // Adjust version to your application
   compile("org.mybatis.scripting:mybatis-thymeleaf:{revnumber}")
 }
 ----
