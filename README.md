@@ -44,6 +44,10 @@ SELECT * FROM names
   * MyBatis 3.4.3+
   * Thymeleaf 3.0+
 
+## Quick Start
+
+* [Wiki page](https://github.com/mybatis/thymeleaf-scripting/wiki/Quick-Start-using-Spring-Boot)
+
 ## Documentation
 
 * [User's Guide](src/main/asciidoc/user-guide.adoc)
