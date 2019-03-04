@@ -15,12 +15,12 @@
  */
 package org.mybatis.scripting.thymeleaf.expression;
 
-import org.thymeleaf.engine.IterationStatusVar;
-
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+
+import org.thymeleaf.engine.IterationStatusVar;
 
 /**
  * The expression utility object that provide helper method for generating SQL.
@@ -115,10 +115,7 @@ public class MyBatisExpression {
     }
     StringBuilder sb = new StringBuilder(value.length() + 16);
     for (char c : value.toCharArray()) {
-      if (c == escapeChar ||
-          c == '%' ||
-          c == '_' ||
-          (!additionalEscapeTargetChars.isEmpty() && additionalEscapeTargetChars.contains(c))) {
+      if (c == escapeChar || c == '%' || c == '_' || additionalEscapeTargetChars.contains(c)) {
         sb.append(escapeChar);
       }
       sb.append(c);

@@ -15,6 +15,16 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.SqlSource;
@@ -22,12 +32,7 @@ import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
 import org.thymeleaf.ITemplateEngine;
-import org.thymeleaf.TemplateSpec;
 import org.thymeleaf.context.IContext;
-import org.thymeleaf.engine.IterationStatusVar;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
 
 /**
  * The {@code SqlSource} for integrating with Thymeleaf.
@@ -63,8 +68,11 @@ class ThymeleafSqlSource implements SqlSource {
    */
   @Override
   public BoundSql getBoundSql(Object parameterObject) {
+    MyBatisBindingContext bindingContext = new MyBatisBindingContext(
+        parameterObject != null && configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass()));
     Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
     DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);
+    dynamicContext.bind(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);
 
     IContext context;
     if (parameterObject instanceof Map) {
@@ -77,16 +85,9 @@ class ThymeleafSqlSource implements SqlSource {
           parameterObject, metaClass, parameterType, dynamicContext, configuration.getVariables());
     }
 
-    Map<String, Object> templateResolutionAttributes = new HashMap<>();
-    Map<String, Object> customBindVariables = new HashMap<>();
-    templateResolutionAttributes.put(ContextVariableNames.CUSTOM_BIND_VARS, customBindVariables);
-    templateResolutionAttributes.put(ContextVariableNames.ITERATION_STATUS_MANAGER, new IterationStatusManager());
-    templateResolutionAttributes.put(ContextVariableNames.FALLBACK_PARAMETER_OBJECT,
-        parameterObject != null && configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass()));
+    String sql = templateEngine.process(sqlTemplate, context);
 
-    String sql = templateEngine.process(new TemplateSpec(sqlTemplate, templateResolutionAttributes), context);
-
-    customBindVariables.forEach(dynamicContext::bind);
+    bindingContext.getCustomBindVariables().forEach(dynamicContext::bind);
     SqlSource sqlSource = sqlSourceBuilder.parse(sql, parameterType, dynamicContext.getBindings());
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);

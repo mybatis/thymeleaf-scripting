@@ -15,11 +15,11 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.templateresolver.ITemplateResolver;
-
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 /**
  * The interface for customizing a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf.

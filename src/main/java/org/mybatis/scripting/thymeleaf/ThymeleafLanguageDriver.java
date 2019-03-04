@@ -15,6 +15,20 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.BoundSql;
@@ -31,20 +45,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * The {@code LanguageDriver} for integrating with Thymeleaf.
@@ -98,8 +98,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
   private static final String KEY_DIALECT_LIKE_ESCAPE_TARGET_CHARS = "dialect.like.additional-escape-target-chars";
   private static final String KEY_CUSTOMIZER = "customizer";
 
-  private final Properties properties = new Properties();
-
+  private final Properties configurationProperties = new Properties();
   private final ITemplateEngine templateEngine;
 
   /**
@@ -128,56 +127,61 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
   }
 
   private ITemplateEngine createDefaultTemplateEngine(Properties customProperties) {
-    properties.putAll(customProperties);
-    InputStream in;
-    try {
-      in = Resources.getResourceAsStream(System.getProperty(KEY_CONFIG_FILE, "mybatis-thymeleaf.properties"));
-    } catch (IOException e) {
-      in = null;
-    }
-    if (in != null) {
-      Charset encoding = Optional.ofNullable(System.getProperty(KEY_CONFIG_ENCODING))
-          .map(Charset::forName)
-          .orElse(StandardCharsets.UTF_8);
-      try (InputStreamReader inReader = new InputStreamReader(in, encoding);
-           BufferedReader bufReader = new BufferedReader(inReader)) {
-        properties.load(bufReader);
-      } catch (IOException e) {
-        throw new IllegalStateException(e);
-      }
-    }
+    loadConfigurationProperties(customProperties);
 
-    TemplateMode mode = Optional.ofNullable(properties.getProperty(KEY_USE_2WAY))
-        .map(String::trim).map(Boolean::valueOf).orElse(Boolean.TRUE) ? TemplateMode.CSS : TemplateMode.TEXT;
-
-    boolean cacheEnabled = Optional.ofNullable(properties.getProperty(KEY_CACHE_ENABLED))
-        .map(String::trim).map(Boolean::parseBoolean).orElse(AbstractConfigurableTemplateResolver.DEFAULT_CACHEABLE);
-
-    Long cacheTtl = Optional.ofNullable(properties.getProperty(KEY_CACHE_TTL))
-        .map(String::trim).map(Long::parseLong).orElse(AbstractConfigurableTemplateResolver.DEFAULT_CACHE_TTL_MS);
-
-    String characterEncoding = Optional.ofNullable(properties.getProperty(KEY_FILE_CHARACTER_ENCODING))
-        .map(String::trim).orElse(StandardCharsets.UTF_8.name());
-
-    String fileBaseDir = Optional.ofNullable(properties.getProperty(KEY_FILE_BASE_DIR))
-        .map(String::trim).orElse("");
-
-    Set<String> filePatterns =
-        Stream.of(properties.getProperty(KEY_FILE_PATTERNS, "*.sql").split(","))
-            .map(String::trim).collect(Collectors.toSet());
-
-    Character likeEscapeChar = Optional.ofNullable(properties.getProperty(KEY_DIALECT_LIKE_ESCAPE_CHAR))
+    // Create an MyBatisDialect instance
+    MyBatisDialect dialect = new MyBatisDialect();
+    Character likeEscapeChar = Optional.ofNullable(configurationProperties.getProperty(KEY_DIALECT_LIKE_ESCAPE_CHAR))
         .map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0)).orElse(null);
-
-    String likeEscapeClauseFormat = Optional.ofNullable(properties.getProperty(KEY_DIALECT_LIKE_ESCAPE_CLAUSE_FORMAT))
-        .map(String::trim).orElse(null);
-
+    String likeEscapeClauseFormat =
+        Optional.ofNullable(configurationProperties.getProperty(KEY_DIALECT_LIKE_ESCAPE_CLAUSE_FORMAT))
+            .map(String::trim).orElse(null);
     Set<Character> likeAdditionalEscapeTargetChars =
-        Stream.of(properties.getProperty(KEY_DIALECT_LIKE_ESCAPE_TARGET_CHARS, "")
+        Stream.of(configurationProperties.getProperty(KEY_DIALECT_LIKE_ESCAPE_TARGET_CHARS, "")
             .split(",")).map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0))
             .collect(Collectors.toSet());
+    dialect.setLikeEscapeChar(likeEscapeChar);
+    dialect.setLikeEscapeClauseFormat(likeEscapeClauseFormat);
+    dialect.setLikeAdditionalEscapeTargetChars(likeAdditionalEscapeTargetChars);
 
-    final TemplateEngineCustomizer customizer = Optional.ofNullable(properties.getProperty(KEY_CUSTOMIZER))
+    // Create an ClassLoaderTemplateResolver instance
+    ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();
+    TemplateMode mode = Optional.ofNullable(configurationProperties.getProperty(KEY_USE_2WAY))
+        .map(String::trim).map(Boolean::valueOf).orElse(Boolean.TRUE) ? TemplateMode.CSS : TemplateMode.TEXT;
+    boolean cacheEnabled = Optional.ofNullable(configurationProperties.getProperty(KEY_CACHE_ENABLED))
+        .map(String::trim).map(Boolean::parseBoolean).orElse(AbstractConfigurableTemplateResolver.DEFAULT_CACHEABLE);
+    Long cacheTtl = Optional.ofNullable(configurationProperties.getProperty(KEY_CACHE_TTL))
+        .map(String::trim).map(Long::parseLong).orElse(AbstractConfigurableTemplateResolver.DEFAULT_CACHE_TTL_MS);
+    String characterEncoding = Optional.ofNullable(configurationProperties.getProperty(KEY_FILE_CHARACTER_ENCODING))
+        .map(String::trim).orElse(StandardCharsets.UTF_8.name());
+    String fileBaseDir = Optional.ofNullable(configurationProperties.getProperty(KEY_FILE_BASE_DIR))
+        .map(String::trim).orElse("");
+    Set<String> filePatterns =
+        Stream.of(configurationProperties.getProperty(KEY_FILE_PATTERNS, "*.sql").split(","))
+            .map(String::trim).collect(Collectors.toSet());
+    classLoaderTemplateResolver.setOrder(1);
+    classLoaderTemplateResolver.setTemplateMode(mode);
+    classLoaderTemplateResolver.setResolvablePatterns(filePatterns);
+    classLoaderTemplateResolver.setCharacterEncoding(characterEncoding);
+    classLoaderTemplateResolver.setCacheable(cacheEnabled);
+    classLoaderTemplateResolver.setCacheTTLMs(cacheTtl);
+    classLoaderTemplateResolver.setPrefix(fileBaseDir);
+
+    // Create an StringTemplateResolver instance
+    StringTemplateResolver stringTemplateResolver = new StringTemplateResolver();
+    stringTemplateResolver.setOrder(2);
+    stringTemplateResolver.setTemplateMode(mode);
+
+    // Create an TemplateEngine instance
+    TemplateEngine targetTemplateEngine = new TemplateEngine();
+    targetTemplateEngine.addTemplateResolver(classLoaderTemplateResolver);
+    targetTemplateEngine.addTemplateResolver(stringTemplateResolver);
+    targetTemplateEngine.addDialect(dialect);
+    targetTemplateEngine.setEngineContextFactory(
+        new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
+
+    // Create an TemplateEngineCustomizer instance and apply
+    final TemplateEngineCustomizer customizer = Optional.ofNullable(configurationProperties.getProperty(KEY_CUSTOMIZER))
         .map(String::trim).map(v -> {
           try {
             return Resources.classForName(v);
@@ -192,33 +196,30 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
             throw new IllegalStateException("Cannot create an instance for class: " + v, e);
           }
         }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.BuiltIn.DEFAULT);
-
-    MyBatisDialect dialect = new MyBatisDialect();
-    dialect.setLikeEscapeChar(likeEscapeChar);
-    dialect.setLikeEscapeClauseFormat(likeEscapeClauseFormat);
-    dialect.setLikeAdditionalEscapeTargetChars(likeAdditionalEscapeTargetChars);
-
-    ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();
-    classLoaderTemplateResolver.setOrder(1);
-    classLoaderTemplateResolver.setTemplateMode(mode);
-    classLoaderTemplateResolver.setResolvablePatterns(filePatterns);
-    classLoaderTemplateResolver.setCharacterEncoding(characterEncoding);
-    classLoaderTemplateResolver.setCacheable(cacheEnabled);
-    classLoaderTemplateResolver.setCacheTTLMs(cacheTtl);
-    classLoaderTemplateResolver.setPrefix(fileBaseDir);
-
-    StringTemplateResolver stringTemplateResolver = new StringTemplateResolver();
-    stringTemplateResolver.setOrder(2);
-    stringTemplateResolver.setTemplateMode(mode);
-
-    TemplateEngine targetTemplateEngine = new TemplateEngine();
-    targetTemplateEngine.addTemplateResolver(classLoaderTemplateResolver);
-    targetTemplateEngine.addTemplateResolver(stringTemplateResolver);
-    targetTemplateEngine.addDialect(dialect);
-    targetTemplateEngine.setEngineContextFactory(new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
-
     customizer.accept(targetTemplateEngine);
+
     return targetTemplateEngine;
+  }
+
+  private void loadConfigurationProperties(Properties customProperties) {
+    configurationProperties.putAll(customProperties);
+    InputStream in;
+    try {
+      in = Resources.getResourceAsStream(System.getProperty(KEY_CONFIG_FILE, "mybatis-thymeleaf.properties"));
+    } catch (IOException e) {
+      in = null;
+    }
+    if (in != null) {
+      Charset encoding = Optional.ofNullable(System.getProperty(KEY_CONFIG_ENCODING))
+          .map(Charset::forName)
+          .orElse(StandardCharsets.UTF_8);
+      try (InputStreamReader inReader = new InputStreamReader(in, encoding);
+           BufferedReader bufReader = new BufferedReader(inReader)) {
+        configurationProperties.load(bufReader);
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+    }
   }
 
   /**
@@ -312,7 +313,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     }
 
     /**
-     * The base directory for reading template resources
+     * The base directory for reading template resources.
      *
      * @param dir base directory path
      * @return a self instance

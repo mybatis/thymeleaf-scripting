@@ -15,6 +15,11 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.mybatis.scripting.thymeleaf.expression.MyBatisExpression;
 import org.mybatis.scripting.thymeleaf.processor.MyBatisBindTagProcessor;
 import org.mybatis.scripting.thymeleaf.processor.MyBatisParamTagProcessor;
@@ -25,11 +30,6 @@ import org.thymeleaf.expression.IExpressionObjectFactory;
 import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.templatemode.TemplateMode;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * The Dialect for integrating with MyBatis.
@@ -102,10 +102,10 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
   @Override
   public Set<IProcessor> getProcessors(String dialectPrefix) {
     return new HashSet<>(Arrays.asList(
-        new MyBatisBindTagProcessor(TemplateMode.TEXT, dialectPrefix)
-        , new MyBatisBindTagProcessor(TemplateMode.CSS, dialectPrefix)
-        , new MyBatisParamTagProcessor(TemplateMode.TEXT, dialectPrefix)
-        , new MyBatisParamTagProcessor(TemplateMode.CSS, dialectPrefix)
+        new MyBatisBindTagProcessor(TemplateMode.TEXT, dialectPrefix),
+        new MyBatisBindTagProcessor(TemplateMode.CSS, dialectPrefix),
+        new MyBatisParamTagProcessor(TemplateMode.TEXT, dialectPrefix),
+        new MyBatisParamTagProcessor(TemplateMode.CSS, dialectPrefix)
     ));
   }
 

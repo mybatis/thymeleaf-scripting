@@ -15,8 +15,7 @@
  */
 package org.mybatis.scripting.thymeleaf.processor;
 
-import org.mybatis.scripting.thymeleaf.ContextVariableNames;
-import org.mybatis.scripting.thymeleaf.IterationStatusManager;
+import org.mybatis.scripting.thymeleaf.MyBatisBindingContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.IterationStatusVar;
@@ -24,8 +23,6 @@ import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
-
-import java.util.Map;
 
 /**
  * The processor class for handling the {@code mybatis:p} tag.
@@ -78,14 +75,12 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
     String iterationObjectKey = objectName + "Stat";
     if (context.containsVariable(iterationObjectKey)) {
       @SuppressWarnings("unchecked")
-      Map<String, Object> customBindVariables =
-          (Map<String, Object>) context.getTemplateResolutionAttributes().get(ContextVariableNames.CUSTOM_BIND_VARS);
+      MyBatisBindingContext bindingContext =
+          (MyBatisBindingContext) context.getVariable(MyBatisBindingContext.CONTEXT_VARIABLE_NAME);
       IterationStatusVar iterationStatus = (IterationStatusVar) context.getVariable(iterationObjectKey);
-      IterationStatusManager iterationStatusManager = (IterationStatusManager) context.getTemplateResolutionAttributes()
-          .get(ContextVariableNames.ITERATION_STATUS_MANAGER);
-      String iterationObjectVariableName = iterationStatusManager.generateUniqueName(objectName, iterationStatus);
-      if (!customBindVariables.containsKey(iterationObjectVariableName)) {
-        customBindVariables.put(iterationObjectVariableName, iterationStatus.getCurrent());
+      String iterationObjectVariableName = bindingContext.generateUniqueName(objectName, iterationStatus);
+      if (!bindingContext.containsCustomBindVariable(iterationObjectVariableName)) {
+        bindingContext.setCustomBindVariable(iterationObjectVariableName, iterationStatus.getCurrent());
       }
       structureHandler.setBody("#{" + iterationObjectVariableName + propertyPath + options + "}", false);
     } else {

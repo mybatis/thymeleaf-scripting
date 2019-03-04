@@ -15,15 +15,15 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
+import java.lang.reflect.Proxy;
+import java.util.Map;
+
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IEngineContext;
 import org.thymeleaf.context.IEngineContextFactory;
 import org.thymeleaf.engine.TemplateData;
-
-import java.lang.reflect.Proxy;
-import java.util.Map;
 
 /**
  * The implementation of {@link IEngineContextFactory} for integrating with MyBatis.
@@ -57,10 +57,11 @@ public class MyBatisIntegratingEngineContextFactory implements IEngineContextFac
           if (method.getName().equals("getVariable")) {
             String name = (String) args[0];
             Object value;
-            if (engineContext.getTemplateResolutionAttributes().containsKey(ContextVariableNames.FALLBACK_PARAMETER_OBJECT) &&
-                (boolean) engineContext.getTemplateResolutionAttributes().get(ContextVariableNames.FALLBACK_PARAMETER_OBJECT)) {
-              value = engineContext.containsVariable(name) ?
-                  engineContext.getVariable(name) : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);
+            MyBatisBindingContext bindingContext =
+                (MyBatisBindingContext) engineContext.getVariable(MyBatisBindingContext.CONTEXT_VARIABLE_NAME);
+            if (bindingContext.isFallbackParameterObject()) {
+              value = engineContext.containsVariable(name)
+                  ? engineContext.getVariable(name) : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);
             } else {
               value = engineContext.getVariable(name);
             }

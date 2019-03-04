@@ -15,7 +15,9 @@
  */
 package org.mybatis.scripting.thymeleaf.processor;
 
-import org.mybatis.scripting.thymeleaf.ContextVariableNames;
+import java.util.List;
+
+import org.mybatis.scripting.thymeleaf.MyBatisBindingContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.exceptions.TemplateProcessingException;
@@ -28,9 +30,6 @@ import org.thymeleaf.standard.expression.AssignationUtils;
 import org.thymeleaf.standard.expression.IStandardExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.util.StringUtils;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * The processor class for handling the {@code mybatis:bind} tag.
@@ -66,14 +65,10 @@ public class MyBatisBindTagProcessor extends AbstractAttributeTagProcessor {
     AssignationSequence assignations =
         AssignationUtils.parseAssignationSequence(context, attributeValue, false);
 
-    @SuppressWarnings("unchecked")
-    Map<String, Object> customBindVariables =
-        (Map<String, Object>) context.getTemplateResolutionAttributes().get(ContextVariableNames.CUSTOM_BIND_VARS);
-
     List<Assignation> assignationValues = assignations.getAssignations();
     assignationValues.forEach(assignation -> {
       IStandardExpression nameExp = assignation.getLeft();
-      Object name = nameExp .execute(context);
+      Object name = nameExp.execute(context);
       IStandardExpression valueExp = assignation.getRight();
       Object value = valueExp.execute(context);
 
@@ -83,7 +78,9 @@ public class MyBatisBindTagProcessor extends AbstractAttributeTagProcessor {
             "Variable name expression evaluated as null or empty: \"" + nameExp + "\"");
       }
 
-      customBindVariables.put(newVariableName, value);
+      MyBatisBindingContext bindingContext =
+          (MyBatisBindingContext) context.getVariable(MyBatisBindingContext.CONTEXT_VARIABLE_NAME);
+      bindingContext.setCustomBindVariable(newVariableName, value);
     });
   }
 
