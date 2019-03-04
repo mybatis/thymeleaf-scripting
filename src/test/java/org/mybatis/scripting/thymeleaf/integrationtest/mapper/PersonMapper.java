@@ -15,9 +15,8 @@
  */
 package org.mybatis.scripting.thymeleaf.integrationtest.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.mapping.FetchType;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Mail;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Person;
 
@@ -32,7 +31,14 @@ public interface PersonMapper {
   @Insert("sql/PersonMapper/insertMailsByBulk.sql")
   void insertMailsByBulk(List<Person> persons);
 
-  @Select("SELECT * FROM person_mails ORDER BY id")
-  List<Mail> selectMails();
+  @Select("SELECT id, name FROM persons ORDER BY id")
+  @Results({
+      @Result(property = "id", column = "id", id = true),
+      @Result(property = "mails", column = "id", many = @Many(select = "selectPersonMails", fetchType = FetchType.EAGER))
+  })
+  List<Person> selectPersons();
+
+  @Select("SELECT id, person_id, address FROM person_mails WHERE person_id = #{id} ORDER BY id")
+  List<Mail> selectPersonMails(int personId);
 
 }

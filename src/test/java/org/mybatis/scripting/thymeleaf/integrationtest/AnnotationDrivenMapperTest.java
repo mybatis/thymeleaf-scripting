@@ -68,7 +68,9 @@ class AnnotationDrivenMapperTest {
     Environment environment = new Environment("development", transactionFactory, dataSource);
 
     Configuration configuration = new Configuration(environment);
+    configuration.setMapUnderscoreToCamelCase(true);
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
+    configuration.setUseColumnLabel(true);
 
     configuration.addMapper(NameMapper.class);
     configuration.addMapper(PersonMapper.class);
@@ -358,9 +360,46 @@ class AnnotationDrivenMapperTest {
       mapper.insertByBulk(persons);
       mapper.insertMailsByBulk(persons);
 
-      persons.stream().flatMap(p -> p.getMails().stream()).forEach(m -> System.out.println(m.getId()));
-
-      mapper.selectMails().forEach(m -> System.out.println(m.getId()));
+      List<Person> loadedPersons = mapper.selectPersons();
+      Assertions.assertEquals(2, loadedPersons.size());
+      {
+        Person person = loadedPersons.get(0);
+        Assertions.assertEquals(0, person.getId());
+        Assertions.assertEquals("MyBatis 1", person.getName());
+        List<Mail> mails = person.getMails();
+        Assertions.assertEquals(2, mails.size());
+        {
+          Mail mail = mails.get(0);
+          Assertions.assertEquals(0, mail.getId());
+          Assertions.assertEquals(0, mail.getPersonId());
+          Assertions.assertEquals("mybatis1.main@test.com", mail.getAddress());
+        }
+        {
+          Mail mail = mails.get(1);
+          Assertions.assertEquals(1, mail.getId());
+          Assertions.assertEquals(0, mail.getPersonId());
+          Assertions.assertEquals("mybatis1.sub@test.com", mail.getAddress());
+        }
+      }
+      {
+        Person person = loadedPersons.get(1);
+        Assertions.assertEquals(1, person.getId());
+        Assertions.assertEquals("MyBatis 2", person.getName());
+        List<Mail> mails = person.getMails();
+        Assertions.assertEquals(2, mails.size());
+        {
+          Mail mail = mails.get(0);
+          Assertions.assertEquals(2, mail.getId());
+          Assertions.assertEquals(1, mail.getPersonId());
+          Assertions.assertEquals("mybatis2.main@test.com", mail.getAddress());
+        }
+        {
+          Mail mail = mails.get(1);
+          Assertions.assertEquals(3, mail.getId());
+          Assertions.assertEquals(1, mail.getPersonId());
+          Assertions.assertEquals("mybatis2.sub@test.com", mail.getAddress());
+        }
+      }
     }
   }
 
