@@ -40,7 +40,13 @@ public interface NameMapper {
   List<Name> getAllNames();
 
   @Select("sql/NameMapper/findByIds.sql")
-  List<Name> findByIds(@Param("ids") List<Integer> ids);
+  List<Name> findByIds(@Param("ids") int... ids);
+
+  @Select("sql/NameMapper/findByFirstNames.sql")
+  List<Name> findByFirstNames(@Param("firstNames") List<String> firstNames);
+
+  @Select("sql/NameMapper/findByFirstNames.sql")
+  Name findByFirstNamesWithNotCollectionType(@Param("firstNames") String firstNames);
 
   @Select("sql/NameMapper/findByIdsWithoutParamAnnotation.sql")
   List<Name> findByIdsWithoutParamAnnotation(List<Integer> ids);

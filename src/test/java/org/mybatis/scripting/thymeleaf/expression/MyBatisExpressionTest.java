@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,30 +33,6 @@ class MyBatisExpressionTest {
     Assertions.assertEquals("a\\％\\＿\\\\b",
         MyBatisExpression.newBuilder().likeAdditionalEscapeTargetChars(new HashSet<>(Arrays.asList('％','＿')))
             .build().escapeLikeWildcard("a％＿\\b"));
-  }
-
-  @Test
-  void testInClauseVariablesSizeIs0() {
-    MyBatisExpression expression = MyBatisExpression.newBuilder().build();
-    Assertions.assertEquals("null", expression.inClauseVariables("ids", 0));
-    Assertions.assertEquals("(null)",
-        expression.inClauseVariables("ids", 0, true));
-  }
-
-  @Test
-  void testInClauseVariablesSizeIs1() {
-    MyBatisExpression expression = MyBatisExpression.newBuilder().build();
-    Assertions.assertEquals("#{ids[0]}", expression.inClauseVariables("ids", 1));
-    Assertions.assertEquals("(#{ids[0]})",
-        expression.inClauseVariables("ids", 1, true));
-  }
-
-  @Test
-  void testInClauseVariablesSizeIs2() {
-    MyBatisExpression expression = MyBatisExpression.newBuilder().build();
-    Assertions.assertEquals("#{ids[0]}, #{ids[1]}", expression.inClauseVariables("ids", 2));
-    Assertions.assertEquals("(#{ids[0]}, #{ids[1]})",
-        expression.inClauseVariables("ids", 2, true));
   }
 
 }

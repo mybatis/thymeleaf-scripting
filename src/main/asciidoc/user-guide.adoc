@@ -75,12 +75,7 @@ The mybatis-thymeleaf translate a dynamically bindable 2-way SQL that specified 
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${not #lists.isEmpty(ids)}"]*/
-    AND id IN (
-    /*[# th:each="id : ${ids}"]*/
-      /*[(${#mybatis.commaIfNotFirst(idStat)})]*/
-      /*[# mybatis:p="id"]*/ 1 /*[/]*/
-    /*[/]*/
-    )
+    AND id IN (/*[# mybatis:p="ids"]*/ 1 /*[/]*/)
   /*[/]*/
   ORDER BY id
 
@@ -111,12 +106,7 @@ The mybatis-thymeleaf translate a dynamically bindable SQL(non 2-way SQL) that s
 SELECT * FROM names
   WHERE 1 = 1
   [# th:if="${not #lists.isEmpty(ids)}"]
-    AND id IN (
-    [# th:each="id : ${ids}"]
-      [(${#mybatis.commaIfNotFirst(idStat)})]
-      [# mybatis:p="id" /]
-    [/]
-    )
+    AND id IN ([# mybatis:p="ids" /])
   [/]
   ORDER BY id
 
@@ -647,6 +637,18 @@ SELECT * FROM names
 
 <4> Specify an end tag of iteration
 
+Also, an above SQL template can be replaced using `mybatis:p` attribute tag with following SQL template.
+
+[source,sql]
+.Use `mybatis:p` for creating bind variables string of IN clause
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
+    AND id IN (/*[# mybatis:p="ids"]*/ 1 /*[/]*/) -- <2>
+  /*[/]*/
+  ORDER BY id
+----
 
 Alternative, you can specify an inlined expression that output a bind variable per iterable element such as `[('#{variable name[index]}')]` format as follow:
 
@@ -665,39 +667,6 @@ SELECT * FROM names
   /*[/]*/
   ORDER BY id
 ----
-
-Also, you can use the custom expression utility method provided by the mybatis-thymeleaf
-instead of standard dialect. For details, please see <<Expression utility method>>.
-
-[source,sql]
-.Use the custom expression utility method for appending comma
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
-    AND id IN (
-    /*[# th:each="id : ${ids}"]*/
-      /*[(${#mybatis.commaIfNotFirst(idStat)})]*/ -- <1>
-      /*[# mybatis:p="id"]*/ 1 /*[/]*/
-    /*[/]*/
-    )
-  /*[/]*/
-  ORDER BY id
-----
-
-[source,sql]
-.Use the custom expression utility method for creating bind variables string of IN clause
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
-    AND id IN (/*[(${#mybatis.inClauseBindVariables('ids', ids.size())})]*/ 1) -- <2>
-  /*[/]*/
-  ORDER BY id
-----
-
-<1> Can use the `#mybatis.commaIfNotFirst(IterationStatusVar)` method instead of standard dialect
-<2> Can use the `#mybatis.inClauseBindVariables(String, int)` method instead of standard dialect or above utility method
 
 
 === Fragment
@@ -1010,6 +979,16 @@ SELECT * FROM names
 
 <1> Can specify parameter options(key=value) separate with comma
 
+[source,sql]
+.Usage for collection and array:
+----
+SELECT * FROM names
+  WHERE id IN (/*[# mybatis:p="ids"]*/ 1 /*[/]*/) -- <1>
+----
+
+<1> Render bind variables(`#{ids[0]}, #{ids[1]}, ...`) that can parsed MyBatis
+
+
 [[mybatis-bind]]
 ==== bind
 
@@ -1085,34 +1064,6 @@ By default, you can access it using `#mybatis` expression.
 
 |Return the comma if a current iteration status is not last
 
-|<<mybatis-inClauseBindVariables,inClauseBindVariables>>
-|
-
-[cols="^1,4,5",options="header"]
-!===
-^!No
-^!Type
-^!Description
-
-!1
-!String
-!A bind variable name for target iteration object
-
-!2
-!int
-!A element size of target iteration object
-
-!3
-!boolean
-!Whether enclose with "(" and ")"
-(If this argument is omit, it become result same with specifying `false`)
-!===
-
-a|Return a bind variables string for IN clause
-
-* If enclose is `true`, return a string like `"(#{ids[0]}, #{ids[1]})"`
-* If enclose is `false`(or omit), return a string like `"#{ids[0]}, #{ids[1]}"`
-
 |<<mybatis-escapeLikeWildcard,escapeLikeWildcard>>
 |
 
@@ -1175,26 +1126,6 @@ id IN (
 ----
 
 <1> Avoid adding comma at the last element
-
-
-[[mybatis-inClauseBindVariables]]
-==== inClauseBindVariables
-
-[source,sql]
-.Basic usage:
-----
-/*[# th:if="${not #lists.isEmpty(ids)}"]*/
-  AND id IN (/*[(${#mybatis.inClauseBindVariables('ids', ids.size())})]*/ 1) -- <1>
-/*[/]*/
-----
-
-<1> Create bind variables string for IN clause with specifying target iteration object
-
-[source,sql]
-.Translate to:
-----
-  AND id IN (#{ids[0]}, #{ids[1]})
-----
 
 
 [[mybatis-escapeLikeWildcard]]
@@ -1287,10 +1218,7 @@ SELECT * FROM names
   WHERE 1 = 1
   [# th:if="${not #lists.isEmpty(ids)}"]
     AND id IN (
-      [# th:each="id : ${ids}"]
-        [(${idStat.first} ? '' : ',')]
-        [# mybatis:p="id" /]
-      [/]
+      [# mybatis:p="ids" /]
     )
   [/]
   ORDER BY id
@@ -1299,81 +1227,6 @@ SELECT * FROM names
 === Different with 2-way SQL mode
 
 The different with 2-way SQL mode is that will be unnecessary to enclose the thymeleaf expressions as SQL comment(`/\*[...]*/`).
-In this section, some samples are provide the non 2-way SQL.
-
-==== Using tag for specifying condition
-
-If you add a SQL part when any condition is matches or not, you can use following attribute tags (`th:if`, `th:unless`, `th:switch` and `th:case`).
-
-[source,sql]
-.Usage of conditional attribute tag on WHERE
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  [# th:if="${firstName} != null"]
-    AND firstName = #{firstName}
-  [/]
-  ORDER BY id
-----
-
-[source,sql]
-.Usage of conditional attribute tag on SET
-----
-UPDATE names
-  SET id = id
-  [# th:if="${firstName} != null"]
-    , firstName = #{firstName}
-  [/]
-  WHERE id = #{id}
-----
-
-==== Using tag for iteration
-
-The Thymeleaf supports to process for iteration object(`List` etc..) using `th:each`.
-
-[source,sql]
-.Usage of iteration
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  [# th:if="${not #lists.isEmpty(ids)}"]
-    AND id IN (
-      [# th:each="id : ${ids}"]
-        [(${idStat.first} ? '' : ',')]
-        [# mybatis:p="id" /]
-      [/]
-    )
-  [/]
-  ORDER BY id
-----
-
-==== Using custom expression utility method
-
-[source,sql]
-.Use the custom expression utility method for creating bind variables string of IN clause
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  [# th:if="${not #lists.isEmpty(ids)}"]
-    AND id IN (
-      [(${#mybatis.inClauseBindVariables('ids', ids.size())})]
-    )
-  [/]
-  ORDER BY id
-----
-
-==== Using custom attribute tag
-
-[source,sql]
-.Use the custom attribute tag
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  [# th:if="${firstName} != null"]
-    [# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]
-    AND firstName LIKE #{patternFirstName}
-  [/]
-----
 
 == Usage on framework
 

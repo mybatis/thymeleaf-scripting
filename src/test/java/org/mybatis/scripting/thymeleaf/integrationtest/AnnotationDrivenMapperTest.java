@@ -15,6 +15,13 @@
  */
 package org.mybatis.scripting.thymeleaf.integrationtest;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.mapping.Environment;
@@ -35,13 +42,6 @@ import org.mybatis.scripting.thymeleaf.integrationtest.domain.Person;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.PersonMapper;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 class AnnotationDrivenMapperTest {
   private static SqlSessionFactory sqlSessionFactory;
@@ -87,15 +87,38 @@ class AnnotationDrivenMapperTest {
   }
 
   @Test
-  void testListParamWithParamAnnotation() {
+  void testCollectionParamWithParamAnnotation() {
+    // collection type is array
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       NameMapper mapper = sqlSession.getMapper(NameMapper.class);
-      List<Name> names = mapper.findByIds(Arrays.asList(1, 3, 4));
+      List<Name> names = mapper.findByIds(1, 3, 4);
       Assertions.assertEquals(3, names.size());
       Assertions.assertEquals(1, names.get(0).getId());
       Assertions.assertEquals(3, names.get(1).getId());
       Assertions.assertEquals(4, names.get(2).getId());
     }
+    // collection type is list
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      List<Name> names = mapper.findByFirstNames(Arrays.asList("Wilma", "Pebbles", "Barney"));
+      Assertions.assertEquals(3, names.size());
+      Assertions.assertEquals(2, names.get(0).getId());
+      Assertions.assertEquals(3, names.get(1).getId());
+      Assertions.assertEquals(4, names.get(2).getId());
+    }
+    // collection is empty
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      List<Name> names = mapper.findByFirstNames(Collections.emptyList());
+      Assertions.assertEquals(0, names.size());
+    }
+    // single value
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      NameMapper mapper = sqlSession.getMapper(NameMapper.class);
+      Name name = mapper.findByFirstNamesWithNotCollectionType("Wilma");
+      Assertions.assertEquals(2, name.getId());
+    }
+
   }
 
   @Test
@@ -207,8 +230,8 @@ class AnnotationDrivenMapperTest {
       }
 
       mapper.insertByBulk(names);
-
-      Assertions.assertEquals(3, mapper.findByIds(names.stream().map(Name::getId).collect(Collectors.toList())).size());
+      int id = names.get(0).getId();
+      Assertions.assertEquals(3, mapper.findByIds(id, id + 1, id + 2).size());
 
     }
   }

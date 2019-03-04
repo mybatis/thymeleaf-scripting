@@ -15,6 +15,9 @@
  */
 package org.mybatis.scripting.thymeleaf.processor;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+
 import org.mybatis.scripting.thymeleaf.MyBatisBindingContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
@@ -73,6 +76,7 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
       propertyPath = parameterValue.substring(nestedPropertyPathStartIndex);
     }
     String iterationObjectKey = objectName + "Stat";
+    String body;
     if (context.containsVariable(iterationObjectKey)) {
       @SuppressWarnings("unchecked")
       MyBatisBindingContext bindingContext =
@@ -82,10 +86,28 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
       if (!bindingContext.containsCustomBindVariable(iterationObjectVariableName)) {
         bindingContext.setCustomBindVariable(iterationObjectVariableName, iterationStatus.getCurrent());
       }
-      structureHandler.setBody("#{" + iterationObjectVariableName + propertyPath + options + "}", false);
+      body = "#{" + iterationObjectVariableName + propertyPath + options + "}";
     } else {
-      structureHandler.setBody("#{" + objectName + propertyPath + options + "}", false);
+      Object value = context.getVariable(objectName);
+      if (value != null && (Collection.class.isAssignableFrom(value.getClass()) || value.getClass().isArray())) {
+        int size = value.getClass().isArray() ? Array.getLength(value) : ((Collection) value).size();
+        if (size == 0) {
+          body = "null";
+        } else {
+          StringBuilder sb = new StringBuilder();
+          for (int i = 0; i < size; i++) {
+            if (i != 0) {
+              sb.append(", ");
+            }
+            sb.append("#{").append(parameterValue).append("[").append(i).append("]").append(options).append("}");
+          }
+          body = sb.toString();
+        }
+      } else {
+        body = "#{" + attributeValue + "}";
+      }
     }
+    structureHandler.setBody(body, false);
   }
 
 }
