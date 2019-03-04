@@ -305,6 +305,31 @@ You can specify a 2-way SQL in annotation using "link:https://openjdk.java.net/j
 Name findById(@Param("id") Integer id);
 ----
 
+Also,"Multiline String Literals" provided other JVM languages (such as Kotlin and Groovy) can be used.
+
+* link:https://kotlinlang.org/docs/reference/basic-types.html#string-literals[Kotlin (String Literals)^]
+* link:http://docs.groovy-lang.org/latest/html/documentation/#_triple_single_quoted_string[Groovy (Triple single quoted string)^]
+
+[source,kotlin]
+.Kotlin
+----
+@Select("""
+  SELECT * FROM names
+    WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+""")
+fun findById(id: Int): Name
+----
+
+[source,groovy]
+.Groovy
+----
+@Select('''
+  SELECT * FROM names
+    WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+''')
+Todo findById(int id);
+----
+
 There is a good compatibility for annotation driven mapper.
 ====
 
