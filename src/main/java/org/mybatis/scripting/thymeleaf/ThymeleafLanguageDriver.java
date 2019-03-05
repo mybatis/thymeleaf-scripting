@@ -244,7 +244,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    */
   @Override
   public SqlSource createSqlSource(Configuration configuration, String script, Class<?> parameterType) {
-    return new ThymeleafSqlSource(configuration, templateEngine, script.trim());
+    return new ThymeleafSqlSource(configuration, templateEngine, script.trim(), parameterType);
   }
 
   /**

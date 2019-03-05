@@ -49,6 +49,7 @@ class ThymeleafSqlSource implements SqlSource {
   private final ITemplateEngine templateEngine;
   private final SqlSourceBuilder sqlSourceBuilder;
   private final String sqlTemplate;
+  private final Class<?> parameterType;
 
   /**
    * Constructor for for integrating with template engine provide by Thymeleaf.
@@ -56,10 +57,11 @@ class ThymeleafSqlSource implements SqlSource {
    * @param templateEngine A template engine provide by Thymeleaf
    * @param sqlTemplate A template string of SQL (inline SQL or template file path)
    */
-  ThymeleafSqlSource(Configuration configuration, ITemplateEngine templateEngine, String sqlTemplate) {
+  ThymeleafSqlSource(Configuration configuration, ITemplateEngine templateEngine, String sqlTemplate, Class<?> parameterType) {
     this.configuration = configuration;
     this.templateEngine = templateEngine;
     this.sqlTemplate = sqlTemplate;
+    this.parameterType = parameterType;
     this.sqlSourceBuilder = new SqlSourceBuilder(configuration);
   }
 
@@ -68,9 +70,16 @@ class ThymeleafSqlSource implements SqlSource {
    */
   @Override
   public BoundSql getBoundSql(Object parameterObject) {
+    Class<?> processingParameterType;
+    if (parameterType == null) {
+      processingParameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+    } else {
+      processingParameterType = parameterType;
+    }
+
     MyBatisBindingContext bindingContext = new MyBatisBindingContext(
-        parameterObject != null && configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass()));
-    Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+        parameterObject != null && configuration.getTypeHandlerRegistry()
+            .hasTypeHandler(processingParameterType));
     DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);
     dynamicContext.bind(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);
 
@@ -80,15 +89,15 @@ class ThymeleafSqlSource implements SqlSource {
       Map<String, Object> parameterMap = (Map<String, Object>) parameterObject;
       context = new MapBasedContext(parameterMap, dynamicContext, configuration.getVariables());
     } else {
-      MetaClass metaClass = MetaClass.forClass(parameterType, configuration.getReflectorFactory());
+      MetaClass metaClass = MetaClass.forClass(processingParameterType, configuration.getReflectorFactory());
       context = new MetaClassBasedContext(
-          parameterObject, metaClass, parameterType, dynamicContext, configuration.getVariables());
+          parameterObject, metaClass, processingParameterType, dynamicContext, configuration.getVariables());
     }
 
     String sql = templateEngine.process(sqlTemplate, context);
 
     bindingContext.getCustomBindVariables().forEach(dynamicContext::bind);
-    SqlSource sqlSource = sqlSourceBuilder.parse(sql, parameterType, dynamicContext.getBindings());
+    SqlSource sqlSource = sqlSourceBuilder.parse(sql, processingParameterType, dynamicContext.getBindings());
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);
 
