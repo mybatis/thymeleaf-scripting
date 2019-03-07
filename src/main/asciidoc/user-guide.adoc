@@ -945,15 +945,15 @@ By default, you can use it using `mybatis` dialect prefix.
 ^|Attribute Value Format
 
 |<<mybatis-param,p>>
-|Render bind variable(`#{...}`) that can parsed MyBatis and register an iteration object to the MyBatis's bind variables.
-a|{variableName}(,{optionKey}={optionValue},...) +
+a|Render bind variable(`#{...}`) that can parsed MyBatis and register an iteration object to the MyBatis's bind variables.
+a|`{variableName}(,{optionKey}={optionValue},...)` +
  +
  Valid format is same with link:{mybatis-doc-url}/sqlmap-xml.html#Parameters[MyBatis's inline parameter format^].
 
 |<<mybatis-bind,bind>>
 |Register an any value to the MyBatis's bind variables
 (Provides a feature similar to that of the link:{mybatis-doc-url}/dynamic-sql.html#bind[`<bind>`^] provided by MyBatis core module)
-a|{variable name}={variable value}(,...) +
+a|`{variable name}={variable value}(,...)` +
  +
  Valid format is same with `th:with` provided by Thymeleaf.
 |===
@@ -968,25 +968,23 @@ SELECT * FROM names
   WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/ -- <1>
 ----
 
-<1> Render bind variable(`#{...}`) that can parsed MyBatis
-
 [source,sql]
 .Usage with option:
 ----
 SELECT * FROM names
-  WHERE id = /*[# mybatis:p="id,typeHandler=com.example.IdTypeHandler"]*/ 1 /*[/]*/ -- <1>
+  WHERE id = /*[# mybatis:p="id,typeHandler=com.example.IdTypeHandler"]*/ 1 /*[/]*/ -- <2>
 ----
-
-<1> Can specify parameter options(key=value) separate with comma
 
 [source,sql]
 .Usage for collection and array:
 ----
 SELECT * FROM names
-  WHERE id IN (/*[# mybatis:p="ids"]*/ 1 /*[/]*/) -- <1>
+  WHERE id IN (/*[# mybatis:p="ids"]*/ 1 /*[/]*/) -- <3>
 ----
 
-<1> Render bind variables(`#{ids[0]}, #{ids[1]}, ...`) that can parsed MyBatis
+<1> Render bind variable(`#{...}`) that can parsed MyBatis
+<2> Can specify parameter options(key=value) separate with comma
+<3> Render bind variables(`#{ids[0]}, #{ids[1]}, ...`) that can parsed MyBatis
 
 
 [[mybatis-bind]]

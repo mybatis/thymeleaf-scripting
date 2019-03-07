@@ -16,6 +16,7 @@
 package org.mybatis.scripting.thymeleaf.processor;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.mybatis.scripting.thymeleaf.MyBatisBindingContext;
 import org.thymeleaf.context.ITemplateContext;
@@ -72,15 +73,14 @@ public class MyBatisBindTagProcessor extends AbstractAttributeTagProcessor {
       IStandardExpression valueExp = assignation.getRight();
       Object value = valueExp.execute(context);
 
-      final String newVariableName = name == null ? null : name.toString();
-      if (StringUtils.isEmptyOrWhitespace(newVariableName)) {
+      if (Objects.isNull(name) || StringUtils.isEmpty(name.toString())) {
         throw new TemplateProcessingException(
             "Variable name expression evaluated as null or empty: \"" + nameExp + "\"");
       }
 
       MyBatisBindingContext bindingContext =
           (MyBatisBindingContext) context.getVariable(MyBatisBindingContext.CONTEXT_VARIABLE_NAME);
-      bindingContext.setCustomBindVariable(newVariableName, value);
+      bindingContext.setCustomBindVariable(name.toString(), value);
     });
   }
 
