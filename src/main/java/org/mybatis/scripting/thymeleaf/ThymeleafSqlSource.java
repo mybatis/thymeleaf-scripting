@@ -57,7 +57,8 @@ class ThymeleafSqlSource implements SqlSource {
    * @param templateEngine A template engine provide by Thymeleaf
    * @param sqlTemplate A template string of SQL (inline SQL or template file path)
    */
-  ThymeleafSqlSource(Configuration configuration, ITemplateEngine templateEngine, String sqlTemplate, Class<?> parameterType) {
+  ThymeleafSqlSource(Configuration configuration, ITemplateEngine templateEngine,
+                     String sqlTemplate, Class<?> parameterType) {
     this.configuration = configuration;
     this.templateEngine = templateEngine;
     this.sqlTemplate = sqlTemplate;

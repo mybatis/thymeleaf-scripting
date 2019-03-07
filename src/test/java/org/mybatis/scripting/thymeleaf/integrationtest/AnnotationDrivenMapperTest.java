@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -342,9 +343,10 @@ class AnnotationDrivenMapperTest {
   }
 
   @Test
-  void testBulkInsert() {
+  void testBulkInsertAndSelect() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
+      // Insert
       List<Person> persons = new ArrayList<>();
       {
         Person person = new Person();
@@ -380,46 +382,96 @@ class AnnotationDrivenMapperTest {
         }
         persons.add(person);
       }
+
+      int maxMailId = Optional.ofNullable(mapper.getMaxMailId()).filter(x -> x != 0).orElse(-1);
+
       mapper.insertByBulk(persons);
       mapper.insertMailsByBulk(persons);
 
-      List<Person> loadedPersons = mapper.selectPersons();
+      // Select
+      List<Person> loadedPersons = mapper.selectPersons(persons.get(0).getId(), persons.get(1).getId());
       Assertions.assertEquals(2, loadedPersons.size());
       {
         Person person = loadedPersons.get(0);
-        Assertions.assertEquals(0, person.getId());
+        Assertions.assertEquals(persons.get(0).getId(), person.getId());
         Assertions.assertEquals("MyBatis 1", person.getName());
         List<Mail> mails = person.getMails();
         Assertions.assertEquals(2, mails.size());
         {
           Mail mail = mails.get(0);
-          Assertions.assertEquals(0, mail.getId());
-          Assertions.assertEquals(0, mail.getPersonId());
+          Assertions.assertEquals(maxMailId + 1, mail.getId());
+          Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
           Assertions.assertEquals("mybatis1.main@test.com", mail.getAddress());
         }
         {
           Mail mail = mails.get(1);
-          Assertions.assertEquals(1, mail.getId());
-          Assertions.assertEquals(0, mail.getPersonId());
+          Assertions.assertEquals(maxMailId + 2, mail.getId());
+          Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
           Assertions.assertEquals("mybatis1.sub@test.com", mail.getAddress());
         }
       }
       {
         Person person = loadedPersons.get(1);
-        Assertions.assertEquals(1, person.getId());
+        Assertions.assertEquals(persons.get(1).getId(), person.getId());
         Assertions.assertEquals("MyBatis 2", person.getName());
         List<Mail> mails = person.getMails();
         Assertions.assertEquals(2, mails.size());
         {
           Mail mail = mails.get(0);
-          Assertions.assertEquals(2, mail.getId());
-          Assertions.assertEquals(1, mail.getPersonId());
+          Assertions.assertEquals(maxMailId + 3, mail.getId());
+          Assertions.assertEquals(persons.get(1).getId(), mail.getPersonId());
           Assertions.assertEquals("mybatis2.main@test.com", mail.getAddress());
         }
         {
           Mail mail = mails.get(1);
-          Assertions.assertEquals(3, mail.getId());
-          Assertions.assertEquals(1, mail.getPersonId());
+          Assertions.assertEquals(maxMailId + 4, mail.getId());
+          Assertions.assertEquals(persons.get(1).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis2.sub@test.com", mail.getAddress());
+        }
+      }
+      // Select using list property
+      {
+        PersonMapper.Conditions conditions = new PersonMapper.Conditions();
+        conditions.setMails(Arrays.asList("mybatis1.main@test.com", "mybatis2.sub@test.com"));
+        List<Mail> mails = mapper.selectMailsByConditions(conditions);
+        Assertions.assertEquals(2, mails.size());
+        {
+          Mail mail = mails.get(0);
+          Assertions.assertEquals(maxMailId + 1, mail.getId());
+          Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis1.main@test.com", mail.getAddress());
+        }
+        {
+          Mail mail = mails.get(1);
+          Assertions.assertEquals(maxMailId + 4, mail.getId());
+          Assertions.assertEquals(persons.get(1).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis2.sub@test.com", mail.getAddress());
+        }
+      }
+      // Select using list property on iteration object
+      {
+        PersonMapper.Conditions conditions1 = new PersonMapper.Conditions();
+        conditions1.setMails(Arrays.asList("mybatis1.main@test.com", "mybatis2.sub@test.com"));
+        PersonMapper.Conditions conditions2 = new PersonMapper.Conditions();
+        conditions2.setMails(Collections.singletonList("mybatis1.sub@test.com"));
+        List<Mail> mails = mapper.selectMailsByConditionsArray(Arrays.asList(conditions1, conditions2));
+        Assertions.assertEquals(3, mails.size());
+        {
+          Mail mail = mails.get(0);
+          Assertions.assertEquals(maxMailId + 1, mail.getId());
+          Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis1.main@test.com", mail.getAddress());
+        }
+        {
+          Mail mail = mails.get(1);
+          Assertions.assertEquals(maxMailId + 2, mail.getId());
+          Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis1.sub@test.com", mail.getAddress());
+        }
+        {
+          Mail mail = mails.get(2);
+          Assertions.assertEquals(maxMailId + 4, mail.getId());
+          Assertions.assertEquals(persons.get(1).getId(), mail.getPersonId());
           Assertions.assertEquals("mybatis2.sub@test.com", mail.getAddress());
         }
       }

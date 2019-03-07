@@ -51,3 +51,11 @@ insert into names (id, firstName, lastName) values(6, 'Be%ty', 'Ab_le');
 insert into names (id, firstName, lastName) values(7, 'Be\ty', 'Abble');
 
 insert into names2 (id, firstName, lastName) values(1, 'MyBatis', 'Thymeleaf');
+
+insert into persons (id, name) values(100, 'Name 1');
+insert into persons (id, name) values(101, 'Name 2');
+
+insert into person_mails (id, person_id, address) values(1000, 100, 'mybatis1.main@test.net');
+insert into person_mails (id, person_id, address) values(1001, 100, 'mybatis1.sub@test.net');
+insert into person_mails (id, person_id, address) values(1002, 101, 'mybatis2.main@test.net');
+insert into person_mails (id, person_id, address) values(1003, 101, 'mybatis2.sub@test.net');

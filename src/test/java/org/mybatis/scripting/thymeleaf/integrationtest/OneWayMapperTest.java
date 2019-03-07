@@ -25,19 +25,22 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.hsqldb.jdbc.JDBCDataSource;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
+import org.mybatis.scripting.thymeleaf.integrationtest.domain.Mail;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
-import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.OneWayNameMapper;
+import org.mybatis.scripting.thymeleaf.integrationtest.mapper.OneWayPersonMapper;
 
 import java.io.Reader;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 class OneWayMapperTest {
@@ -65,10 +68,12 @@ class OneWayMapperTest {
     Environment environment = new Environment("development", transactionFactory, dataSource);
 
     Configuration configuration = new Configuration(environment);
+    configuration.setMapUnderscoreToCamelCase(true);
     configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder().use2way(false).build());
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     configuration.addMapper(OneWayNameMapper.class);
+    configuration.addMapper(OneWayPersonMapper.class);
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
   }
 
@@ -296,6 +301,37 @@ class OneWayMapperTest {
       param.setFirstName("");
       List<Name> names = mapper.findByName(param);
       Assertions.assertEquals(7, names.size());
+    }
+  }
+
+  @Test
+  void testNestedCollectionProperty() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      OneWayPersonMapper mapper = sqlSession.getMapper(OneWayPersonMapper.class);
+      OneWayPersonMapper.Conditions conditions1 = new OneWayPersonMapper.Conditions();
+      conditions1.setMails(Arrays.asList("mybatis1.main@test.net", "mybatis2.sub@test.net"));
+      OneWayPersonMapper.Conditions conditions2 = new OneWayPersonMapper.Conditions();
+      conditions2.setMails(Collections.singletonList("mybatis1.sub@test.net"));
+      List<Mail> mails = mapper.selectMailsByConditionsArray(Arrays.asList(conditions1, conditions2));
+      Assertions.assertEquals(3, mails.size());
+      {
+        Mail mail = mails.get(0);
+        Assertions.assertEquals(1000, mail.getId());
+        Assertions.assertEquals(100, mail.getPersonId());
+        Assertions.assertEquals("mybatis1.main@test.net", mail.getAddress());
+      }
+      {
+        Mail mail = mails.get(1);
+        Assertions.assertEquals(1001, mail.getId());
+        Assertions.assertEquals(100, mail.getPersonId());
+        Assertions.assertEquals("mybatis1.sub@test.net", mail.getAddress());
+      }
+      {
+        Mail mail = mails.get(2);
+        Assertions.assertEquals(1003, mail.getId());
+        Assertions.assertEquals(101, mail.getPersonId());
+        Assertions.assertEquals("mybatis2.sub@test.net", mail.getAddress());
+      }
     }
   }
 

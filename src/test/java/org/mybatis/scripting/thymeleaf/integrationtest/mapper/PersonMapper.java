@@ -15,12 +15,12 @@
  */
 package org.mybatis.scripting.thymeleaf.integrationtest.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.mapping.FetchType;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Mail;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Person;
-
-import java.util.List;
 
 public interface PersonMapper {
 
@@ -31,14 +31,35 @@ public interface PersonMapper {
   @Insert("sql/PersonMapper/insertMailsByBulk.sql")
   void insertMailsByBulk(List<Person> persons);
 
-  @Select("SELECT id, name FROM persons ORDER BY id")
+  @Select("SELECT MAX(id) FROM person_mails")
+  Integer getMaxMailId();
+
+  @Select("SELECT id, name FROM persons WHERE id IN ([# mybatis:p='ids'/]) ORDER BY id")
   @Results({
       @Result(property = "id", column = "id", id = true),
       @Result(property = "mails", column = "id", many = @Many(select = "selectPersonMails", fetchType = FetchType.EAGER))
   })
-  List<Person> selectPersons();
+  List<Person> selectPersons(@Param("ids") int... ids);
 
   @Select("SELECT id, person_id, address FROM person_mails WHERE person_id = #{id} ORDER BY id")
   List<Mail> selectPersonMails(int personId);
+
+  @Select("SELECT id, person_id, address FROM person_mails WHERE address IN ([# mybatis:p='conditions.mails'/]) ORDER BY id")
+  List<Mail> selectMailsByConditions(@Param("conditions") Conditions conditions);
+
+  @Select("sql/PersonMapper/selectMailsByConditionsArray.sql")
+  List<Mail> selectMailsByConditionsArray(List<Conditions> list);
+
+  class Conditions {
+    private List<String> mails;
+
+    public List<String> getMails() {
+      return mails;
+    }
+
+    public void setMails(List<String> mails) {
+      this.mails = mails;
+    }
+  }
 
 }
