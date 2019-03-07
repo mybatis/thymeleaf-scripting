@@ -38,8 +38,8 @@ SELECT * FROM names
 ## Requirements
 
   * Java 8, Java 11+
-  * MyBatis 3.4.3+
-  * Thymeleaf 3.0+
+  * MyBatis 3.4.3+ (Recommend to use 3.5+ or 3.4.x latest version)
+  * Thymeleaf 3.0+ (Recommend to use 3.0.x latest version)
 
 ## Quick Start
 
