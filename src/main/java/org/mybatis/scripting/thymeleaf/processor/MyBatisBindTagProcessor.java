@@ -78,8 +78,7 @@ public class MyBatisBindTagProcessor extends AbstractAttributeTagProcessor {
             "Variable name expression evaluated as null or empty: \"" + nameExp + "\"");
       }
 
-      MyBatisBindingContext bindingContext =
-          (MyBatisBindingContext) context.getVariable(MyBatisBindingContext.CONTEXT_VARIABLE_NAME);
+      MyBatisBindingContext bindingContext = MyBatisBindingContext.load(context);
       bindingContext.setCustomBindVariable(name.toString(), value);
     });
   }

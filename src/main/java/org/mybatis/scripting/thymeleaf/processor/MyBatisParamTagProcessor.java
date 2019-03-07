@@ -74,8 +74,7 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
     String body;
     String iterationObjectName = objectName + "Stat";
     if (context.containsVariable(iterationObjectName)) {
-      MyBatisBindingContext bindingContext =
-          (MyBatisBindingContext) context.getVariable(MyBatisBindingContext.CONTEXT_VARIABLE_NAME);
+      MyBatisBindingContext bindingContext = MyBatisBindingContext.load(context);
       IterationStatusVar iterationStatus = (IterationStatusVar) context.getVariable(iterationObjectName);
       String iterationObjectVariableName = bindingContext.generateUniqueName(objectName, iterationStatus);
       if (!bindingContext.containsCustomBindVariable(iterationObjectVariableName)) {

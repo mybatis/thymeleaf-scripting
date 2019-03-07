@@ -57,8 +57,7 @@ public class MyBatisIntegratingEngineContextFactory implements IEngineContextFac
           if (method.getName().equals("getVariable")) {
             String name = (String) args[0];
             Object value;
-            MyBatisBindingContext bindingContext =
-                (MyBatisBindingContext) engineContext.getVariable(MyBatisBindingContext.CONTEXT_VARIABLE_NAME);
+            MyBatisBindingContext bindingContext = MyBatisBindingContext.load(engineContext);
             if (bindingContext.isFallbackParameterObject()) {
               value = engineContext.containsVariable(name)
                   ? engineContext.getVariable(name) : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.thymeleaf.context.IContext;
 import org.thymeleaf.engine.IterationStatusVar;
 
 /**
@@ -30,14 +31,21 @@ import org.thymeleaf.engine.IterationStatusVar;
  */
 public class MyBatisBindingContext {
 
-  /**
-   * The variable name for storing this instance into template engine context.
-   */
-  public static final String CONTEXT_VARIABLE_NAME = "_" + MyBatisBindingContext.class.getName();
+  static final String CONTEXT_VARIABLE_NAME = "_" + MyBatisBindingContext.class.getName();
 
   private final Map<String, Object> customBindVariables = new HashMap<>();
   private final IterationStatusManager iterationStatusManager = new IterationStatusManager();
   private final boolean fallbackParameterObject;
+
+  /**
+   * Load instance from {@link IContext} provided by Thymeleaf.
+   *
+   * @param context a context of thymeleaf template processing
+   * @return instance of this class
+   */
+  public static MyBatisBindingContext load(IContext context) {
+    return (MyBatisBindingContext)context.getVariable(CONTEXT_VARIABLE_NAME);
+  }
 
   /**
    * Constructor.

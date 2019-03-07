@@ -78,13 +78,26 @@ public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
         .filter(type::isInstance).map(type::cast).findFirst();
   }
 
+  /**
+   * Enum for providing builtin customizer instance.
+   *
+   * @since 1.0.0
+   */
   enum BuiltIn implements TemplateEngineCustomizer {
-    DEFAULT() {
+
+    /**
+     * Default instance.
+     * <p>
+     * This customizer instance do nothing.
+     * </p>
+     */
+    DEFAULT {
       @Override
       public void customize(TemplateEngine defaultTemplateEngine) {
         // NOP
       }
-    };
+    }
+
   }
 
 }
