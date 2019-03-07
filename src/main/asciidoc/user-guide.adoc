@@ -163,9 +163,9 @@ About tested versions see the latest link:{travis-ci-url}[Travi CI^] build resul
 ====
 As basically policy, we do test using following versions.
 
-* latest release version on 3.4.x line
 * latest release version on 3.5.x line
 * latest snapshot version on 3.5.x line
+* latest release version on 3.4.x line
 ====
 
 === Thymeleaf
@@ -192,16 +192,18 @@ If you are using the Maven as build tool, you can add as follow:
 [source,xml,subs="specialchars,attributes"]
 .pom.xml (dependencies)
 ----
-<dependency>
-  <groupId>org.mybatis</groupId>
-  <artifactId>mybatis</artifactId>
-  <version>{mybatis-version}</version> <!-- Adjust to your application -->
-</dependency>
-<dependency>
-  <groupId>org.mybatis.scripting</groupId>
-  <artifactId>mybatis-thymeleaf</artifactId>
-  <version>{revnumber}</version>
-</dependency>
+<dependencies>
+  <dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis</artifactId>
+    <version>{mybatis-version}</version> <!-- Adjust to your application -->
+  </dependency>
+  <dependency>
+    <groupId>org.mybatis.scripting</groupId>
+    <artifactId>mybatis-thymeleaf</artifactId>
+    <version>{revnumber}</version>
+  </dependency>
+</dependencies>
 ----
 
 If you use a snapshot version, you need add the configuration
@@ -227,7 +229,6 @@ If you are using the Gradle as build tool, you can add as follow:
 .build.gradle (dependencies)
 ----
 dependencies {
-  // ...
   compile("org.mybatis:mybatis:{mybatis-version}") // Adjust version to your application
   compile("org.mybatis.scripting:mybatis-thymeleaf:{revnumber}")
 }
@@ -239,7 +240,6 @@ If you use a snapshot version, you need add the configuration for using the "Son
 .build.gradle (repositories)
 ----
 repositories {
-  // ...
   maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 ----
@@ -270,13 +270,13 @@ The MyBatis provides two ways(annotation driven and XML driven) for creating a M
 
 ==== Annotation driven mapper
 
-If you use the annotation driven mapper, you can specify a 2-way SQL as follow:
+If you use the annotation driven mapper, you can specify an SQL as follow:
 
 [source,java]
 .src/main/java/com/example/NameMapper.java
 ----
 public class NameMapper {
-  @Select("SELECT * FROM names WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/")
+  @Select("SELECT * FROM names WHERE id = /*[# mybatis:p='id']*/ 1 /*[/]*/")
   Name findById(@Param("id") Integer id);
 }
 ----
@@ -284,7 +284,7 @@ public class NameMapper {
 [TIP]
 ====
 
-You can specify a 2-way SQL in annotation using "link:https://openjdk.java.net/jeps/326[Raw String Literals^]" feature that support by future JDK version as follow:
+You can specify an SQL in annotation using "link:https://openjdk.java.net/jeps/326[Raw String Literals^]" feature that support by future JDK version as follow:
 
 [source,java]
 ----
@@ -323,7 +323,7 @@ Todo findById(int id);
 There is a good compatibility for annotation driven mapper.
 ====
 
-Also, you can specify a 2-way SQL on template file(e.g. `/NameMapper/findById.sql` on class path) as follow:
+Also, you can specify an SQL on template file(e.g. `/NameMapper/findById.sql` on class path) as follow:
 
 [source,java]
 ----
@@ -343,7 +343,7 @@ SELECT * FROM names
 
 ==== XML driven mapper
 
-If you use the XML driven mapper, you can specify a 2-way SQL as follow:
+If you use the XML driven mapper, you can specify an SQL as follow:
 
 [source,java]
 .src/main/java/com/example/NameMapper.java
@@ -362,7 +362,7 @@ public class NameMapper {
 </select>
 ----
 
-Also, you can specify a 2-way SQL on template file
+Also, you can specify an SQL on template file
 (see '<<_getting-started-template-sql,Annotation driven mapper>>' section) as follow:
 
 [source,xml]
@@ -1176,38 +1176,33 @@ The non 2-way SQL is simple a little compare with 2-way SQL and limitations not 
 By default, the mybatis-thymeleaf will be use the 2-way SQL mode.
 Therefore you should be configure explicitly to use the non 2-way SQL mode using configuration properties file or builder option as follow:
 
+[NOTE]
+====
+This configuration is optional. The non 2-way SQL can be use on the 2-way SQL mode.
+====
+
 [source,properties]
 .How to configure using configuration properties file(src/main/resources/mybatis-thymeleaf.properties)
 ----
 use-2way = false # <1>
 ----
 
-<1> Set the `use-2way` to `false`
+or
 
 [source,java]
 .How to configure using builder option
 ----
-// ...
 configuration.getLanguageRegistry()
-    .register(ThymeleafLanguageDriver.newBuilder().use2way(false).build()); // <1>
-// ...
+    .register(ThymeleafLanguageDriver.newBuilder().use2way(false).build()); // <2>
 ----
 
-<1> Set the `use2way` builder option to `false`
+<1> Set the `use-2way` to `false`
+<2> Set the `use2way` builder option to `false`
 
 
-=== Binding value
+=== Basic usage
 
-In the non 2-way SQL mode, you use the MyBatis's standard bind variable expression such as `#{...}` as follow:
-
-[source,sql]
-.MyBatis's standard bind variable expression
-----
-SELECT * FROM names WHERE id = #{id}
-----
-
-If you bind a iteration object(List etc..) using dynamic SQL,
-you need to generate MyBatis's standard bind variable expression using inlined expression of Thymeleaf as follow:
+The different with the 2-way SQL mode is that will be unnecessary to enclose the thymeleaf expressions as SQL comment(`/\*[...]*/`).
 
 [source,sql]
 .SQL Template
@@ -1221,10 +1216,6 @@ SELECT * FROM names
   [/]
   ORDER BY id
 ----
-
-=== Different with 2-way SQL mode
-
-The different with 2-way SQL mode is that will be unnecessary to enclose the thymeleaf expressions as SQL comment(`/\*[...]*/`).
 
 == Usage on framework
 
