@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,13 @@
  */
 package org.mybatis.scripting.thymeleaf.integrationtest;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -26,13 +33,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 class SqlSessionTest {
   private static SqlSessionFactory sqlSessionFactory;
@@ -242,8 +242,8 @@ class SqlSessionTest {
       sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByNameBindNameIsEmpty", param);
       Assertions.fail();
     } catch (PersistenceException e) {
-      Assertions.assertEquals("Variable name expression evaluated as null or empty: \"${''}\" (template: \"/*[# mybatis:bind=\"${''}=1\" /]*/\n" +
-          "      SELECT * FROM names\" - line 1, col 6)", e.getCause().getCause().getMessage());
+      Assertions.assertTrue(e.getCause().getCause().getMessage().startsWith("Variable name expression evaluated as null or empty: \"${''}\" (template: \"/*[# mybatis:bind=\"${''}=1\" /]*/"));
+      Assertions.assertTrue(e.getCause().getCause().getMessage().endsWith("SELECT * FROM names\" - line 1, col 6)"));
     }
   }
 
