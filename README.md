@@ -29,10 +29,7 @@ SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${not #lists.isEmpty(ids)}"]*/
     AND id IN (
-    /*[# th:each="id : ${ids}"]*/
-      /*[+ [# th:if="${not idStat.first}"][(',')][/] +]*/
-      /*[# mybatis:p="id"]*/ 1 /*[/]*/
-    /*[/]*/
+      /*[# mybatis:p="ids"]*/ 1 /*[/]*/
     )
   /*[/]*/
   ORDER BY id
