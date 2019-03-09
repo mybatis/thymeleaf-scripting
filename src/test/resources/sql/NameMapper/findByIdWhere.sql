@@ -14,7 +14,10 @@
 --    limitations under the License.
 --
 
-WHERE 1 = 1
-/*[# th:if="${id} != null"]*/
-  AND id = /*[# mb:p="id"]*/ 1 /*[/]*/
-/*[/]*/
+/*[- */
+SELECT * FROM names
+/* -]*/
+  WHERE 1 = 1
+  /*[# th:if="${id} != null"]*/
+    AND id = /*[# mb:p="id"]*/ 1 /*[/]*/
+  /*[/]*/

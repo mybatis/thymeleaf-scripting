@@ -727,6 +727,9 @@ At first, you create a fragment SQL template file for sharing by multiple SQL as
 .src/main/resources/NameMapper/whereByCriteria.sql
 [source,sql]
 ----
+/*[- */ -- <1>
+SELECT * FROM names
+/* -]*/ -- <2>
   WHERE 1 = 1
   /*[# th:if="${criteria.firstName} != null"]*/
     AND firstName = /*[# mb:p="criteria.firstName"]*/ 'Taro' /*[/]*/
@@ -735,6 +738,9 @@ At first, you create a fragment SQL template file for sharing by multiple SQL as
     AND lastName = /*[# mb:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
 ----
+
+<1> Start a block comment for ignoring `"SELECT * FROM names"` part at template processing time
+<2> End a block comment
 
 ==== Insert a fragment SQL
 
