@@ -20,17 +20,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.thymeleaf.engine.IterationStatusVar;
-
 /**
- * The expression utility object that provide helper method for generating SQL.
+ * The expression utility object that provide helper method for like feature.
  * <br>
- * This object can be access using {@code #mybatis}) as expression utility object.
+ * This object can be access using {@code #likes}) as expression utility object.
  *
  * @author Kazuki Shimizu
  * @version 1.0.0
  */
-public class MyBatisExpression {
+public class Likes {
 
   private char escapeChar = '\\';
 
@@ -41,7 +39,7 @@ public class MyBatisExpression {
   /**
    * Construct new instance that corresponds with specified configuration.
    */
-  private MyBatisExpression() {
+  private Likes() {
     // NOP
   }
 
@@ -52,7 +50,7 @@ public class MyBatisExpression {
    * @param value A target condition value
    * @return A escaped value
    */
-  public String escapeLikeWildcard(String value) {
+  public String escapeWildcard(String value) {
     if (value == null || value.isEmpty()) {
       return "";
     }
@@ -72,12 +70,12 @@ public class MyBatisExpression {
    * By default configuration, this method return {@code "ESCAPE '\'"}.
    * @return A escape clause string of LIKE
    */
-  public String likeEscapeClause() {
+  public String escapeClause() {
     return escapeClauseSupplier.apply(escapeChar);
   }
 
   /**
-   * Creates a new builder instance for {@link MyBatisExpression}.
+   * Creates a new builder instance for {@link Likes}.
    * @return a new builder instance
    */
   public static Builder newBuilder() {
@@ -85,11 +83,11 @@ public class MyBatisExpression {
   }
 
   /**
-   * The builder class for {@link MyBatisExpression}.
+   * The builder class for {@link Likes}.
    */
   public static class Builder {
 
-    private final MyBatisExpression expression = new MyBatisExpression();
+    private final Likes instance = new Likes();
 
     private Builder() {
       // NOP
@@ -102,8 +100,8 @@ public class MyBatisExpression {
      * @param escapeChar A escape character
      * @return A self instance
      */
-    public Builder likeEscapeChar(Character escapeChar) {
-      Optional.ofNullable(escapeChar).ifPresent(v -> expression.escapeChar = v);
+    public Builder escapeChar(Character escapeChar) {
+      Optional.ofNullable(escapeChar).ifPresent(v -> instance.escapeChar = v);
       return this;
     }
 
@@ -115,8 +113,8 @@ public class MyBatisExpression {
      * @param additionalEscapeTargetChars escape target characters(custom wildcard characters)
      * @return A self instance
      */
-    public Builder likeAdditionalEscapeTargetChars(Set<Character> additionalEscapeTargetChars) {
-      Optional.ofNullable(additionalEscapeTargetChars).ifPresent(v -> expression.additionalEscapeTargetChars = v);
+    public Builder additionalEscapeTargetChars(Set<Character> additionalEscapeTargetChars) {
+      Optional.ofNullable(additionalEscapeTargetChars).ifPresent(v -> instance.additionalEscapeTargetChars = v);
       return this;
     }
 
@@ -128,18 +126,18 @@ public class MyBatisExpression {
      * @param escapeClauseFormat a format of escape clause
      * @return A self instance
      */
-    public Builder likeEscapeClauseFormat(String escapeClauseFormat) {
+    public Builder escapeClauseFormat(String escapeClauseFormat) {
       Optional.ofNullable(escapeClauseFormat)
-          .ifPresent(v -> expression.escapeClauseSupplier = escapeChar -> String.format(v, escapeChar));
+          .ifPresent(v -> instance.escapeClauseSupplier = escapeChar -> String.format(v, escapeChar));
       return this;
     }
 
     /**
-     * Return a {@link MyBatisExpression} instance .
-     * @return A {@link MyBatisExpression} instance corresponding with specified option
+     * Return a {@link Likes} instance .
+     * @return A {@link Likes} instance corresponding with specified option
      */
-    public MyBatisExpression build() {
-      return expression;
+    public Likes build() {
+      return instance;
     }
 
   }

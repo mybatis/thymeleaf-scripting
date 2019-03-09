@@ -869,7 +869,7 @@ If you specify the `ESCAPE '\'` directly as static template parts, the Thymeleaf
 [source,sql]
 .Invalid usage
 ----
-/*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
+/*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|" /]*/
 AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /**/ ESCAPE '\'
 ----
 
@@ -879,7 +879,7 @@ AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /**/ ESCAPE '\'
 ====
 As a solution for avoiding this behavior,
 the mybatis-thymeleaf provide the expression utility method for adding the `ESCAPE` clause.
-For detail, please see <<likeEscapeClause>>.
+For detail, please see <<escapeClause>>.
 ====
 
 == Custom Dialect
@@ -950,7 +950,7 @@ SELECT * FROM names
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${firstName} != null"]*/
-    /*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
+    /*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|" /]*/ -- <1>
     AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro' /*[/]*/ -- <2>
   /*[/]*/
 ----
@@ -958,7 +958,7 @@ SELECT * FROM names
 [source,sql]
 .Usage for registering multiple variables:
 ----
-/*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|, patternLastName=|${#mybatis.escapeLikeWildcard(lastName)}%|" /]*/ -- <3>
+/*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|, patternLastName=|${#likes.escapeWildcard(lastName)}%|" /]*/ -- <3>
 ----
 
 <1> Register an any value(e.g. editing value at template) as custom bind variables
@@ -975,7 +975,9 @@ because it can only access within a template. Hence, the mybatis-thymeleaf provi
 
 === Expression utility method
 
-You can access it using `#mybatis` expression.
+==== #likes expression
+
+The `#likes` expression provide utility methods for LIKE clause.
 
 [cols="1,5a,4",options="header"]
 .Supported method list
@@ -984,7 +986,7 @@ You can access it using `#mybatis` expression.
 ^|Arguments
 ^|Description
 
-|<<mybatis-escapeLikeWildcard,escapeLikeWildcard>>
+|<<mybatis-escapeLikeWildcard,escapeWildcard>>
 |
 
 [cols="^1,4,5",options="header"]
@@ -1001,7 +1003,7 @@ You can access it using `#mybatis` expression.
 |Return a value that escaped a wildcard character of LIKE condition
 (By default behavior, this method escape the `"%"`, `"_"` and `"\"`(escape character itself) using `"\"`)
 
-|<<mybatis-likeEscapeClause,likeEscapeClause>>
+|<<mybatis-likeEscapeClause,escapeClause>>
 | N/A
 |Return a escape clause string of LIKE condition
 ( By default behavior, this method return `"ESCAPE '\'"`)
@@ -1010,19 +1012,19 @@ You can access it using `#mybatis` expression.
 
 [TIP]
 ====
-You can customize the default behavior for the `escapeLikeWildcard` and `likeEscapeClause`
+You can customize the default behavior for the `escapeWildcard` and `escapeClause`
 using <<Configuration properties, Configuration properties>>.
 ====
 
 
 [[mybatis-escapeLikeWildcard]]
-==== escapeLikeWildcard
+===== escapeWildcard
 
 [source,sql]
 .Basic usage:
 ----
 /*[# th:if="${firstName} != null"]*/
-  /*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
+  /*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|" /]*/ -- <1>
   AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro%' /*[/]*/
 /*[/]*/
 ----
@@ -1037,14 +1039,14 @@ using <<Configuration properties, Configuration properties>>.
 
 
 [[mybatis-likeEscapeClause]]
-==== likeEscapeClause
+===== escapeClause
 
 [source,sql]
 .Basic usage:
 ----
 /*[# th:if="${firstName} != null"]*/
-  /*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
-  AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro%' /*[/]*/ /*[(${#mybatis.likeEscapeClause()})]*/ -- <1>
+  /*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|" /]*/
+  AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro%' /*[/]*/ /*[(${#likes.escapeClause()})]*/ -- <1>
 /*[/]*/
 ----
 

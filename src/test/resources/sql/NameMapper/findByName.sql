@@ -17,10 +17,10 @@
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${firstName} != null"]*/
-    /*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
-    AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro%' /*[/]*/ /*[(${#mybatis.likeEscapeClause()})]*/
+    /*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|" /]*/
+    AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro%' /*[/]*/ /*[(${#likes.escapeClause()})]*/
   /*[/]*/
   /*[# th:if="${lastName} != null"]*/
-    /*[# mb:bind="patternLastName=|${#mybatis.escapeLikeWildcard(lastName)}%|" /]*/
-    AND lastName LIKE /*[# mb:p="patternLastName"]*/ 'Yamada%' /*[/]*/ /*[(${#mybatis.likeEscapeClause()})]*/
+    /*[# mb:bind="patternLastName=|${#likes.escapeWildcard(lastName)}%|" /]*/
+    AND lastName LIKE /*[# mb:p="patternLastName"]*/ 'Yamada%' /*[/]*/ /*[(${#likes.escapeClause()})]*/
   /*[/]*/

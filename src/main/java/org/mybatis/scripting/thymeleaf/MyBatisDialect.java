@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mybatis.scripting.thymeleaf.expression.MyBatisExpression;
+import org.mybatis.scripting.thymeleaf.expression.Likes;
 import org.mybatis.scripting.thymeleaf.processor.MyBatisBindTagProcessor;
 import org.mybatis.scripting.thymeleaf.processor.MyBatisParamTagProcessor;
 import org.thymeleaf.context.IExpressionContext;
@@ -37,9 +37,9 @@ import org.thymeleaf.templatemode.TemplateMode;
  * This dialect provides following features. This dialect prefix is {@code "mb"} by default.
  *
  * <ul>
- *   <li>{@code #mybatis} : {@link MyBatisExpression}</li>
- *   <li>{@code mb:p} : {@link MyBatisParamTagProcessor}</li>
- *   <li>{@code mb:bind} : {@link MyBatisBindTagProcessor}</li>
+ *   <li>{@code #likes} expression : {@link Likes}</li>
+ *   <li>{@code mb:p} attribute tag: {@link MyBatisParamTagProcessor}</li>
+ *   <li>{@code mb:bind} attribute tag : {@link MyBatisBindTagProcessor}</li>
  * </ul>
  *
  * @author Kazuki Shimizu
@@ -49,7 +49,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
 
   static final String DEFAULT_PREFIX = "mb";
 
-  private static final MyBatisExpression.Builder expressionBuilder = MyBatisExpression.newBuilder();
+  private Likes likes = Likes.newBuilder().build();
 
   /**
    * Default constructor.
@@ -68,35 +68,12 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
   }
 
   /**
-   * Set an escape character for wildcard of LIKE.
+   * Set an expression utility object that provide helper method for like feature.
    * <br>
-   * The default value is {@code '\'} (backslash)
-   * @param escapeChar A escape character
+   * @param likes An expression utility object that provide helper method for like feature
    */
-  public void setLikeEscapeChar(Character escapeChar) {
-    expressionBuilder.likeEscapeChar(escapeChar);
-  }
-
-  /**
-   * Set a format of escape clause.
-   * <br>
-   * The default value is {@code "ESCAPE '%s'"}.
-   *
-   * @param escapeClauseFormat a format of escape clause
-   */
-  public void setLikeEscapeClauseFormat(String escapeClauseFormat) {
-    expressionBuilder.likeEscapeClauseFormat(escapeClauseFormat);
-  }
-
-  /**
-   * Set additional escape target characters(custom wildcard characters) for LIKE condition.
-   * <br>
-   * The default value is nothing.
-   *
-   * @param additionalEscapeTargetChars escape target characters(custom wildcard characters)
-   */
-  public void setLikeAdditionalEscapeTargetChars(Set<Character> additionalEscapeTargetChars) {
-    expressionBuilder.likeAdditionalEscapeTargetChars(additionalEscapeTargetChars);
+  public void setLikes(Likes likes) {
+    this.likes = likes;
   }
 
   /**
@@ -127,7 +104,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
      */
     @Override
     public Set<String> getAllExpressionObjectNames() {
-      return Collections.singleton("mybatis");
+      return Collections.singleton("likes");
     }
 
     /**
@@ -135,7 +112,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
      */
     @Override
     public Object buildObject(IExpressionContext context, String expressionObjectName) {
-      return expressionBuilder.build();
+      return likes;
     }
 
     /**

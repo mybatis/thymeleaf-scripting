@@ -38,7 +38,7 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
-import org.mybatis.scripting.thymeleaf.expression.MyBatisExpression;
+import org.mybatis.scripting.thymeleaf.expression.Likes;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -143,9 +143,12 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
             .split(",")).map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0))
             .collect(Collectors.toSet());
     MyBatisDialect dialect = new MyBatisDialect(prefix);
-    dialect.setLikeEscapeChar(likeEscapeChar);
-    dialect.setLikeEscapeClauseFormat(likeEscapeClauseFormat);
-    dialect.setLikeAdditionalEscapeTargetChars(likeAdditionalEscapeTargetChars);
+    Likes likes = Likes.newBuilder()
+        .escapeChar(likeEscapeChar)
+        .escapeClauseFormat(likeEscapeClauseFormat)
+        .additionalEscapeTargetChars(likeAdditionalEscapeTargetChars)
+        .build();
+    dialect.setLikes(likes);
 
     // Create an ClassLoaderTemplateResolver instance
     ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();

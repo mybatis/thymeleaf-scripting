@@ -15,24 +15,24 @@
  */
 package org.mybatis.scripting.thymeleaf.expression;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.HashSet;
 
-class MyBatisExpressionTest {
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+class LikesTest {
 
   @Test
-  void testEscapeLikeWildcardValueIsNull() {
-    Assertions.assertEquals(MyBatisExpression.newBuilder().build().escapeLikeWildcard(null), "");
+  void testEscapeWildcardValueIsNull() {
+    Assertions.assertEquals(Likes.newBuilder().build().escapeWildcard(null), "");
   }
 
   @Test
-  void testEscapeLikeWildcardValueWithAdditionalEscapeTargetChars() {
+  void testEscapeWildcardValueWithAdditionalEscapeTargetChars() {
     Assertions.assertEquals("a\\％\\＿\\\\b",
-        MyBatisExpression.newBuilder().likeAdditionalEscapeTargetChars(new HashSet<>(Arrays.asList('％','＿')))
-            .build().escapeLikeWildcard("a％＿\\b"));
+        Likes.newBuilder().additionalEscapeTargetChars(new HashSet<>(Arrays.asList('％','＿')))
+            .build().escapeWildcard("a％＿\\b"));
   }
 
 }

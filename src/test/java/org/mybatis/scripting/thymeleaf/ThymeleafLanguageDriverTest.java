@@ -27,8 +27,12 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.hsqldb.jdbc.JDBCDataSource;
-import org.junit.jupiter.api.*;
-import org.mybatis.scripting.thymeleaf.expression.MyBatisExpression;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mybatis.scripting.thymeleaf.expression.Likes;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
@@ -130,9 +134,9 @@ class ThymeleafLanguageDriverTest {
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
       Assertions.assertEquals("mb", v.getPrefix());
-      MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
+      Likes expression = (Likes) v.getExpressionObjectFactory()
           .buildObject(null, null);
-      Assertions.assertEquals("ESCAPE '\\'", expression.likeEscapeClause());
+      Assertions.assertEquals("ESCAPE '\\'", expression.escapeClause());
     });
   }
 
@@ -165,10 +169,10 @@ class ThymeleafLanguageDriverTest {
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
       Assertions.assertEquals("mybatis", v.getPrefix());
-      MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
+      Likes expression = (Likes) v.getExpressionObjectFactory()
           .buildObject(null, null);
-      Assertions.assertEquals("escape '~'", expression.likeEscapeClause());
-      Assertions.assertEquals("a~％~＿~~b", expression.escapeLikeWildcard("a％＿~b"));
+      Assertions.assertEquals("escape '~'", expression.escapeClause());
+      Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
     });
   }
 
@@ -214,10 +218,10 @@ class ThymeleafLanguageDriverTest {
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
       Assertions.assertEquals("mbs", v.getPrefix());
-      MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
+      Likes expression = (Likes) v.getExpressionObjectFactory()
           .buildObject(null, null);
-      Assertions.assertEquals("escape '~'", expression.likeEscapeClause());
-      Assertions.assertEquals("a~％~＿~~b", expression.escapeLikeWildcard("a％＿~b"));
+      Assertions.assertEquals("escape '~'", expression.escapeClause());
+      Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
     });
   }
 
