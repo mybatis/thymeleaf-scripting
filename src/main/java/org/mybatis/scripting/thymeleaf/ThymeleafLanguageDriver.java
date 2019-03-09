@@ -93,6 +93,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
   private static final String KEY_FILE_CHARACTER_ENCODING = "file.character-encoding";
   private static final String KEY_FILE_BASE_DIR = "file.base-dir";
   private static final String KEY_FILE_PATTERNS = "file.patterns";
+  private static final String KEY_DIALECT_PREFIX = "dialect.prefix";
   private static final String KEY_DIALECT_LIKE_ESCAPE_CHAR = "dialect.like.escape-char";
   private static final String KEY_DIALECT_LIKE_ESCAPE_CLAUSE_FORMAT = "dialect.like.escape-clause-format";
   private static final String KEY_DIALECT_LIKE_ESCAPE_TARGET_CHARS = "dialect.like.additional-escape-target-chars";
@@ -130,7 +131,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     loadConfigurationProperties(customProperties);
 
     // Create an MyBatisDialect instance
-    MyBatisDialect dialect = new MyBatisDialect();
+    String prefix = Optional.ofNullable(configurationProperties.getProperty(KEY_DIALECT_PREFIX))
+            .map(String::trim).orElse(MyBatisDialect.DEFAULT_PREFIX);
     Character likeEscapeChar = Optional.ofNullable(configurationProperties.getProperty(KEY_DIALECT_LIKE_ESCAPE_CHAR))
         .map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0)).orElse(null);
     String likeEscapeClauseFormat =
@@ -140,6 +142,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
         Stream.of(configurationProperties.getProperty(KEY_DIALECT_LIKE_ESCAPE_TARGET_CHARS, "")
             .split(",")).map(String::trim).filter(v -> v.length() == 1).map(v -> v.charAt(0))
             .collect(Collectors.toSet());
+    MyBatisDialect dialect = new MyBatisDialect(prefix);
     dialect.setLikeEscapeChar(likeEscapeChar);
     dialect.setLikeEscapeClauseFormat(likeEscapeClauseFormat);
     dialect.setLikeAdditionalEscapeTargetChars(likeAdditionalEscapeTargetChars);
@@ -345,6 +348,17 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
      */
     public Builder dialectLikeEscapeChar(char escapeChar) {
       customProperties.setProperty(KEY_DIALECT_LIKE_ESCAPE_CHAR, String.valueOf(escapeChar));
+      return this;
+    }
+
+    /**
+     * The dialect prefix.
+     *
+     * @param prefix dialect prefix
+     * @return a self instance
+     */
+    public Builder dialectPrefix(String prefix) {
+      Optional.ofNullable(prefix).ifPresent(v -> customProperties.setProperty(KEY_DIALECT_PREFIX, v));
       return this;
     }
 

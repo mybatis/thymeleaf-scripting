@@ -1327,6 +1327,11 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 
 4+|*Dialect configuration*
 
+|`dialect.prefix`
+|The prefix name of dialect provided by this project
+|`String`
+|`"mybatis"`
+
 |`dialect.like.escape-char`
 |The escape character for wildcard of LIKE condition
 |`Character`
@@ -1355,6 +1360,7 @@ cache.ttl = 3600000
 file.character-encoding = UTF-8
 file.base-dir = /templates/sqls
 file.patterns = *sql, *.sql.template
+dialect.prefix = mb
 dialect.like.escape-char = ~
 dialect.like.escape-clause-format = escape '%s'
 dialect.like.additional-escape-target-chars = ％, ＿
@@ -1374,6 +1380,7 @@ configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder(
     .fileCharacterEncoding(StandardCharsets.UTF_8)
     .fileBaseDir("/templates/sqls")
     .filePatterns("*.sql", "*.sql.template")
+    .dialectPrefix("mb")
     .dialectLikeEscapeChar('~')
     .dialectLikeEscapeClauseFormat("escape '%s'")
     .dialectLikeAdditionalEscapeTargetChars('％' , '＿')

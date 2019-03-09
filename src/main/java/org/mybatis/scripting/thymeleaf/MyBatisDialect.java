@@ -47,13 +47,15 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class MyBatisDialect extends AbstractProcessorDialect implements IExpressionObjectDialect {
 
+  static final String DEFAULT_PREFIX = "mybatis";
+
   private static final MyBatisExpression.Builder expressionBuilder = MyBatisExpression.newBuilder();
 
   /**
    * Default constructor.
    */
   public MyBatisDialect() {
-    this("mybatis");
+    this(DEFAULT_PREFIX);
   }
 
   /**
