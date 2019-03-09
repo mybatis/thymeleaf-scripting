@@ -36,7 +36,7 @@ public class MyBatisExpression {
 
   private Set<Character> additionalEscapeTargetChars = Collections.emptySet();
 
-  private Function<Character, String> escapeClauseSupplier = targetEscapeChar -> " ESCAPE '" + targetEscapeChar + "' ";
+  private Function<Character, String> escapeClauseSupplier = targetEscapeChar -> "ESCAPE '" + targetEscapeChar + "'";
 
   /**
    * Construct new instance that corresponds with specified configuration.
@@ -89,7 +89,7 @@ public class MyBatisExpression {
   /**
    * Return a escape clause string of LIKE.
    * <br>
-   * By default configuration, this method return {@code " ESCAPE '\' "}.
+   * By default configuration, this method return {@code "ESCAPE '\'"}.
    * @return A escape clause string of LIKE
    */
   public String likeEscapeClause() {
@@ -143,7 +143,7 @@ public class MyBatisExpression {
     /**
      * Set a format of escape clause.
      * <br>
-     * The default value is {@code " ESCAPE '%s' "}.
+     * The default value is {@code "ESCAPE '%s'"}.
      *
      * @param escapeClauseFormat a format of escape clause
      * @return A self instance

@@ -1082,7 +1082,7 @@ By default, you can access it using `#mybatis` expression.
 |<<mybatis-likeEscapeClause,likeEscapeClause>>
 | N/A
 |Return a escape clause string of LIKE condition
-( By default behavior, this method return `" ESCAPE '\' "`)
+( By default behavior, this method return `"ESCAPE '\'"`)
 |===
 
 
@@ -1336,7 +1336,7 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |The format of escape clause for LIKE condition
 (Can specify format that can be allowed by `String#format` method)
 |`String`
-|`" ESCAPE '%s' "`
+|`"ESCAPE '%s'"`
 
 |`dialect.like.additional-escape-target-chars`
 |Additional escape target characters(custom wildcard characters) for LIKE condition

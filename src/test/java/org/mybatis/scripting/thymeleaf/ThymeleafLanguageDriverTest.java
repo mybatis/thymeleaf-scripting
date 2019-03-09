@@ -131,7 +131,7 @@ class ThymeleafLanguageDriverTest {
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
       MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
           .buildObject(null, null);
-      Assertions.assertEquals(" ESCAPE '\\' ", expression.likeEscapeClause());
+      Assertions.assertEquals("ESCAPE '\\'", expression.likeEscapeClause());
     });
   }
 
