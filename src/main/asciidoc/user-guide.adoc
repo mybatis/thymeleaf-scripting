@@ -1273,6 +1273,7 @@ configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder(
     .dialectLikeEscapeChar('~')
     .dialectLikeEscapeClauseFormat("escape '%s'")
     .dialectLikeAdditionalEscapeTargetChars('％' , '＿')
+    .customProperties(configurationProperties)
     .build());
 ----
 

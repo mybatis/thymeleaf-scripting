@@ -278,6 +278,17 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     }
 
     /**
+     * The custom properties for customizing a {@link ThymeleafLanguageDriver}.
+     *
+     * @param customProperties custom properties for customizing a {@link ThymeleafLanguageDriver}
+     * @return a self instance
+     */
+    public Builder customProperties(Properties customProperties) {
+      Optional.ofNullable(customProperties).ifPresent(this.customProperties::putAll);
+      return this;
+    }
+
+    /**
      * Whether use the 2-way SQL.
      *
      * @param user2way If use the 2-way SQL, set {@code true}
