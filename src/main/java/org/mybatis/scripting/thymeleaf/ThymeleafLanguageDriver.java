@@ -57,24 +57,26 @@ import org.thymeleaf.templateresolver.StringTemplateResolver;
  * Supported properties are as follows:
  * <ul>
  * <li>use-2way:
- * Whether use the 2-way SQL. Default is true</li>
+ * Whether use the 2-way SQL. Default is {@code true}</li>
  * <li>customizer:
  * The implementation class for customizing a default {@code TemplateEngine}
  * instanced by the MyBatis Thymeleaf.</li>
  * <li>cache.enabled:
- * Whether use the cache feature. Default is true</li>
+ * Whether use the cache feature. Default is {@code true}</li>
  * <li>cache.ttl:
- * The cache TTL for resolved templates. Default is null(no TTL)</li>
+ * The cache TTL for resolved templates. Default is {@code null}(no TTL)</li>
  * <li>file.character-encoding:
- * The character encoding for reading template resources. Default is 'UTF-8'</li>
+ * The character encoding for reading template resources. Default is {@code "UTF-8"}</li>
  * <li>file.base-dir:
- * The base directory for reading template resources. Default is ''(just under class path)</li>
+ * The base directory for reading template resources. Default is {@code ""}(just under class path)</li>
  * <li>file.patterns:
- * The patterns for reading as template resources. Default is '*.sql'</li>
+ * The patterns for reading as template resources. Default is {@code "*.sql"}</li>
+ * <li>dialect.prefix:
+ * The prefix name of dialect provided by this project. Default is {@code "mb"}</li>
  * <li>dialect.like.escape-char:
  * The escape character for wildcard of LIKE. Default is {@code '\'} (backslash)</li>
  * <li>dialect.like.escape-clause-format:
- * The format of escape clause. Default is {@code " ESCAPE '%s' "}</li>
+ * The format of escape clause. Default is {@code "ESCAPE '%s'"}</li>
  * <li>dialect.like.additional-escape-target-chars:
  * The additional escape target characters(custom wildcard characters) for LIKE condition. Default is nothing</li>
  * </ul>
@@ -254,7 +256,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
   }
 
   /**
-   * Creates a new builder instance for {@link MyBatisExpression}.
+   * Creates a new builder instance for {@link ThymeleafLanguageDriver}.
    * @return a new builder instance
    */
   public static Builder newBuilder() {

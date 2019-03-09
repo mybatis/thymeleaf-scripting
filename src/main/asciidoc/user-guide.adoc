@@ -129,8 +129,6 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-This template is simple compare with 2-way SQL, but it cannot execute as-is in SQL execution tool (such as psql, mysql, sqlplus, plugins for IDE, etc...).
-
 
 === Mainly Features
 
