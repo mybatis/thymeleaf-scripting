@@ -19,6 +19,5 @@ INSERT INTO names (firstName, lastName) VALUES
   (
     /*[# mb:p="name.firstName"]*/ 'Taro' /*[/]*/,
     /*[# mb:p="name.lastName"]*/ 'Yamada' /*[/]*/
-  )
-  /*[(${#mybatis.commaIfNotLast(nameStat)})]*/
+  )/*[(${nameStat.last ? '' : ','})]*/
 /*[/]*/

@@ -984,38 +984,6 @@ You can access it using `#mybatis` expression.
 ^|Arguments
 ^|Description
 
-|<<mybatis-commaIfNotFirst,commaIfNotFirst>>
-|
-
-[cols="^1,4,5",options="header"]
-!===
-^!No
-^!Type
-^!Description
-
-!1
-!IterationStatusVar
-!A current iteration status
-!===
-
-|Return the comma if a current iteration status is not first
-
-|<<mybatis-commaIfNotLast,commaIfNotLast>>
-|
-
-[cols="^1,4,5",options="header"]
-!===
-^!No
-^!Type
-^!Description
-
-!1
-!IterationStatusVar
-!A current iteration status
-!===
-
-|Return the comma if a current iteration status is not last
-
 |<<mybatis-escapeLikeWildcard,escapeLikeWildcard>>
 |
 
@@ -1045,39 +1013,6 @@ You can access it using `#mybatis` expression.
 You can customize the default behavior for the `escapeLikeWildcard` and `likeEscapeClause`
 using <<Configuration properties, Configuration properties>>.
 ====
-
-
-[[mybatis-commaIfNotFirst]]
-==== commaIfNotFirst
-
-[source,sql]
-.Basic usage:
-----
-id IN (
-/*[# th:each="id : ${ids}"]*/
-  /*[(${#mybatis.commaIfNotFirst(idStat)})]*/ -- <1>
-  /*[# mb:p="id"]*/ 1 /*[/]*/
-/*[/]*/
-)
-----
-
-<1> Avoid adding comma at the first element
-
-[[mybatis-commaIfNotLast]]
-==== commaIfNotLast
-
-[source,sql]
-.Basic usage:
-----
-id IN (
-/*[# th:each="id : ${ids}"]*/
-  /*[# mb:p="id"]*/ 1 /*[/]*/
-  /*[(${#mybatis.commaIfNotLast(idStat)})]*/ -- <1>
-/*[/]*/
-)
-----
-
-<1> Avoid adding comma at the last element
 
 
 [[mybatis-escapeLikeWildcard]]

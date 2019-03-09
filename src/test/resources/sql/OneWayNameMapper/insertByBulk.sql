@@ -18,6 +18,5 @@ INSERT INTO names (firstName, lastName) VALUES
 [# th:each="name : ${list}"]
   (
     [# mb:p="name.firstName" /], [# mb:p="name.lastName" /]
-  )
-  [(${#mybatis.commaIfNotLast(nameStat)})]
+  )[(${nameStat.last ? '' : ','})]
 [/]

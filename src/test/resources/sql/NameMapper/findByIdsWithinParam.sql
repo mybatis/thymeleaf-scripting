@@ -19,7 +19,7 @@ SELECT * FROM names
     /*[# th:if="${not #lists.isEmpty(ids)}"]*/
     AND id IN (
     /*[# th:each="id : ${ids}"]*/
-      /*[(${#mybatis.commaIfNotFirst(idStat)})]*/
+      /*[(${idStat.first ? '' : ','})]*/
       /*[# mb:p="id"]*/ 1 /*[/]*/
     /*[/]*/
     )

@@ -46,26 +46,6 @@ public class MyBatisExpression {
   }
 
   /**
-   * Return the comma if a current iteration status is not first.
-   *
-   * @param iterationStatus A current iteration status
-   * @return If iteration status is not first, return comma and otherwise return empty string
-   */
-  public String commaIfNotFirst(IterationStatusVar iterationStatus) {
-    return iterationStatus.isFirst() ? "" : ",";
-  }
-
-  /**
-   * Return the comma if a current iteration status is not last.
-   *
-   * @param iterationStatus A current iteration status
-   * @return If iteration status is not last, return comma and otherwise return empty string
-   */
-  public String commaIfNotLast(IterationStatusVar iterationStatus) {
-    return iterationStatus.isLast() ? "" : ",";
-  }
-
-  /**
    * Escape for LIKE condition value.
    * <br>
    * By default configuration, this method escape the {@code "%"} and {@code "_"} using {@code "\"}.

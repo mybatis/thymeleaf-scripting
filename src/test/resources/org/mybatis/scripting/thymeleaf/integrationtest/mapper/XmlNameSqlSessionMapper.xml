@@ -90,7 +90,7 @@
         AND id IN (
         /*[# th:each="value : ${list}"]*/
           /*[('#{list[' + ${valueStat.index} + ']}')]*/ 1
-          /*[(${#mybatis.commaIfNotLast(valueStat)})]*/
+          /*[(${valueStat.last ? '' : ','})]*/
         /*[/]*/
         )
         /*[/]*/
