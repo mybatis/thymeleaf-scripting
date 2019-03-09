@@ -20,8 +20,7 @@ INSERT INTO person_mails (person_id, address) VALUES
     (
       /*[# mb:p="person.id"]*/ 1 /*[/]*/,
       /*[# mb:p="mail.address"]*/ 'taro.yamada@test.com' /*[/]*/
-    )
-    /*[(${personStat.last and mailStat.last} ? '' : ',')]*/
+    )/*[(${personStat.last and mailStat.last} ? '' : ',')]*/
   /*[/]*/
 /*[/]*/
 

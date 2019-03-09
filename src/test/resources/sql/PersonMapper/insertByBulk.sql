@@ -18,6 +18,5 @@ INSERT INTO persons (name) VALUES
 /*[# th:each="person : ${list}"]*/
   (
     /*[# mb:p="person.name"]*/ 'Taro Yamada' /*[/]*/
-  )
-  /*[(${#mybatis.commaIfNotLast(personStat)})]*/
+  )/*[(${personStat.last} ? '' : ',')]*/
 /*[/]*/
