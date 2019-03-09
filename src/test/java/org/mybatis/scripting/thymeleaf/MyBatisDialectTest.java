@@ -52,7 +52,7 @@ class MyBatisDialectTest {
     Environment environment = new Environment("development", transactionFactory, dataSource);
 
     Configuration configuration = new Configuration(environment);
-    configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder().dialectPrefix("mb").build());
+    configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder().dialectPrefix("mybatis").build());
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
     configuration.getMapperRegistry().addMapper(Mapper.class);
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
@@ -78,7 +78,7 @@ class MyBatisDialectTest {
   }
 
   interface Mapper {
-    @Select("SELECT * FROM names WHERE id = /*[# mb:p='id']*/ 1000 /*[/]*/")
+    @Select("SELECT * FROM names WHERE id = /*[# mybatis:p='id']*/ 1000 /*[/]*/")
     Name select(int id);
   }
 

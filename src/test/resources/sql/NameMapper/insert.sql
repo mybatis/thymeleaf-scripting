@@ -15,4 +15,4 @@
 --
 
 INSERT INTO names (firstName, lastName)
-  VALUES (/*[# mybatis:p="firstName"]*/ 'Taro' /*[/]*/, /*[# mybatis:p="lastName"]*/ 'Yamada' /*[/]*/)
+  VALUES (/*[# mb:p="firstName"]*/ 'Taro' /*[/]*/, /*[# mb:p="lastName"]*/ 'Yamada' /*[/]*/)

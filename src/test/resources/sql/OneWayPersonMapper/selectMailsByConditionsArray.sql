@@ -19,7 +19,7 @@ FROM person_mails
 WHERE 1 != 1
 [# th:each="conditions : ${list}"]
   OR address IN (
-    [# mybatis:p="conditions.mails,typeHandler=org.apache.ibatis.type.StringTypeHandler" /]
+    [# mb:p="conditions.mails,typeHandler=org.apache.ibatis.type.StringTypeHandler" /]
   )
 [/]
 ORDER BY id

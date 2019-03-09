@@ -20,7 +20,7 @@ SELECT * FROM names
     AND id IN (
     [# th:each="id : ${ids}"]
       [(${idStat.first} ? '' : ',')]
-      [# mybatis:p="id" /]
+      [# mb:p="id" /]
     [/]
     )
   [/]

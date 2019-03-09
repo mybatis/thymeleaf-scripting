@@ -34,12 +34,12 @@ import org.thymeleaf.templatemode.TemplateMode;
 /**
  * The Dialect for integrating with MyBatis.
  * <br>
- * This dialect provides following features.
+ * This dialect provides following features. This dialect prefix is {@code "mb"} by default.
  *
  * <ul>
  *   <li>{@code #mybatis} : {@link MyBatisExpression}</li>
- *   <li>{@code mybatis:p} : {@link MyBatisParamTagProcessor}</li>
- *   <li>{@code mybatis:bind} : {@link MyBatisBindTagProcessor}</li>
+ *   <li>{@code mb:p} : {@link MyBatisParamTagProcessor}</li>
+ *   <li>{@code mb:bind} : {@link MyBatisBindTagProcessor}</li>
  * </ul>
  *
  * @author Kazuki Shimizu
@@ -47,7 +47,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class MyBatisDialect extends AbstractProcessorDialect implements IExpressionObjectDialect {
 
-  static final String DEFAULT_PREFIX = "mybatis";
+  static final String DEFAULT_PREFIX = "mb";
 
   private static final MyBatisExpression.Builder expressionBuilder = MyBatisExpression.newBuilder();
 
@@ -61,7 +61,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
   /**
    * Constructor that can be specified the dialect prefix.
    *
-   * @param prefix A dialect prefix(also use as expression object name)
+   * @param prefix A dialect prefix
    */
   public MyBatisDialect(String prefix) {
     super("MyBatis Dialect", prefix, StandardDialect.PROCESSOR_PRECEDENCE);

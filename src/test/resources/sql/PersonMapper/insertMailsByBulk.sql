@@ -18,8 +18,8 @@ INSERT INTO person_mails (person_id, address) VALUES
 /*[# th:each="person : ${list}"]*/
   /*[# th:each="mail : ${person.mails}"]*/
     (
-      /*[# mybatis:p="person.id"]*/ 1 /*[/]*/,
-      /*[# mybatis:p="mail.address"]*/ 'taro.yamada@test.com' /*[/]*/
+      /*[# mb:p="person.id"]*/ 1 /*[/]*/,
+      /*[# mb:p="mail.address"]*/ 'taro.yamada@test.com' /*[/]*/
     )
     /*[(${personStat.last and mailStat.last} ? '' : ',')]*/
   /*[/]*/

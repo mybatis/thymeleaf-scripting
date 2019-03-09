@@ -17,5 +17,5 @@
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${p.id} != null"]*/
-    AND id = /*[# mybatis:p="p.id,typeHandler=org.apache.ibatis.type.IntegerTypeHandler"]*/ 1 /*[/]*/
+    AND id = /*[# mb:p="p.id,typeHandler=org.apache.ibatis.type.IntegerTypeHandler"]*/ 1 /*[/]*/
   /*[/]*/

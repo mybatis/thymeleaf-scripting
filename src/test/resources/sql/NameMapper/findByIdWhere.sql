@@ -16,5 +16,5 @@
 
 WHERE 1 = 1
 /*[# th:if="${id} != null"]*/
-  AND id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+  AND id = /*[# mb:p="id"]*/ 1 /*[/]*/
 /*[/]*/

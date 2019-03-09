@@ -55,7 +55,7 @@ The mybatis-thymeleaf translate a simple bindable 2-way SQL that specified by na
 ----
 -- Use the custom tag provided by mybatis-thymeleaf
 SELECT * FROM names
-  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+  WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 
 -- or
 
@@ -75,7 +75,7 @@ The mybatis-thymeleaf translate a dynamically bindable 2-way SQL that specified 
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${not #lists.isEmpty(ids)}"]*/
-    AND id IN (/*[# mybatis:p="ids"]*/ 1 /*[/]*/)
+    AND id IN (/*[# mb:p="ids"]*/ 1 /*[/]*/)
   /*[/]*/
   ORDER BY id
 
@@ -106,7 +106,7 @@ The mybatis-thymeleaf translate a dynamically bindable SQL(non 2-way SQL) that s
 SELECT * FROM names
   WHERE 1 = 1
   [# th:if="${not #lists.isEmpty(ids)}"]
-    AND id IN ([# mybatis:p="ids" /])
+    AND id IN ([# mb:p="ids" /])
   [/]
   ORDER BY id
 
@@ -276,7 +276,7 @@ If you use the annotation driven mapper, you can specify an SQL as follow:
 .src/main/java/com/example/NameMapper.java
 ----
 public class NameMapper {
-  @Select("SELECT * FROM names WHERE id = /*[# mybatis:p='id']*/ 1 /*[/]*/")
+  @Select("SELECT * FROM names WHERE id = /*[# mb:p='id']*/ 1 /*[/]*/")
   Name findById(@Param("id") Integer id);
 }
 ----
@@ -290,7 +290,7 @@ You can specify an SQL in annotation using "link:https://openjdk.java.net/jeps/3
 ----
 @Select(``
   SELECT * FROM names
-    WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+    WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 ``)
 Name findById(@Param("id") Integer id);
 ----
@@ -305,7 +305,7 @@ Also,"Multiline String Literals" provided other JVM languages (such as Kotlin an
 ----
 @Select("""
   SELECT * FROM names
-    WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+    WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 """)
 fun findById(id: Int): Name
 ----
@@ -315,7 +315,7 @@ fun findById(id: Int): Name
 ----
 @Select('''
   SELECT * FROM names
-    WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+    WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 ''')
 Todo findById(int id);
 ----
@@ -338,7 +338,7 @@ By default behavior, the mybatis-thymeleaf read a specified template file from j
 .src/main/resources/NameMapper/findById.sql
 ----
 SELECT * FROM names
-  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+  WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 ----
 
 ==== XML driven mapper
@@ -358,7 +358,7 @@ public class NameMapper {
 ----
 <select id="findById" resultType="com.example.Name">
   SELECT * FROM names
-    WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+    WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 </select>
 ----
 
@@ -536,7 +536,7 @@ that can be parsed by MyBatis core module as follow:
 .2-way SQL template for generating string that can be parsed by MyBatis core module
 ----
 SELECT * FROM names
-  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/ -- <1>
+  WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/ -- <1>
 ----
 
 <1> Can specify using custom tag(`mybatis:p="variable name"`) provided by mybatis-thymeleaf
@@ -581,7 +581,7 @@ If you add a SQL part when any condition is matches or not, you can use followin
 SELECT * FROM names
   WHERE 1 = 1 -- <1>
   /*[# th:if="${firstName} != null"]*/ -- <2>
-    AND firstName = /*[# mybatis:p="firstName"]*/ 'Taro' /*[/]*/
+    AND firstName = /*[# mb:p="firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/ -- <3>
   ORDER BY id
 ----
@@ -592,9 +592,9 @@ SELECT * FROM names
 UPDATE names
   SET id = id -- <4>
   /*[# th:if="${firstName} != null"]*/
-    , firstName = /*[# mybatis:p="firstName"]*/ 'Taro' /*[/]*/
+    , firstName = /*[# mb:p="firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
-  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+  WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 ----
 
 <1> Specify a non-dynamic condition at first position because the mybatis-thymeleaf does not provide
@@ -620,7 +620,7 @@ SELECT * FROM names
     AND id IN (
     /*[# th:each="id : ${ids}"]*/ -- <1>
       /*[+ [# th:if="${not idStat.first}"][(',')][/] +]*/ -- <2>
-      /*[# mybatis:p="id"]*/ 1 /*[/]*/ -- <3>
+      /*[# mb:p="id"]*/ 1 /*[/]*/ -- <3>
     /*[/]*/ -- <4>
     )
   /*[/]*/
@@ -645,7 +645,7 @@ Also, an above SQL template can be replaced using `mybatis:p` attribute tag with
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${not #lists.isEmpty(ids)}"]*/
-    AND id IN (/*[# mybatis:p="ids"]*/ 1 /*[/]*/) -- <2>
+    AND id IN (/*[# mb:p="ids"]*/ 1 /*[/]*/) -- <2>
   /*[/]*/
   ORDER BY id
 ----
@@ -694,10 +694,10 @@ List<Name> findPageByCriteria(@Param("criteria") NameCriteria criteria, @Param("
 SELECT COUNT(*) FROM names
   WHERE 1 = 1
   /*[# th:if="${criteria.firstName} != null"]*/
-    AND firstName = /*[# mybatis:p="criteria.firstName"]*/ 'Taro' /*[/]*/
+    AND firstName = /*[# mb:p="criteria.firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
   /*[# th:if="${criteria.lastName} != null"]*/
-    AND lastName = /*[# mybatis:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
+    AND lastName = /*[# mb:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
 ----
 
@@ -707,13 +707,13 @@ SELECT COUNT(*) FROM names
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${criteria.firstName} != null"]*/
-    AND firstName = /*[# mybatis:p="criteria.firstName"]*/ 'Taro' /*[/]*/
+    AND firstName = /*[# mb:p="criteria.firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
   /*[# th:if="${criteria.lastName} != null"]*/
-    AND lastName = /*[# mybatis:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
+    AND lastName = /*[# mb:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
-  LIMIT /*[# mybatis:p="pageable.pageSize"]*/ 20 /*[/]*/
-  OFFSET /*[# mybatis:p="pageable.offset"]*/ 0 /*[/]*/
+  LIMIT /*[# mb:p="pageable.pageSize"]*/ 20 /*[/]*/
+  OFFSET /*[# mb:p="pageable.offset"]*/ 0 /*[/]*/
   ORDER BY id
 ----
 
@@ -729,10 +729,10 @@ At first, you create a fragment SQL template file for sharing by multiple SQL as
 ----
   WHERE 1 = 1
   /*[# th:if="${criteria.firstName} != null"]*/
-    AND firstName = /*[# mybatis:p="criteria.firstName"]*/ 'Taro' /*[/]*/
+    AND firstName = /*[# mb:p="criteria.firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
   /*[# th:if="${criteria.lastName} != null"]*/
-    AND lastName = /*[# mybatis:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
+    AND lastName = /*[# mb:p="criteria.lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
 ----
 
@@ -752,8 +752,8 @@ SELECT COUNT(*) FROM names
 ----
 SELECT * FROM names
   /*[# th:insert="~{/NameMapper/whereByCriteria.sql}" /]*/ -- <1>
-  LIMIT /*[# mybatis:p="pageable.pageSize"]*/ 20 /*[/]*/
-  OFFSET /*[# mybatis:p="pageable.offset"]*/ 0 /*[/]*/
+  LIMIT /*[# mb:p="pageable.pageSize"]*/ 20 /*[/]*/
+  OFFSET /*[# mb:p="pageable.offset"]*/ 0 /*[/]*/
   ORDER BY id
 ----
 
@@ -915,7 +915,7 @@ If you specify the `ESCAPE '\'` directly as static template parts, the Thymeleaf
 [source,sql]
 .Invalid usage
 ----
-/*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
+/*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
 AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /**/ ESCAPE '\'
 ----
 
@@ -935,7 +935,7 @@ that help for generating dynamic SQL.
 
 === Attribute tag
 
-By default, you can use it using `mybatis` dialect prefix.
+By default, you can use it using `mb` dialect prefix (default prefix is initial letter of "**M**y**B**atis").
 
 [cols="2,4,4",options="header"]
 .Supported method list
@@ -965,21 +965,21 @@ a|`{variable name}={variable value}(,...)` +
 .Basic usage:
 ----
 SELECT * FROM names
-  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/ -- <1>
+  WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/ -- <1>
 ----
 
 [source,sql]
 .Usage with option:
 ----
 SELECT * FROM names
-  WHERE id = /*[# mybatis:p="id,typeHandler=com.example.IdTypeHandler"]*/ 1 /*[/]*/ -- <2>
+  WHERE id = /*[# mb:p="id,typeHandler=com.example.IdTypeHandler"]*/ 1 /*[/]*/ -- <2>
 ----
 
 [source,sql]
 .Usage for collection and array:
 ----
 SELECT * FROM names
-  WHERE id IN (/*[# mybatis:p="ids"]*/ 1 /*[/]*/) -- <3>
+  WHERE id IN (/*[# mb:p="ids"]*/ 1 /*[/]*/) -- <3>
 ----
 
 <1> Render bind variable(`#{...}`) that can parsed MyBatis
@@ -996,15 +996,15 @@ SELECT * FROM names
 SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${firstName} != null"]*/
-    /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
-    AND firstName LIKE /*[# mybatis:p="patternFirstName"]*/ 'Taro' /*[/]*/ -- <2>
+    /*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
+    AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro' /*[/]*/ -- <2>
   /*[/]*/
 ----
 
 [source,sql]
 .Usage for registering multiple variables:
 ----
-/*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|, patternLastName=|${#mybatis.escapeLikeWildcard(lastName)}%|" /]*/ -- <3>
+/*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|, patternLastName=|${#mybatis.escapeLikeWildcard(lastName)}%|" /]*/ -- <3>
 ----
 
 <1> Register an any value(e.g. editing value at template) as custom bind variables
@@ -1102,7 +1102,7 @@ using <<Configuration properties, Configuration properties>>.
 id IN (
 /*[# th:each="id : ${ids}"]*/
   /*[(${#mybatis.commaIfNotFirst(idStat)})]*/ -- <1>
-  /*[# mybatis:p="id"]*/ 1 /*[/]*/
+  /*[# mb:p="id"]*/ 1 /*[/]*/
 /*[/]*/
 )
 ----
@@ -1117,7 +1117,7 @@ id IN (
 ----
 id IN (
 /*[# th:each="id : ${ids}"]*/
-  /*[# mybatis:p="id"]*/ 1 /*[/]*/
+  /*[# mb:p="id"]*/ 1 /*[/]*/
   /*[(${#mybatis.commaIfNotLast(idStat)})]*/ -- <1>
 /*[/]*/
 )
@@ -1133,8 +1133,8 @@ id IN (
 .Basic usage:
 ----
 /*[# th:if="${firstName} != null"]*/
-  /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
-  AND firstName LIKE /*[# mybatis:p="patternFirstName"]*/ 'Taro%' /*[/]*/
+  /*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/ -- <1>
+  AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro%' /*[/]*/
 /*[/]*/
 ----
 
@@ -1154,8 +1154,8 @@ id IN (
 .Basic usage:
 ----
 /*[# th:if="${firstName} != null"]*/
-  /*[# mybatis:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
-  AND firstName LIKE /*[# mybatis:p="patternFirstName"]*/ 'Taro%' /*[/]*/ /*[(${#mybatis.likeEscapeClause()})]*/ -- <1>
+  /*[# mb:bind="patternFirstName=|${#mybatis.escapeLikeWildcard(firstName)}%|" /]*/
+  AND firstName LIKE /*[# mb:p="patternFirstName"]*/ 'Taro%' /*[/]*/ /*[(${#mybatis.likeEscapeClause()})]*/ -- <1>
 /*[/]*/
 ----
 
@@ -1211,7 +1211,7 @@ SELECT * FROM names
   WHERE 1 = 1
   [# th:if="${not #lists.isEmpty(ids)}"]
     AND id IN (
-      [# mybatis:p="ids" /]
+      [# mb:p="ids" /]
     )
   [/]
   ORDER BY id
@@ -1330,7 +1330,7 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`dialect.prefix`
 |The prefix name of dialect provided by this project
 |`String`
-|`"mybatis"`
+|`"mb"`
 
 |`dialect.like.escape-char`
 |The escape character for wildcard of LIKE condition
@@ -1360,7 +1360,7 @@ cache.ttl = 3600000
 file.character-encoding = UTF-8
 file.base-dir = /templates/sqls
 file.patterns = *sql, *.sql.template
-dialect.prefix = mb
+dialect.prefix = mybatis
 dialect.like.escape-char = ~
 dialect.like.escape-clause-format = escape '%s'
 dialect.like.additional-escape-target-chars = ％, ＿
@@ -1380,7 +1380,7 @@ configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder(
     .fileCharacterEncoding(StandardCharsets.UTF_8)
     .fileBaseDir("/templates/sqls")
     .filePatterns("*.sql", "*.sql.template")
-    .dialectPrefix("mb")
+    .dialectPrefix("mybatis")
     .dialectLikeEscapeChar('~')
     .dialectLikeEscapeClauseFormat("escape '%s'")
     .dialectLikeAdditionalEscapeTargetChars('％' , '＿')

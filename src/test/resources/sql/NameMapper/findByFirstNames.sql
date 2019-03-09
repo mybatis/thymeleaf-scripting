@@ -16,5 +16,5 @@
 
 SELECT * FROM names
   WHERE 1 = 1
-  AND firstName IN (/*[# mybatis:p="firstNames,typeHandler=org.apache.ibatis.type.StringTypeHandler"]*/ 'FirstName' /*[/]*/)
+  AND firstName IN (/*[# mb:p="firstNames,typeHandler=org.apache.ibatis.type.StringTypeHandler"]*/ 'FirstName' /*[/]*/)
   ORDER BY id

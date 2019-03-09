@@ -129,7 +129,7 @@ class ThymeleafLanguageDriverTest {
 
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
-      Assertions.assertEquals("mybatis", v.getPrefix());
+      Assertions.assertEquals("mb", v.getPrefix());
       MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
           .buildObject(null, null);
       Assertions.assertEquals("ESCAPE '\\'", expression.likeEscapeClause());
@@ -164,7 +164,7 @@ class ThymeleafLanguageDriverTest {
 
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
-      Assertions.assertEquals("mbs", v.getPrefix());
+      Assertions.assertEquals("mybatis", v.getPrefix());
       MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
           .buildObject(null, null);
       Assertions.assertEquals("escape '~'", expression.likeEscapeClause());
@@ -183,7 +183,7 @@ class ThymeleafLanguageDriverTest {
         .fileCharacterEncoding(StandardCharsets.ISO_8859_1)
         .fileBaseDir("/templates/sqls/")
         .filePatterns("*.sql", "*.sql.template")
-        .dialectPrefix("mb")
+        .dialectPrefix("mbs")
         .dialectLikeEscapeChar('~')
         .dialectLikeEscapeClauseFormat("escape '%s'")
         .dialectLikeAdditionalEscapeTargetChars('％' , '＿')
@@ -213,7 +213,7 @@ class ThymeleafLanguageDriverTest {
 
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
-      Assertions.assertEquals("mb", v.getPrefix());
+      Assertions.assertEquals("mbs", v.getPrefix());
       MyBatisExpression expression = (MyBatisExpression) v.getExpressionObjectFactory()
           .buildObject(null, null);
       Assertions.assertEquals("escape '~'", expression.likeEscapeClause());

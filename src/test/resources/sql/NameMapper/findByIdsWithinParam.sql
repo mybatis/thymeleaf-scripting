@@ -20,7 +20,7 @@ SELECT * FROM names
     AND id IN (
     /*[# th:each="id : ${ids}"]*/
       /*[(${#mybatis.commaIfNotFirst(idStat)})]*/
-      /*[# mybatis:p="id"]*/ 1 /*[/]*/
+      /*[# mb:p="id"]*/ 1 /*[/]*/
     /*[/]*/
     )
     /*[/]*/

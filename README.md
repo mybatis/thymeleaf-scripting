@@ -19,7 +19,7 @@ If you are not familiar with Thymeleaf 3 syntax, you can see the Thymeleaf docum
 
 ```sql
 SELECT * FROM names
-  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+  WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 ```
 
 ### Dynamic bindable 2-way SQL
@@ -29,7 +29,7 @@ SELECT * FROM names
   WHERE 1 = 1
   /*[# th:if="${not #lists.isEmpty(ids)}"]*/
     AND id IN (
-      /*[# mybatis:p="ids"]*/ 1 /*[/]*/
+      /*[# mb:p="ids"]*/ 1 /*[/]*/
     )
   /*[/]*/
   ORDER BY id

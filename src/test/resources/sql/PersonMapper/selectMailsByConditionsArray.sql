@@ -19,7 +19,7 @@ FROM person_mails
 WHERE 1 != 1
 /*[# th:each="conditions : ${list}"]*/
   OR address IN (
-    /*[# mybatis:p="conditions.mails"]*/ 'a@test.com', 'a2@test.com' /*[/]*/
+    /*[# mb:p="conditions.mails"]*/ 'a@test.com', 'a2@test.com' /*[/]*/
   )
 /*[/]*/
 ORDER BY id

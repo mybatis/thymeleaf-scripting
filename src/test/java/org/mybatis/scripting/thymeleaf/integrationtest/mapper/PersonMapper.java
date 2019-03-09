@@ -34,7 +34,7 @@ public interface PersonMapper {
   @Select("SELECT MAX(id) FROM person_mails")
   Integer getMaxMailId();
 
-  @Select("SELECT id, name FROM persons WHERE id IN ([# mybatis:p='ids'/]) ORDER BY id")
+  @Select("SELECT id, name FROM persons WHERE id IN ([# mb:p='ids'/]) ORDER BY id")
   @Results({
       @Result(property = "id", column = "id", id = true),
       @Result(property = "mails", column = "id", many = @Many(select = "selectPersonMails", fetchType = FetchType.EAGER))
@@ -44,7 +44,7 @@ public interface PersonMapper {
   @Select("SELECT id, person_id, address FROM person_mails WHERE person_id = #{id} ORDER BY id")
   List<Mail> selectPersonMails(int personId);
 
-  @Select("SELECT id, person_id, address FROM person_mails WHERE address IN ([# mybatis:p='conditions.mails'/]) ORDER BY id")
+  @Select("SELECT id, person_id, address FROM person_mails WHERE address IN ([# mb:p='conditions.mails'/]) ORDER BY id")
   List<Mail> selectMailsByConditions(@Param("conditions") Conditions conditions);
 
   @Select("sql/PersonMapper/selectMailsByConditionsArray.sql")

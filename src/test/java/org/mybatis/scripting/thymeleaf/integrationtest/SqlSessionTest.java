@@ -242,7 +242,7 @@ class SqlSessionTest {
       sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByNameBindNameIsEmpty", param);
       Assertions.fail();
     } catch (PersistenceException e) {
-      Assertions.assertTrue(e.getCause().getCause().getMessage().startsWith("Variable name expression evaluated as null or empty: \"${''}\" (template: \"/*[# mybatis:bind=\"${''}=1\" /]*/"));
+      Assertions.assertTrue(e.getCause().getCause().getMessage().startsWith("Variable name expression evaluated as null or empty: \"${''}\" (template: \"/*[# mb:bind=\"${''}=1\" /]*/"));
       Assertions.assertTrue(e.getCause().getCause().getMessage().endsWith("SELECT * FROM names\" - line 1, col 6)"));
     }
   }

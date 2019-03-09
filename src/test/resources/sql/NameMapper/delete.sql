@@ -15,4 +15,4 @@
 --
 
 DELETE FROM names
-  WHERE id = /*[# mybatis:p="id,typeHandler=org.apache.ibatis.type.IntegerTypeHandler"]*/ 1 /*[/]*/
+  WHERE id = /*[# mb:p="id,typeHandler=org.apache.ibatis.type.IntegerTypeHandler"]*/ 1 /*[/]*/

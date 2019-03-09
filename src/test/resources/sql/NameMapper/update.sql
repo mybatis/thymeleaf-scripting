@@ -17,9 +17,9 @@
 UPDATE names
   SET id = id
   /*[# th:if="${firstName} != null"]*/
-    ,firstName = /*[# mybatis:p="firstName"]*/ 'Taro' /*[/]*/
+    ,firstName = /*[# mb:p="firstName"]*/ 'Taro' /*[/]*/
   /*[/]*/
   /*[# th:if="${lastName} != null"]*/
-    ,lastName = /*[# mybatis:p="lastName"]*/ 'Yamada' /*[/]*/
+    ,lastName = /*[# mb:p="lastName"]*/ 'Yamada' /*[/]*/
   /*[/]*/
-  WHERE id = /*[# mybatis:p="id"]*/ 1 /*[/]*/
+  WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
