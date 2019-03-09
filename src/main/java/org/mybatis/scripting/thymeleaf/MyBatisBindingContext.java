@@ -86,6 +86,8 @@ public class MyBatisBindingContext {
 
   /**
    * Generate an unique variable name per iteration object.
+   * <br>
+   * Variable name rule is {@code {objectName}_{status list index}_{status.getIndex()}}.
    *
    * @param objectName base object name
    * @param status iteration status object
