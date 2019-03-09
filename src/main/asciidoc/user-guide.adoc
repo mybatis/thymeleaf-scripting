@@ -539,7 +539,7 @@ SELECT * FROM names
   WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/ -- <1>
 ----
 
-<1> Can specify using custom tag(`mybatis:p="variable name"`) provided by mybatis-thymeleaf
+<1> Can specify using custom tag(`mb:p="variable name"`) provided by mybatis-thymeleaf
 
 Also, you can specify using inlined expression such as `/\*[('#{variable name}')]*/` provided by Thymeleaf standard feature.
 
@@ -554,8 +554,8 @@ SELECT * FROM names
 **What can you bind?**
 
 Basically, you can bind a parameter object(Mapper method arguments or `SqlSession` method arguments).
-In addition, the mybatis-thymeleaf allow to be bind a registered value using `mybatis:bind` tag.
-About usage of `mybatis:bind`, please see <<Attribute tag>>.
+In addition, the mybatis-thymeleaf allow to be bind a registered value using `mb:bind` tag.
+About usage of `mb:bind`, please see <<Attribute tag>>.
 ====
 
 === Dynamic SQL
@@ -633,14 +633,14 @@ SELECT * FROM names
     You can access an iteration status object (`IterationStatusVar`) that named by `"{variable name of iterable element}Stat"` format.
 
 <3> Specify a 2-way SQL of binding value per iterable element.
-    A bind value specify by `mybatis:p="{variable name of iterable element}"` format.
+    A bind value specify by `mb:p="{variable name of iterable element}"` format.
 
 <4> Specify an end tag of iteration
 
-Also, an above SQL template can be replaced using `mybatis:p` attribute tag with following SQL template.
+Also, an above SQL template can be replaced using `mb:p` attribute tag with following SQL template.
 
 [source,sql]
-.Use `mybatis:p` for creating bind variables string of IN clause
+.Use `mb:p` for creating bind variables string of IN clause
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -842,7 +842,7 @@ Therefore there are some cautions for usage.
 
 === 2-way SQL format
 
-If you use a binding value using 2-way SQL format without `mybatis:p` custom tag,
+If you use a binding value using 2-way SQL format without `mb:p` custom tag,
 there is case that cannot translate correctly 2-way SQL when specify multiple item on one line as follow:
 
 [source,sql]
@@ -988,9 +988,9 @@ SELECT * FROM names
   WHERE id IN (/*[# mb:p="ids"]*/ 1 /*[/]*/) -- <3>
 ----
 
-<1> Render bind variable(`#{...}`) that can parsed MyBatis
-<2> Can specify parameter options(key=value) separate with comma
-<3> Render bind variables(`#{ids[0]}, #{ids[1]}, ...`) that can parsed MyBatis
+<1> Render single bind variable(e.g. `#{id}`) that can parsed MyBatis when specify a simple value object
+<2> Can specify parameter options(`key=value` format) separate with comma
+<3> Render multiple bind variables(e.g. `#{ids[0]}, #{ids[1]}, ...`) that can parsed MyBatis when specify a collection or array object
 
 
 [[mybatis-bind]]
@@ -1027,7 +1027,7 @@ because it can only access within a template. Hence, the mybatis-thymeleaf provi
 
 === Expression utility method
 
-By default, you can access it using `#mybatis` expression.
+You can access it using `#mybatis` expression.
 
 [cols="1,5a,4",options="header"]
 .Supported method list
