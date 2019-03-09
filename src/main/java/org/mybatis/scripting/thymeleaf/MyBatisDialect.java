@@ -127,7 +127,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
      */
     @Override
     public Set<String> getAllExpressionObjectNames() {
-      return Collections.singleton(getPrefix());
+      return Collections.singleton("mybatis");
     }
 
     /**
