@@ -33,7 +33,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 /**
  * The processor class for handling the {@code mybatis:p} tag.
  * <br>
- * This class will output a bind variable expression such as {@code #{...}}.
+ * This processor render bind variable({@code #{…​}}) expression that can parsed MyBatis
+ * and register an iteration object to the MyBatis’s bind variables.
  *
  * @author Kazuki Shimizu
  * @version 1.0.0

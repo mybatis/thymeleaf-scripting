@@ -22,7 +22,7 @@ public class DefaultTemplateEngineCustomizer implements TemplateEngineCustomizer
 
   @Override
   public void customize(TemplateEngine defaultTemplateEngine) {
-    BuiltIn.DEFAULT.customize(defaultTemplateEngine);
+    BuiltIn.DO_NOTHING.customize(defaultTemplateEngine);
     templateEngine = defaultTemplateEngine;
   }
 

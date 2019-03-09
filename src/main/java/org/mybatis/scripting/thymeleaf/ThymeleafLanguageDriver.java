@@ -195,7 +195,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
               | InvocationTargetException | NoSuchMethodException e) {
             throw new IllegalStateException("Cannot create an instance for class: " + v, e);
           }
-        }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.BuiltIn.DEFAULT);
+        }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.BuiltIn.DO_NOTHING);
     customizer.accept(targetTemplateEngine);
 
     return targetTemplateEngine;
@@ -257,6 +257,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
 
   /**
    * Builder class for {@link ThymeleafLanguageDriver}.
+   *
+   * @since 1.0.0
    */
   public static class Builder {
 

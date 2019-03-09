@@ -41,7 +41,6 @@ import org.thymeleaf.context.IContext;
  * @version 1.0.0
  *
  * @see ThymeleafLanguageDriver
- * @see org.mybatis.scripting.thymeleaf.processor.MyBatisBindTagProcessor
  */
 class ThymeleafSqlSource implements SqlSource {
 
@@ -53,9 +52,11 @@ class ThymeleafSqlSource implements SqlSource {
 
   /**
    * Constructor for for integrating with template engine provide by Thymeleaf.
+   *
    * @param configuration A configuration instance of MyBatis
    * @param templateEngine A template engine provide by Thymeleaf
    * @param sqlTemplate A template string of SQL (inline SQL or template file path)
+   * @param parameterType A parameter type that specified at mapper method argument or xml element
    */
   ThymeleafSqlSource(Configuration configuration, ITemplateEngine templateEngine,
                      String sqlTemplate, Class<?> parameterType) {

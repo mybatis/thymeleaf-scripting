@@ -35,9 +35,9 @@ import org.thymeleaf.util.StringUtils;
 /**
  * The processor class for handling the {@code mybatis:bind} tag.
  * <br>
- * This class was inspired with the {@code StandardWithTagProcessor} provide by Thymeleaf.
- * <br>
- * This processor can be access using {@code mybatis:bind}) as element tag processor.
+ * This processor register an any value to the MyBatis’s bind variables
+ * (similar to that of the {@code <bind>} provided by MyBatis core module)
+ * This class's implementation was inspired with the {@code StandardWithTagProcessor} provide by Thymeleaf.
  *
  * @author Kazuki Shimizu
  * @version 1.0.0

@@ -38,6 +38,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  *
  * <ul>
  *   <li>{@code #mybatis} : {@link MyBatisExpression}</li>
+ *   <li>{@code mybatis:p} : {@link MyBatisParamTagProcessor}</li>
  *   <li>{@code mybatis:bind} : {@link MyBatisBindTagProcessor}</li>
  * </ul>
  *
@@ -77,7 +78,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
   /**
    * Set a format of escape clause.
    * <br>
-   * The default value is {@code " ESCAPE '%s' "}.
+   * The default value is {@code "ESCAPE '%s'"}.
    *
    * @param escapeClauseFormat a format of escape clause
    */

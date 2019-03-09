@@ -91,7 +91,7 @@ public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
      * This customizer instance do nothing.
      * </p>
      */
-    DEFAULT {
+    DO_NOTHING {
       @Override
       public void customize(TemplateEngine defaultTemplateEngine) {
         // NOP
