@@ -57,12 +57,6 @@ SELECT * FROM names
   WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 ----
 
-[source,sql]
-.SQL Template using only Thymeleaf standard feature
-----
-SELECT * FROM names
-  WHERE id = /*[('#{id}')]*/ 1
-----
 
 ==== Dynamically bindable 2-way SQL
 
@@ -79,24 +73,6 @@ SELECT * FROM names
   ORDER BY id
 ----
 
-f you use only the Thymeleaf standard feature, an above tempalte can be replaced following template
-
-[source,sql]
-.SQL Template using only Thymeleaf standard feature
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
-    AND id IN (
-    /*[# th:each="id : ${ids}"]*/
-      /*[('#{ids[' + ${idStat.index} + ']}')]*/ 1
-      /*[(${idStat.last} ? '' : ',')]*/
-    /*[/]*/
-    )
-  /*[/]*/
-  ORDER BY id
-----
-
 ==== Dynamically bindable SQL
 
 The mybatis-thymeleaf translate a dynamically bindable SQL(non 2-way SQL) that specified by template to as follow:
@@ -104,27 +80,10 @@ The mybatis-thymeleaf translate a dynamically bindable SQL(non 2-way SQL) that s
 [source,sql]
 .SQL Template using custom attribute tag provided by mybatis-thymeleaf
 ----
--- Use the custom tag provided by mybatis-thymeleaf
 SELECT * FROM names
   WHERE 1 = 1
   [# th:if="${not #lists.isEmpty(ids)}"]
     AND id IN ([# mb:p="ids" /])
-  [/]
-  ORDER BY id
-----
-
-[source,sql]
-.SQL Template using only Thymeleaf standard feature
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  [# th:if="${not #lists.isEmpty(ids)}"]
-    AND id IN (
-    [# th:each="id : ${ids}"]
-      [('#{ids[' + ${idStat.index} + ']}')]
-      [(${idStat.last} ? '' : ',')]
-    [/]
-    )
   [/]
   ORDER BY id
 ----
@@ -776,108 +735,55 @@ SELECT * FROM accounts
 SELECT * FROM users
 ----
 
+== Using non 2-way SQL mode
 
-== Cautions for usage
+The non 2-way SQL is simple a little compare with 2-way SQL and limitations not found at now.
 
-[CAUTION]
-====
-The Thymeleaf 3 does not provide the template mode for SQL.
-Therefore there are some cautions for usage.
-====
+=== Configuration
 
-=== 2-way SQL format
-
-If you use a binding value using 2-way SQL format without `mb:p` custom tag,
-there is case that cannot translate correctly 2-way SQL when specify multiple item on one line as follow:
-
-[source,sql]
-.Invalid format
-----
-SELECT * FROM names
-  WHERE id = /*[('#{id}')]*/ 1 AND version = /*[('#{version}')]*/ 1
-----
-
-You can resolve it that add a line break chars between with each conditions as follow:
-
-[source,sql]
-.Valid format
-----
-SELECT * FROM names
-  WHERE id = /*[('#{id}')]*/ 1 -- <1>
-  AND version = /*[('#{version}')]*/ 1
-----
-
-<1> Add the line break chars(LF or CRLF) between with each conditions
-
-Alternatively, you can resolve it that specify the empty comment between with each conditions as follow:
-
-[source,sql]
-.Valid format
-----
-SELECT * FROM names
-  WHERE id = /*[('#{id}')]*/ 1 /**/ AND version = /*[('#{version}')]*/ 1 -- <1>
-----
-
-<1> Add the empty SQL comment(`/**/`) between each conditions
+By default, the mybatis-thymeleaf will be use the 2-way SQL mode.
+Therefore you should be configure explicitly to use the non 2-way SQL mode using configuration properties file or builder option as follow:
 
 [NOTE]
 ====
-We known that threre is no problem using on `VALUES` and `SET` clause as follows:
-
-[source,sql]
-.Valid format on VALUES
-----
-INSERT INTO names (firstName, lastName)
-  VALUES (/*[('#{firstName}')]*/ 'Taro' ,/*[('#{lastName}')]*/ 'Yamada')
-----
-
-[source%nowrap,sql]
-.Valid format on SET
-----
-UPDATE names
-  SET firstName = /*[('#{firstName}')]*/ 'Taro' ,lastName = /*[('#{lastName}')]*/ 'Yamada'
-  WHERE id = /*[('#{id}')]*/ 1
-----
-
-However, the following 2-way SQL is invalid.
-
-[source,sql]
-.Invalid format
-----
-UPDATE names
-  SET firstName = /*[('#{firstName}')]*/ 'Taro'
-     ,lastName = /*[('#{lastName}')]*/ 'Yamada' WHERE id = /*[('#{id}')]*/ 1 -- <1>
-----
-
-<1> Cannot specify the `WHERE` clause after the 2-way SQL on same line
-    (Even in this case, you can resolve it that specify the empty comment(`/**/`) before the `WHERE` clause)
-
+This configuration is optional. The non 2-way SQL can be use on the 2-way SQL mode.
 ====
 
-=== Using '\'(backslash)
+[source,properties]
+.How to configure using configuration properties file(src/main/resources/mybatis-thymeleaf.properties)
+----
+use-2way = false # <1>
+----
 
-If you are using 2-way SQL mode, there is case that cannot parse a 2-way SQL when specify `'\'`(backslash) within static template parts.
-We know that following case cannot be parsed 2-way SQL. If you are not using 2-way SQL mode, this limitation can be ignore.
+or
 
-==== ESCAPE clause for LIKE
+[source,java]
+.How to configure using config class
+----
+configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(
+        ThymeleafLanguageDriverConfig.newInstance(c -> c.setUse2Way(false)))); // <2>
+----
 
-If you specify the `ESCAPE '\'` directly as static template parts, the Thymeleaf cannot parse it.
+<1> Set the `use-2way` to `false`
+<2> Set the `use2way` property to `false`
+
+
+=== Basic usage
+
+The different with the 2-way SQL mode is that will be unnecessary to enclose the thymeleaf expressions as SQL comment(`/\*[...]*/`).
 
 [source,sql]
-.Invalid usage
+.SQL Template
 ----
-/*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|" /]*/
-AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /**/ ESCAPE '\'
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${not #lists.isEmpty(ids)}"]
+    AND id IN (
+      [# mb:p="ids" /]
+    )
+  [/]
+  ORDER BY id
 ----
-
-<1> Specify the `ESCAPE '\'` directly as static template parts
-
-[TIP]
-====
-As a solution for avoiding this behavior,
-the mybatis-thymeleaf provide the expression utility method for adding the `ESCAPE` clause.
-For detail, please see <<escapeClause>>.
-====
 
 == Custom Dialect
 
@@ -1055,61 +961,14 @@ using <<Configuration properties, Configuration properties>>.
   AND firstName LIKE #{patternFirstName} ESCAPE '\'
 ----
 
-== Using non 2-way SQL mode
-
-The non 2-way SQL is simple a little compare with 2-way SQL and limitations not found at now.
-
-=== Configuration
-
-By default, the mybatis-thymeleaf will be use the 2-way SQL mode.
-Therefore you should be configure explicitly to use the non 2-way SQL mode using configuration properties file or builder option as follow:
-
-[NOTE]
-====
-This configuration is optional. The non 2-way SQL can be use on the 2-way SQL mode.
-====
-
-[source,properties]
-.How to configure using configuration properties file(src/main/resources/mybatis-thymeleaf.properties)
-----
-use-2way = false # <1>
-----
-
-or
-
-[source,java]
-.How to configure using config class
-----
-configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(
-        ThymeleafLanguageDriverConfig.newInstance(c -> c.setUse2Way(false)))); // <2>
-----
-
-<1> Set the `use-2way` to `false`
-<2> Set the `use2way` property to `false`
-
-
-=== Basic usage
-
-The different with the 2-way SQL mode is that will be unnecessary to enclose the thymeleaf expressions as SQL comment(`/\*[...]*/`).
-
-[source,sql]
-.SQL Template
-----
-SELECT * FROM names
-  WHERE 1 = 1
-  [# th:if="${not #lists.isEmpty(ids)}"]
-    AND id IN (
-      [# mb:p="ids" /]
-    )
-  [/]
-  ORDER BY id
-----
 
 == Usage on framework
 
 In this chapter, we explain ways that integrate with an application framework.
 
 === Spring Boot
+
+==== Basic configuration
 
 If you are using the {mybatis-spring-boot-doc-url}/mybatis-spring-boot-autoconfigure/index.html[mybatis-spring-boot-starter(Spring Boot)^],
 you can configure using configuration properties(properties or yaml file) as follow:
@@ -1127,6 +986,52 @@ mybatis:
   configuration:
     default-scripting-language: org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver
 ----
+
+==== Customizing a configuration
+
+You can customize a configuration using `mybatis-thymeleaf.properties`.
+Furthermore, you can customize using the Spring Boot configuration properties instead of `mybatis-thymeleaf.properties` as follow:
+
+[source%nowrap,properties]
+.src/main/resources/application.properties
+----
+mybatis.configuration-properties.use-2way=true # <1>
+mybatis.configuration-properties.template-file.cache-ttl=3600000
+# ...
+----
+
+[source,yml]
+.src/main/resources/application.yml
+----
+mybatis:
+  configuration-properties:
+    use-2way: true # <1>
+    template-file.cache-ttl: 3600000
+----
+
+[source,java]
+.Configuration class
+----
+@Bean
+ConfigurationCustomizer mybatisConfigurationCustomizer(MyBatisProperties properties) {
+  return configuration -> {
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(
+      ThymeleafLanguageDriverConfig.newInstance(properties.getConfigurationProperties()))); // <2>
+    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
+  };
+}
+----
+
+<1> Specify the configuration property of `mybatis.configuration.configuration-properties.{property key}` format
+
+<2> Create a `ThymeleafLanguageDriverConfig` instance using `Properties` object that holds values of
+    `mybatis.configuration.configuration-properties.{property key}` and
+    register a `ThymeleafLanguageDriver` correspond with it.
+
+<3> Set the `ThymeleafLanguageDriver` class as default scripting language driver
+    at after registering a `ThymeleafLanguageDriver` instance instead of Spring Boot configuration properties
+
+==== Full customizing a configuration
 
 Also, you can fully customize a template engine using the `ConfigurationCustomizer`.
 
@@ -1151,8 +1056,41 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
 
 <2> Register an instance of `ThymeleafLanguageDriver` that associate with user-defined template engine instance
 
-<3> Set the `ThymeleafLanguageDriver` class as default scripting language driver instead of
-    specifying as configuration properties
+<3> Set the `ThymeleafLanguageDriver` class as default scripting language driver at after registering a `ThymeleafLanguageDriver` instance instead of Spring Boot configuration properties
+
+
+== Cautions for usage
+
+[CAUTION]
+====
+The Thymeleaf 3 does not provide the template mode for SQL.
+Therefore there are some cautions for usage.
+====
+
+=== Using '\'(backslash)
+
+If you are using 2-way SQL mode, there is case that cannot parse a 2-way SQL when specify `'\'`(backslash) within static template parts.
+We know that following case cannot be parsed 2-way SQL. If you are not using 2-way SQL mode, this limitation can be ignore.
+
+==== ESCAPE clause for LIKE
+
+If you specify the `ESCAPE '\'` directly as static template parts, the Thymeleaf cannot parse it.
+
+[source,sql]
+.Invalid usage
+----
+/*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|" /]*/
+AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /**/ ESCAPE '\'
+----
+
+<1> Specify the `ESCAPE '\'` directly as static template parts
+
+[TIP]
+====
+As a solution for avoiding this behavior,
+the mybatis-thymeleaf provide the expression utility method for adding the `ESCAPE` clause.
+For detail, please see <<escapeClause>>.
+====
 
 
 == Appendix
@@ -1279,7 +1217,7 @@ We provide following factory methods for creating a `ThymeleafLanguageDriver` in
 
 * `newInstance()`
 * `newInstance(String resourcePath)`
-* `newInstance(Properties customProperteis)`
+* `newInstance(Properties customProperties)`
 * `newInstance(Consumer<ThymeleafLanguageDriverConfig> customizer)`
 
 ====

@@ -313,7 +313,7 @@ public class ThymeleafLanguageDriverConfig {
   public static ThymeleafLanguageDriverConfig newInstance(Properties customProperties) {
     ThymeleafLanguageDriverConfig config = new ThymeleafLanguageDriverConfig();
     Properties properties = loadDefaultProperties();
-    properties.putAll(customProperties);
+    Optional.ofNullable(customProperties).ifPresent(properties::putAll);
     override(config, properties);
     return config;
   }
