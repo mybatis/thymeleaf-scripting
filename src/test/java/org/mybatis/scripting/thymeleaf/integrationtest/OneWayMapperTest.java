@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
+import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriverConfig;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Mail;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
@@ -69,7 +70,8 @@ class OneWayMapperTest {
 
     Configuration configuration = new Configuration(environment);
     configuration.setMapUnderscoreToCamelCase(true);
-    configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder().use2way(false).build());
+    configuration.getLanguageRegistry()
+        .register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> c.setUse2way(false))));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     configuration.addMapper(OneWayNameMapper.class);

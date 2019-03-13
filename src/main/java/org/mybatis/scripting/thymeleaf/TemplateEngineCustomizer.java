@@ -26,7 +26,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  * <br>
  * If you want to customize a default {@code TemplateEngine},
  * you implements class of this interface and you need to specify
- * the 'template.customizer' property of mybatis-thymeleaf.properties.
+ * the 'customizer' property of mybatis-thymeleaf.properties.
  * <br>
  * e.g.) Implementation class:
  * <pre>
@@ -51,6 +51,7 @@ public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
 
   /**
    * {@inheritDoc}
+   * @see #customize(TemplateEngine)
    */
   @Override
   default void accept(TemplateEngine templateEngine) {

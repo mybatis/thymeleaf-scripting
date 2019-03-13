@@ -15,10 +15,12 @@
  */
 package org.mybatis.scripting.thymeleaf.expression;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * The expression utility object that provide helper method for like feature.
@@ -113,8 +115,9 @@ public class Likes {
      * @param additionalEscapeTargetChars escape target characters(custom wildcard characters)
      * @return A self instance
      */
-    public Builder additionalEscapeTargetChars(Set<Character> additionalEscapeTargetChars) {
-      Optional.ofNullable(additionalEscapeTargetChars).ifPresent(v -> instance.additionalEscapeTargetChars = v);
+    public Builder additionalEscapeTargetChars(Character... additionalEscapeTargetChars) {
+      Optional.ofNullable(additionalEscapeTargetChars).ifPresent(
+          v -> instance.additionalEscapeTargetChars = Arrays.stream(v).collect(Collectors.toSet()));
       return this;
     }
 

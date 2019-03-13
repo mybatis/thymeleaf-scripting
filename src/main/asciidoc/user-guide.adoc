@@ -464,8 +464,7 @@ templateEngine.setEngineContextFactory(new MyBatisIntegratingEngineContextFactor
 // ...
 
 Configuration configuration = new Configuration();
-configuration.getLanguageRegistry()
-    .register(ThymeleafLanguageDriver.newBuilder().templateEngine(templateEngine).build()); // <2>
+configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(templateEngine)); // <2>
 configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
 ----
 
@@ -1079,14 +1078,14 @@ use-2way = false # <1>
 or
 
 [source,java]
-.How to configure using builder option
+.How to configure using config class
 ----
-configuration.getLanguageRegistry()
-    .register(ThymeleafLanguageDriver.newBuilder().use2way(false).build()); // <2>
+configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(
+        ThymeleafLanguageDriverConfig.newInstance(c -> c.setUse2Way(false)))); // <2>
 ----
 
 <1> Set the `use-2way` to `false`
-<2> Set the `use2way` builder option to `false`
+<2> Set the `use2way` property to `false`
 
 
 === Basic usage
@@ -1142,8 +1141,7 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
     templateEngine.setEngineContextFactory(new MyBatisIntegratingEngineContextFactory(
       targetTemplateEngine.getEngineContextFactory()));
     // ...
-    configuration.getLanguageRegistry().register(
-        ThymeleafLanguageDriver.newBuilder().templateEngine(templateEngine).build()); // <2>
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(templateEngine)); // <2>
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
   };
 }
@@ -1163,7 +1161,7 @@ ConfigurationCustomizer mybatisConfigurationCustomizer() {
 
 The mybatis-thymeleaf provides following properties for customizing configurations.
 
-[cols="1,6,^1,2",options="header"]
+[cols="3,4,^1,2",options="header"]
 .Supported property list
 |===
 ^|Property Key
@@ -1184,31 +1182,30 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`Class`
 |`null` (This instance is do-nothing)
 
-4+|*Template cache configuration*
+4+|*Template file configuration*
 
-|`cache.enabled`
+
+|`template-file.cache-enabled`
 |Whether use the cache feature when load template resource file
 |`Boolean`
 |`true` (enable template cache feature)
 
-|`cache.ttl`
+|`template-file.cache-ttl`
 |The cache TTL(millisecond) for resolved templates
 |`Long`
 |`null` (no TTL)
 
-4+|*Template file configuration*
-
-|`file.character-encoding`
+|`template-file.encoding`
 |The character encoding for reading template resource file
 |`String`
 |`"UTF-8"`
 
-|`file.base-dir`
+|`template-file.base-dir`
 |The base directory for reading template resource file
 |`String`
 |`""` (just under class path)
 
-|`file.patterns`
+|`template-file.patterns`
 |The patterns for reading as template resource file
 (Can specify multiple patterns using comma(`","`) as separator character)
 |`String`
@@ -1221,18 +1218,18 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`String`
 |`"mb"`
 
-|`dialect.like.escape-char`
+|`dialect.like-escape-char`
 |The escape character for wildcard of LIKE condition
 |`Character`
 |`'\'` (backslash)
 
-|`dialect.like.escape-clause-format`
+|`dialect.like-escape-clause-format`
 |The format of escape clause for LIKE condition
 (Can specify format that can be allowed by `String#format` method)
 |`String`
 |`"ESCAPE '%s'"`
 
-|`dialect.like.additional-escape-target-chars`
+|`dialect.like-additional-escape-target-chars`
 |Additional escape target characters(custom wildcard characters) for LIKE condition
 (Can specify multiple characters using comma(`","`) as separator character)
 |`String`
@@ -1244,40 +1241,47 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 ----
 use-2way = true
 customizer = com.example.MyTemplateEngineCustomizer
-cache.enabled = true
-cache.ttl = 3600000
-file.character-encoding = UTF-8
-file.base-dir = /templates/sqls
-file.patterns = *sql, *.sql.template
+template-file.cache-enabled = true
+template-file.cache-ttl = 3600000
+template-file.encoding = UTF-8
+template-file.base-dir = /templates/sqls
+template-file.patterns = *sql, *.sql.template
 dialect.prefix = mybatis
-dialect.like.escape-char = ~
-dialect.like.escape-clause-format = escape '%s'
-dialect.like.additional-escape-target-chars = ％, ＿
+dialect.like-escape-char = ~
+dialect.like-escape-clause-format = escape '%s'
+dialect.like-additional-escape-target-chars = ％, ＿
 ----
 
 [TIP]
 ====
-These properties can be specified via builder class of `ThymeleafLanguageDriver` as follow:
+These properties can be specified via factory method of `ThymeleafLanguageDriverConfig` as follow:
 
 [source,java]
 ----
-configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder()
-    .use2way(true)
-    .customizer(CustomTemplateEngineCustomizer.class)
-    .cacheEnabled(true)
-    .cacheTtl(3600000)
-    .fileCharacterEncoding(StandardCharsets.UTF_8)
-    .fileBaseDir("/templates/sqls")
-    .filePatterns("*.sql", "*.sql.template")
-    .dialectPrefix("mybatis")
-    .dialectLikeEscapeChar('~')
-    .dialectLikeEscapeClauseFormat("escape '%s'")
-    .dialectLikeAdditionalEscapeTargetChars('％' , '＿')
-    .customProperties(configurationProperties)
-    .build());
+configuration.getLanguageRegistry().register(
+  new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
+  c.setUse2way(true);
+  c.setCustomizer(CustomTemplateEngineCustomizer.class);
+  c.getTemplateFile().setCacheEnabled(false);
+  c.getTemplateFile().setCacheTtl(3600000L);
+  c.getTemplateFile().setEncoding(StandardCharsets.UTF_8);
+  c.getTemplateFile().setBaseDir("/templates/sqls/");
+  c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
+  c.getDialect().setPrefix("mybatis");
+  c.getDialect().setLikeEscapeChar('~');
+  c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
+  c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
+})));
 ----
 
-If you specify the value both with properties file and builder option, the properties file value applied.
+If you specify the value both with properties file and customizer function, the properties file value applied.
+We provide following factory methods for creating a `ThymeleafLanguageDriver` instance.
+
+* `newInstance()`
+* `newInstance(String resourcePath)`
+* `newInstance(Properties customProperteis)`
+* `newInstance(Consumer<ThymeleafLanguageDriverConfig> customizer)`
+
 ====
 
 

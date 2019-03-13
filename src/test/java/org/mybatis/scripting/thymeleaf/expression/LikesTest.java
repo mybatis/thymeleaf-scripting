@@ -15,9 +15,6 @@
  */
 package org.mybatis.scripting.thymeleaf.expression;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +28,7 @@ class LikesTest {
   @Test
   void testEscapeWildcardValueWithAdditionalEscapeTargetChars() {
     Assertions.assertEquals("a\\％\\＿\\\\b",
-        Likes.newBuilder().additionalEscapeTargetChars(new HashSet<>(Arrays.asList('％','＿')))
+        Likes.newBuilder().additionalEscapeTargetChars('％','＿')
             .build().escapeWildcard("a％＿\\b"));
   }
 

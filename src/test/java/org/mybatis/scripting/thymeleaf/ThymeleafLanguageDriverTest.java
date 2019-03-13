@@ -15,6 +15,16 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -40,15 +50,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
-
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Properties;
 
 class ThymeleafLanguageDriverTest {
 
@@ -78,8 +79,7 @@ class ThymeleafLanguageDriverTest {
     Environment environment = new Environment("development", transactionFactory, dataSource);
 
     Configuration configuration = new Configuration(environment);
-    configuration.getLanguageRegistry().register(
-        ThymeleafLanguageDriver.newBuilder().templateEngine(new TemplateEngine()).build());
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(new TemplateEngine()));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     configuration.addMapper(NameMapper.class);
@@ -142,7 +142,7 @@ class ThymeleafLanguageDriverTest {
   }
 
   @Test
-  void testCustomWithCustomConfigFile() {
+  void testCustomWithCustomConfigFileUsingSystemProperty() {
     System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-custom.properties");
     Configuration configuration = new Configuration();
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
@@ -178,22 +178,59 @@ class ThymeleafLanguageDriverTest {
   }
 
   @Test
-  void testCustomWithBuilder() {
+  void testCustomWithCustomConfigFileUsingMethodArgument() {
+    Configuration configuration = new Configuration();
+    configuration.getLanguageRegistry().register(
+        new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance("mybatis-thymeleaf-custom.properties")));
+    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
+
+    new SqlSessionFactoryBuilder().build(configuration);
+
+    TemplateEngine templateEngine = CustomTemplateEngineCustomizer.templateEngine;
+    ClassLoaderTemplateResolver classLoaderTemplateResolver =
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
+
+    Assertions.assertEquals(TemplateMode.TEXT, classLoaderTemplateResolver.getTemplateMode());
+    Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
+    Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
+    Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
+    Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
+    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")), classLoaderTemplateResolver.getResolvablePatterns());
+
+    StringTemplateResolver stringTemplateResolver =
+        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
+    Assertions.assertEquals(TemplateMode.TEXT, stringTemplateResolver.getTemplateMode());
+    Assertions.assertFalse(stringTemplateResolver.isCacheable());
+
+    templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
+        .map(MyBatisDialect.class::cast).ifPresent(v -> {
+      Assertions.assertEquals("mybatis", v.getPrefix());
+      Likes expression = (Likes) v.getExpressionObjectFactory()
+          .buildObject(null, null);
+      Assertions.assertEquals("escape '~'", expression.escapeClause());
+      Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
+    });
+  }
+
+  @Test
+  void testCustomWithCustomizerFunction() {
     System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-empty.properties");
     Configuration configuration = new Configuration();
-    configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder()
-        .use2way(false)
-        .cacheEnabled(false)
-        .cacheTtl(30000)
-        .fileCharacterEncoding(StandardCharsets.ISO_8859_1)
-        .fileBaseDir("/templates/sqls/")
-        .filePatterns("*.sql", "*.sql.template")
-        .dialectPrefix("mbs")
-        .dialectLikeEscapeChar('~')
-        .dialectLikeEscapeClauseFormat("escape '%s'")
-        .dialectLikeAdditionalEscapeTargetChars('％' , '＿')
-        .customizer(CustomTemplateEngineCustomizer.class)
-        .build());
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
+      c.setUse2way(false);
+      c.setCustomizer(CustomTemplateEngineCustomizer.class);
+      c.getTemplateFile().setCacheEnabled(false);
+      c.getTemplateFile().setCacheTtl(30000L);
+      c.getTemplateFile().setEncoding(StandardCharsets.ISO_8859_1);
+      c.getTemplateFile().setBaseDir("/templates/sqls/");
+      c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
+      c.getDialect().setPrefix("mbs");
+      c.getDialect().setLikeEscapeChar('~');
+      c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
+      c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
+    })));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     new SqlSessionFactoryBuilder().build(configuration);
@@ -233,18 +270,17 @@ class ThymeleafLanguageDriverTest {
     Properties customProperties = new Properties();
     customProperties.setProperty("use-2way", "false");
     customProperties.setProperty("customizer", "org.mybatis.scripting.thymeleaf.CustomTemplateEngineCustomizer");
-    customProperties.setProperty("cache.enabled", "false");
-    customProperties.setProperty("cache.ttl", "30000");
-    customProperties.setProperty("file.character-encoding", "ISO-8859-1");
-    customProperties.setProperty("file.base-dir", "/templates/sqls/");
-    customProperties.setProperty("file.patterns", "*.sql, *.sql.template");
+    customProperties.setProperty("template-file.cache-enabled", "false");
+    customProperties.setProperty("template-file.cache-ttl", "30000");
+    customProperties.setProperty("template-file.encoding", "ISO-8859-1");
+    customProperties.setProperty("template-file.base-dir", "/templates/sqls/");
+    customProperties.setProperty("template-file.patterns", "*.sql, *.sql.template");
     customProperties.setProperty("dialect.prefix", "mbs");
-    customProperties.setProperty("dialect.like.escape-char", "~");
-    customProperties.setProperty("dialect.like.escape-clause-format", "escape '%s'");
-    customProperties.setProperty("dialect.like.additional-escape-target-chars", "％,＿");
+    customProperties.setProperty("dialect.like-escape-char", "~");
+    customProperties.setProperty("dialect.like-escape-clause-format", "escape '%s'");
+    customProperties.setProperty("dialect.like-additional-escape-target-chars", "％,＿");
 
-    configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder()
-        .customProperties(customProperties).build());
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(customProperties)));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     new SqlSessionFactoryBuilder().build(configuration);
@@ -283,6 +319,16 @@ class ThymeleafLanguageDriverTest {
     Configuration configuration = new Configuration();
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
     Assertions.assertEquals(ThymeleafLanguageDriver.class, configuration.getLanguageRegistry().getDefaultDriverClass());
+  }
+
+  @Test
+  void testConfigFileNotFoundAtMethodArgument() {
+    try {
+      ThymeleafLanguageDriverConfig.newInstance("mybatis-thymeleaf-dummy.properties");
+      Assertions.fail();
+    } catch (UncheckedIOException e) {
+      Assertions.assertEquals("java.io.IOException: Could not find resource mybatis-thymeleaf-dummy.properties", e.getMessage());
+    }
   }
 
   @Test

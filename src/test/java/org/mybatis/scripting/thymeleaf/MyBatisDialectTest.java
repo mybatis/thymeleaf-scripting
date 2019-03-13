@@ -17,9 +17,7 @@ package org.mybatis.scripting.thymeleaf;
 
 import java.io.Reader;
 import java.sql.Connection;
-import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -52,7 +50,8 @@ class MyBatisDialectTest {
     Environment environment = new Environment("development", transactionFactory, dataSource);
 
     Configuration configuration = new Configuration(environment);
-    configuration.getLanguageRegistry().register(ThymeleafLanguageDriver.newBuilder().dialectPrefix("mybatis").build());
+    configuration.getLanguageRegistry().
+        register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> c.getDialect().setPrefix("mybatis"))));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
     configuration.getMapperRegistry().addMapper(Mapper.class);
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
