@@ -47,7 +47,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class MyBatisDialect extends AbstractProcessorDialect implements IExpressionObjectDialect {
 
-  static final String DEFAULT_PREFIX = "mb";
+  private static final String DEFAULT_PREFIX = "mb";
 
   private Likes likes = Likes.newBuilder().build();
 
