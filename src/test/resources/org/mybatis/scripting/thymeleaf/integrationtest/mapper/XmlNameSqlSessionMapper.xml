@@ -23,31 +23,26 @@
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO names (firstName, lastName)
-          VALUES (/*[('#{firstName}')]*/ 'Taro', /*[('#{lastName}')]*/ 'Yamada')
+          VALUES ( /*[# mb:p='firstName']*/ 'Taro' /*[/]*/, /*[# mb:p='lastName']*/ 'Yamada' /*[/]*/)
     </insert>
 
     <update id="update">
       <![CDATA[
         UPDATE names
           SET id = id
-          /*[# th:if="${firstName} != null"]*/
-            ,firstName = /*[('#{firstName}')]*/ 'Taro'
+          /*[# th:if='${firstName} != null']*/
+              ,firstName = /*[# mb:p='firstName']*/ 'Taro' /*[/]*/
           /*[/]*/
-          /*[# th:if="${lastName} != null"]*/
-            ,lastName = /*[('#{lastName}')]*/ 'Yamada'
-          /*[/]*/
-          WHERE id = /*[('#{id}')]*/ 1
+            /*[# th:if='${lastName} != null']*/
+              ,firstName = /*[# mb:p='lastName']*/ 'Yamada' /*[/]*/
+            /*[/]*/
+          WHERE id =  /*[# mb:p='id']*/ 1 /*[/]*/
        ]]>
-    </update>
-
-    <update id="updateWithEmptyComment">
-        UPDATE names
-        SET firstName = /*[('#{firstName}')]*/ 'Taro' ,lastName = /*[('#{lastName}')]*/ 'Yamada' /**/ WHERE id = /*[('#{id}')]*/ 1
     </update>
 
     <delete id="delete">
         DELETE FROM names
-          WHERE id = /*[('#{id}')]*/ 1
+          WHERE id = /*[# mb:p='id']*/ 1 /*[/]*/
     </delete>
 
     <select id="getAllNames" resultType="Name">
@@ -64,20 +59,15 @@
     <select id="findById_value" resultType="Name">
         SELECT * FROM names
         WHERE 1 = 1
-        /*[# th:if="${value} != null"]*/
-          AND id = /*[('#{value}')]*/ 1
+        /*[# th:if='${value} != null']*/
+          AND id = /*[# mb:p='value']*/ 1 /*[/]*/
         /*[/]*/
-    </select>
-
-    <select id="findByNameWithEmptyComment" resultType="Name">
-        SELECT * FROM names
-        WHERE firstName = /*[('#{firstName}')]*/ 'Taro' /**/ AND lastName = /*[('#{lastName}')]*/
     </select>
 
     <select id="findUsing_parameter" resultType="Name">
         SELECT * FROM names WHERE 1 = 1
-        /*[# th:if="${_parameter.id} != null"]*/
-            AND id = /*[('#{_parameter.id}')]*/ 1
+        /*[# th:if='${_parameter.id} != null']*/
+            AND id = /*[# mb:p='_parameter.id']*/ 1 /*[/]*/
         /*[/]*/
     </select>
 
@@ -86,35 +76,30 @@
     </select>
 
     <sql id="inValues">
-        /*[# th:if="${not #lists.isEmpty(list)}"]*/
-        AND id IN (
-        /*[# th:each="value : ${list}"]*/
-          /*[('#{list[' + ${valueStat.index} + ']}')]*/ 1
-          /*[(${valueStat.last ? '' : ','})]*/
-        /*[/]*/
-        )
+        /*[# th:if='${not #lists.isEmpty(list)}']*/
+        AND id IN ( /*[# mb:p='list']*/ 1 /*[/]*/ )
         /*[/]*/
     </sql>
 
     <select id="findDatabaseId" resultType="string" databaseId="hsql">
-        SELECT /*[('#{_databaseId}')]*/ 'test db'
+        SELECT /*[# mb:p='_databaseId']*/ 'test db' /*[/]*/
           FROM INFORMATION_SCHEMA.SYSTEM_USERS
     </select>
 
     <select id="findDatabaseId" resultType="string" databaseId="h2">
-        SELECT /*[('#{_databaseId}')]*/ 'test db'
+        SELECT /*[# mb:p='_databaseId']*/ 'test db' /*[/]*/
     </select>
 
     <select id="findByName" resultType="Name">
-      /*[# mb:bind="patternFirstName=|${firstName}%|, patternLastName=|${lastName}%|" /]*/
+      /*[# mb:bind='patternFirstName=|${firstName}%|, patternLastName=|${lastName}%|' /]*/
 
       SELECT * FROM names
         WHERE 1 = 1
-        /*[# th:if="${firstName} != null"]*/
-          AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro'
+        /*[# th:if='${firstName} != null']*/
+          AND firstName LIKE /*[# mb:p='patternFirstName']*/ 'Taro' /*[/]*/
         /*[/]*/
-        /*[# th:if="${lastName} != null"]*/
-          AND lastName LIKE /*[('#{patternLastName}')]*/ 'Yamada'
+        /*[# th:if='${lastName} != null']*/
+          AND lastName LIKE /*[# mb:p='patternLastName']*/ 'Yamada' /*[/]*/
         /*[/]*/
     </select>
 

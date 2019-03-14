@@ -170,26 +170,6 @@ class SqlSessionTest {
   }
 
   @Test
-  void testUpdateWithEmptyComment() {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      Name name = new Name();
-      name.setFirstName("Thymeleaf");
-      name.setLastName("MyBatis");
-      sqlSession.insert("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.insert", name);
-
-      Name updatingName = new Name();
-      updatingName.setId(name.getId());
-      updatingName.setFirstName("Thymeleaf3");
-      updatingName.setLastName("MyBatis3");
-      sqlSession.update("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.updateWithEmptyComment", updatingName);
-
-      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
-      Assertions.assertEquals(updatingName.getFirstName(), loadedName.getFirstName());
-      Assertions.assertEquals(updatingName.getLastName(), loadedName.getLastName());
-    }
-  }
-
-  @Test
   void testDelete() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       Name name = new Name();
@@ -201,23 +181,6 @@ class SqlSessionTest {
 
       Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
       Assertions.assertNull(loadedName);
-    }
-  }
-
-  @Test
-  void testFindByNameWithEmptyComment() {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      Name name = new Name();
-      name.setFirstName("Thymeleaf");
-      name.setLastName("MyBatis");
-      sqlSession.insert("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.insert", name);
-
-      NameParam param = new NameParam();
-      param.setFirstName(name.getFirstName());
-      param.setLastName(name.getLastName());
-      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByNameWithEmptyComment", param);
-      Assertions.assertEquals(param.getFirstName(), loadedName.getFirstName());
-      Assertions.assertEquals(param.getLastName(), loadedName.getLastName());
     }
   }
 
