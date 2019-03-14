@@ -323,12 +323,10 @@ class ThymeleafLanguageDriverTest {
 
   @Test
   void testConfigFileNotFoundAtMethodArgument() {
-    try {
-      ThymeleafLanguageDriverConfig.newInstance("mybatis-thymeleaf-dummy.properties");
-      Assertions.fail();
-    } catch (UncheckedIOException e) {
-      Assertions.assertEquals("java.io.IOException: Could not find resource mybatis-thymeleaf-dummy.properties", e.getMessage());
-    }
+    ThymeleafLanguageDriverConfig.newInstance("mybatis-thymeleaf-dummy.properties");
+    Configuration configuration = new Configuration();
+    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
+    Assertions.assertEquals(ThymeleafLanguageDriver.class, configuration.getLanguageRegistry().getDefaultDriverClass());
   }
 
   @Test

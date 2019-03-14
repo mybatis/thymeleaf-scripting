@@ -300,7 +300,7 @@ public class ThymeleafLanguageDriverConfig {
    */
   public static ThymeleafLanguageDriverConfig newInstance(String resourcePath) {
     Properties properties = loadDefaultProperties();
-    properties.putAll(loadProperties(resourcePath, false));
+    properties.putAll(loadProperties(resourcePath));
     return newInstance(properties);
   }
 
@@ -345,20 +345,16 @@ public class ThymeleafLanguageDriverConfig {
   }
 
   private static Properties loadDefaultProperties() {
-    return loadProperties(System.getProperty(PROPERTY_KEY_CONFIG_FILE, DEFAULT_PROPERTIES_FILE), true);
+    return loadProperties(System.getProperty(PROPERTY_KEY_CONFIG_FILE, DEFAULT_PROPERTIES_FILE));
   }
 
-  private static Properties loadProperties(String resourcePath, boolean ignoreNotFound) {
+  private static Properties loadProperties(String resourcePath) {
     Properties properties = new Properties();
     InputStream in;
     try {
       in = Resources.getResourceAsStream(resourcePath);
     } catch (IOException e) {
-      if (ignoreNotFound) {
         in = null;
-      } else {
-        throw new UncheckedIOException(e);
-      }
     }
     if (in != null) {
       Charset encoding = Optional.ofNullable(System.getProperty(PROPERTY_KEY_CONFIG_ENCODING))
