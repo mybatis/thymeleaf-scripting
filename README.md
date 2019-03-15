@@ -43,7 +43,7 @@ SELECT * FROM names
 
 ## Quick Start
 
-* [Wiki page](https://github.com/mybatis/thymeleaf-scripting/wiki/Quick-Start-using-Spring-Boot)
+* [Wiki page](https://github.com/mybatis/thymeleaf-scripting/wiki/Quick-Start)
 
 ## Documentation
 
