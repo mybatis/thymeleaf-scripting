@@ -19,7 +19,6 @@
 // Define variable for urls
 :mybatis-doc-url: http://www.mybatis.org/mybatis-3
 :travis-ci-url: https://travis-ci.org/mybatis/thymeleaf-scripting
-:mybatis-spring-boot-doc-url: http://www.mybatis.org/spring-boot-starter
 :thymeleaf-doc-url: https://www.thymeleaf.org/doc/tutorials/3.0
 :github-organization-url: https://github.com/mybatis
 
@@ -960,103 +959,6 @@ using <<Configuration properties, Configuration properties>>.
 ----
   AND firstName LIKE #{patternFirstName} ESCAPE '\'
 ----
-
-
-== Usage on framework
-
-In this chapter, we explain ways that integrate with an application framework.
-
-=== Spring Boot
-
-==== Basic configuration
-
-If you are using the {mybatis-spring-boot-doc-url}/mybatis-spring-boot-autoconfigure/index.html[mybatis-spring-boot-starter(Spring Boot)^],
-you can configure using configuration properties(properties or yaml file) as follow:
-
-[source%nowrap,properties]
-.src/main/resources/application.properties
-----
-mybatis.configuration.default-scripting-language=org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver
-----
-
-[source,yml]
-.src/main/resources/application.yml
-----
-mybatis:
-  configuration:
-    default-scripting-language: org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver
-----
-
-==== Customizing a configuration
-
-You can customize a configuration using `mybatis-thymeleaf.properties`.
-Furthermore, you can customize using the Spring Boot configuration properties instead of `mybatis-thymeleaf.properties` as follow:
-
-[source%nowrap,properties]
-.src/main/resources/application.properties
-----
-mybatis.configuration-properties.use-2way=true # <1>
-mybatis.configuration-properties.template-file.cache-ttl=3600000
-# ...
-----
-
-[source,yml]
-.src/main/resources/application.yml
-----
-mybatis:
-  configuration-properties:
-    use-2way: true # <1>
-    template-file.cache-ttl: 3600000
-----
-
-[source,java]
-.Configuration class
-----
-@Bean
-ConfigurationCustomizer mybatisConfigurationCustomizer(MyBatisProperties properties) {
-  return configuration -> {
-    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(
-      ThymeleafLanguageDriverConfig.newInstance(properties.getConfigurationProperties()))); // <2>
-    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
-  };
-}
-----
-
-<1> Specify the configuration property of `mybatis.configuration.configuration-properties.{property key}` format
-
-<2> Create a `ThymeleafLanguageDriverConfig` instance using `Properties` object that holds values of
-    `mybatis.configuration.configuration-properties.{property key}` and
-    register a `ThymeleafLanguageDriver` correspond with it.
-
-<3> Set the `ThymeleafLanguageDriver` class as default scripting language driver
-    at after registering a `ThymeleafLanguageDriver` instance instead of Spring Boot configuration properties
-
-==== Full customizing a configuration
-
-Also, you can fully customize a template engine using the `ConfigurationCustomizer`.
-
-[source,java]
-.Configuration class
-----
-@Bean
-ConfigurationCustomizer mybatisConfigurationCustomizer() {
-  return configuration -> {
-    TemplateEngine templateEngine = new TemplateEngine(); // <1>
-    templateEngine.addDialect(new MyBatisDialect());
-    templateEngine.setEngineContextFactory(new MyBatisIntegratingEngineContextFactory(
-      targetTemplateEngine.getEngineContextFactory()));
-    // ...
-    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(templateEngine)); // <2>
-    configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); // <3>
-  };
-}
-----
-
-<1> Create an instance of class that implements `org.thymeleaf.ITemplateEngine`
-
-<2> Register an instance of `ThymeleafLanguageDriver` that associate with user-defined template engine instance
-
-<3> Set the `ThymeleafLanguageDriver` class as default scripting language driver at after registering a `ThymeleafLanguageDriver` instance instead of Spring Boot configuration properties
 
 
 == Cautions for usage
