@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -53,15 +52,23 @@ public class ThymeleafLanguageDriverConfig {
 
   {
     Map<Class<?>, Function<String, Object>> converters = new HashMap<>();
-    converters.put(boolean.class, v -> Boolean.valueOf(v.trim()));
-    converters.put(String.class, String::trim);
-    converters.put(Character[].class, v -> Stream.of(v.split(","))
-        .map(String::trim).filter(e -> e.length() == 1).map(e -> e.charAt(0)).toArray(Character[]::new));
-    converters.put(Character.class, v -> v.trim().charAt(0));
-    converters.put(Charset.class, v -> Charset.forName(v.trim()));
-    converters.put(Long.class, v -> Long.valueOf(v.trim()));
-    converters.put(String[].class, v -> Stream.of(v.split(",")).map(String::trim).toArray(String[]::new));
-    converters.put(Class.class, ThymeleafLanguageDriverConfig::classForName);
+    converters.put(boolean.class,
+        v -> Boolean.valueOf(v.trim()));
+    converters.put(String.class,
+        String::trim);
+    converters.put(Character[].class,
+        v -> Stream.of(v.split(","))
+            .map(String::trim).filter(e -> e.length() == 1).map(e -> e.charAt(0)).toArray(Character[]::new));
+    converters.put(Character.class,
+        v -> v.trim().charAt(0));
+    converters.put(Charset.class,
+        v -> Charset.forName(v.trim()));
+    converters.put(Long.class,
+        v -> Long.valueOf(v.trim()));
+    converters.put(String[].class,
+        v -> Stream.of(v.split(",")).map(String::trim).toArray(String[]::new));
+    converters.put(Class.class,
+        ThymeleafLanguageDriverConfig::classForName);
     TYPE_CONVERTERS = Collections.unmodifiableMap(converters);
   }
 
@@ -85,26 +92,60 @@ public class ThymeleafLanguageDriverConfig {
    */
   private final DialectConfig dialect = new DialectConfig();
 
+  /**
+   * Get whether use the 2-way SQL feature.
+   * <p>
+   * Default is {@code true}.
+   * </p>
+   * @return If use the 2-way SQL feature, return {@code true}
+   */
   public boolean isUse2way() {
     return use2way;
   }
 
+  /**
+   * Set whether use the 2-way SQL feature.
+   *
+   * @param use2way If use the 2-way SQL feature, set {@code true}
+   */
   public void setUse2way(boolean use2way) {
     this.use2way = use2way;
   }
 
+  /**
+   * Get the interface for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
+   * <p>
+   * Default is {@code null}.
+   * </p>
+   * @return the interface for customizing a default TemplateEngine
+   */
   public Class<? extends TemplateEngineCustomizer> getCustomizer() {
     return customizer;
   }
 
+  /**
+   * Set the interface for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
+   *
+   * @param customizer the interface for customizing a default TemplateEngine
+   */
   public void setCustomizer(Class<? extends TemplateEngineCustomizer> customizer) {
     this.customizer = customizer;
   }
 
+  /**
+   * Get a template file configuration.
+   *
+   * @return a template file configuration
+   */
   public TemplateFileConfig getTemplateFile() {
     return templateFile;
   }
 
+  /**
+   * Get a dialect configuration.
+   *
+   * @return a dialect configuration
+   */
   public DialectConfig getDialect() {
     return dialect;
   }
@@ -142,42 +183,103 @@ public class ThymeleafLanguageDriverConfig {
      */
     private Long cacheTtl;
 
+    /**
+     * Get the character encoding for reading template resource file.
+     * <p>
+     * Default is {@code UTF-8}.
+     * </p>
+     * @return the character encoding for reading template resource file
+     */
     public Charset getEncoding() {
       return encoding;
     }
 
+    /**
+     * Set the character encoding for reading template resource file.
+     *
+     * @param encoding the character encoding for reading template resource file
+     */
     public void setEncoding(Charset encoding) {
       this.encoding = encoding;
     }
 
+    /**
+     * Get the base directory for reading template resource file.
+     * <p>
+     * Default is {@code ""}(none).
+     * </p>
+     *
+     * @return the base directory for reading template resource file
+     */
     public String getBaseDir() {
       return baseDir;
     }
 
+    /**
+     * Set the base directory for reading template resource file.
+     *
+     * @param baseDir the base directory for reading template resource file
+     */
     public void setBaseDir(String baseDir) {
       this.baseDir = baseDir;
     }
 
+    /**
+     * Get patterns for reading as template resource file.
+     * <p>
+     * Default is {@code "*.sql"}.
+     * </p>
+     * @return patterns for reading as template resource file
+     */
     public String[] getPatterns() {
       return patterns;
     }
 
+    /**
+     * Set patterns for reading as template resource file.
+     *
+     * @param patterns patterns for reading as template resource file
+     */
     public void setPatterns(String... patterns) {
       this.patterns = patterns;
     }
 
+    /**
+     * Get whether use the cache feature when load template resource file.
+     * <p>
+     * Default is {@code true}.
+     * </p>
+     * @return If use th cache feature, return {@code true}
+     */
     public boolean isCacheEnabled() {
       return cacheEnabled;
     }
 
+    /**
+     * Set whether use the cache feature when load template resource file.
+     *
+     * @param cacheEnabled If use th cache feature, set {@code true}
+     */
     public void setCacheEnabled(boolean cacheEnabled) {
       this.cacheEnabled = cacheEnabled;
     }
 
+    /**
+     * Get the cache TTL(millisecond) for resolved templates.
+     * <p>
+     * Default is {@code null}(indicate to use default value of Thymeleaf).
+     * </p>
+     * @return the cache TTL(millisecond) for resolved templates
+     */
     public Long getCacheTtl() {
       return cacheTtl;
     }
 
+    /**
+     * Set the cache TTL(millisecond) for resolved templates.
+     *
+     * @param cacheTtl the cache TTL(millisecond) for resolved templates
+     */
     public void setCacheTtl(Long cacheTtl) {
       this.cacheTtl = cacheTtl;
     }
@@ -212,34 +314,84 @@ public class ThymeleafLanguageDriverConfig {
      */
     private Character[] likeAdditionalEscapeTargetChars;
 
+    /**
+     * Get the prefix name of dialect provided by this project.
+     * <p>
+     * Default is {@code "mb"}.
+     * </p>
+     * @return the prefix name of dialect
+     */
     public String getPrefix() {
       return prefix;
     }
 
+    /**
+     * Set the prefix name of dialect provided by this project.
+     *
+     * @param prefix the prefix name of dialect
+     */
     public void setPrefix(String prefix) {
       this.prefix = prefix;
     }
 
+    /**
+     * Get the escape character for wildcard of LIKE condition.
+     * <p>
+     * Default is {@code '\'}.
+     * </p>
+     * @return the escape character for wildcard
+     */
     public Character getLikeEscapeChar() {
       return likeEscapeChar;
     }
 
+    /**
+     * Set the escape character for wildcard of LIKE condition.
+     *
+     * @param likeEscapeChar the escape character for wildcard
+     */
     public void setLikeEscapeChar(Character likeEscapeChar) {
       this.likeEscapeChar = likeEscapeChar;
     }
 
+    /**
+     * Get the format of escape clause for LIKE condition.
+     * <p>
+     * Can specify format that can be allowed by String#format method.
+     * Default is {@code "ESCAPE '%s'"}.
+     * </p>
+     * @return the format of escape clause for LIKE condition
+     */
     public String getLikeEscapeClauseFormat() {
       return likeEscapeClauseFormat;
     }
 
+    /**
+     * Set the format of escape clause for LIKE condition.
+     *
+     * @param likeEscapeClauseFormat the format of escape clause for LIKE condition
+     */
     public void setLikeEscapeClauseFormat(String likeEscapeClauseFormat) {
       this.likeEscapeClauseFormat = likeEscapeClauseFormat;
     }
 
+    /**
+     * Get additional escape target characters(custom wildcard characters) for LIKE condition.
+     * <p>
+     * Can specify multiple characters using comma(",") as separator character.
+     * Default is empty(none).
+     * </p>
+     * @return additional escape target characters(custom wildcard characters)
+     */
     public Character[] getLikeAdditionalEscapeTargetChars() {
       return likeAdditionalEscapeTargetChars;
     }
 
+    /**
+     * Set additional escape target characters(custom wildcard characters) for LIKE condition.
+     *
+     * @param likeAdditionalEscapeTargetChars additional escape target characters(custom wildcard characters)
+     */
     public void setLikeAdditionalEscapeTargetChars(Character... likeAdditionalEscapeTargetChars) {
       this.likeAdditionalEscapeTargetChars = likeAdditionalEscapeTargetChars;
     }
@@ -296,7 +448,7 @@ public class ThymeleafLanguageDriverConfig {
    *
    * @param resourcePath A property file resource path
    * @return a configuration instance
-   * @see #newInstance
+   * @see #newInstance()
    */
   public static ThymeleafLanguageDriverConfig newInstance(String resourcePath) {
     Properties properties = loadDefaultProperties();
@@ -309,6 +461,7 @@ public class ThymeleafLanguageDriverConfig {
    *
    * @param customProperties custom configuration properties
    * @return a configuration instance
+   * @see #newInstance()
    */
   public static ThymeleafLanguageDriverConfig newInstance(Properties customProperties) {
     ThymeleafLanguageDriverConfig config = new ThymeleafLanguageDriverConfig();
@@ -323,6 +476,7 @@ public class ThymeleafLanguageDriverConfig {
    *
    * @param customizer baseline customizer
    * @return a configuration instance
+   * @see #newInstance()
    */
   public static ThymeleafLanguageDriverConfig newInstance(Consumer<ThymeleafLanguageDriverConfig> customizer) {
     ThymeleafLanguageDriverConfig config = new ThymeleafLanguageDriverConfig();
@@ -354,7 +508,7 @@ public class ThymeleafLanguageDriverConfig {
     try {
       in = Resources.getResourceAsStream(resourcePath);
     } catch (IOException e) {
-        in = null;
+      in = null;
     }
     if (in != null) {
       Charset encoding = Optional.ofNullable(System.getProperty(PROPERTY_KEY_CONFIG_ENCODING))
