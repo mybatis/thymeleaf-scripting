@@ -1048,7 +1048,7 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`template-file.patterns`
 |The patterns for reading as template resource file
 (Can specify multiple patterns using comma(`","`) as separator character)
-|`String`
+|`String[]`
 |`"*.sql"`
 
 4+|*Dialect configuration*
@@ -1072,7 +1072,7 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`dialect.like-additional-escape-target-chars`
 |Additional escape target characters(custom wildcard characters) for LIKE condition
 (Can specify multiple characters using comma(`","`) as separator character)
-|`String`
+|`Character[]`
 |`""` (no specify)
 |===
 

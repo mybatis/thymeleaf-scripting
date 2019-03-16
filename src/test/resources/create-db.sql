@@ -59,3 +59,40 @@ insert into person_mails (id, person_id, address) values(1000, 100, 'mybatis1.ma
 insert into person_mails (id, person_id, address) values(1001, 100, 'mybatis1.sub@test.net');
 insert into person_mails (id, person_id, address) values(1002, 101, 'mybatis2.main@test.net');
 insert into person_mails (id, person_id, address) values(1003, 101, 'mybatis2.sub@test.net');
+
+
+/*[# th:if=""]*/
+  
+/*[/]*/
+
+/*[# th:unless=""]*/
+  
+/*[/]*/
+
+/*[# th:switch=""]*/
+  /*[# th:case=""]*/
+    
+  /*[/]*/
+  /*[# th:case="*"]*/
+    
+  /*[/]*/
+/*[/]*/
+
+/*[# th:each=" : ${}"]*/
+  
+/*[/]*/
+
+/*[# th:insert="~{}" /]*/
+
+/*[# mb:p=""]*/  /*[/]*/
+
+/*[# mb:bind="=" /]*/
+
+/*[(${#likes.escapeClause()})]*/
+
+#likes.escapeWildcard()
+
+/*[(${idStat.last} ? '' : ',')]*/
+
+
+th_e
