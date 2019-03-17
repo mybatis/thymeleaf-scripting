@@ -12,8 +12,10 @@ MyBatis Thymeleaf 3 Scripting Support.
 
 ## Introduction
 
-The mybatis-thymeleaf is a plugin that helps applying a 2-way SQL using natural template provided by Thymeleaf 3.
+The mybatis-thymeleaf is a plugin that helps applying a SQL using template provided by Thymeleaf 3.
 If you are not familiar with Thymeleaf 3 syntax, you can see the Thymeleaf documentations.
+
+* https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#textual-template-modes
 
 ### Simple bindable 2-way SQL
 
@@ -41,13 +43,17 @@ SELECT * FROM names
   * MyBatis 3.4.3+ (Recommend to use 3.5+ or 3.4.x latest version)
   * Thymeleaf 3.0+ (Recommend to use 3.0.x latest version)
 
-## Quick Start
-
-* [Wiki page](https://github.com/mybatis/thymeleaf-scripting/wiki/Quick-Start)
-
 ## Documentation
 
 * [User's Guide](src/main/asciidoc/user-guide.adoc)
+
+
+## Related Resources
+
+* [Quick Start](https://github.com/mybatis/thymeleaf-scripting/wiki/Quick-Start)
+* [Code completion](https://github.com/mybatis/thymeleaf-scripting/wiki/Code-completion)
+* [Usage on framework](https://github.com/mybatis/thymeleaf-scripting/wiki/Usage-on-framework)
+
 
 ## Contact us
 
