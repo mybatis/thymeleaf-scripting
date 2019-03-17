@@ -50,7 +50,7 @@ public class ThymeleafLanguageDriverConfig {
   private static final String DEFAULT_PROPERTIES_FILE = "mybatis-thymeleaf.properties";
   private static Map<Class<?>, Function<String, Object>> TYPE_CONVERTERS;
 
-  {
+  static {
     Map<Class<?>, Function<String, Object>> converters = new HashMap<>();
     converters.put(boolean.class,
         v -> Boolean.valueOf(v.trim()));
@@ -407,31 +407,80 @@ public class ThymeleafLanguageDriverConfig {
    * (-Dmybatis-thymeleaf.config.file=... -Dmybatis-thymeleaf.config.encoding=...).
    * <br>
    * Supported properties are as follows:
-   * <ul>
-   * <li>use-2way:
-   * Whether use the 2-way SQL. Default is {@code true}</li>
-   * <li>customizer:
-   * The implementation class for customizing a default {@code TemplateEngine}
-   * instanced by the MyBatis Thymeleaf.</li>
-   * <li>template-file.cache-enabled:
-   * Whether use the cache feature. Default is {@code true}</li>
-   * <li>template-file.cache-ttl:
-   * The cache TTL for resolved templates. Default is {@code null}(no TTL)</li>
-   * <li>template-file.encoding:
-   * The character encoding for reading template resources. Default is {@code "UTF-8"}</li>
-   * <li>template-file.base-dir:
-   * The base directory for reading template resources. Default is {@code ""}(just under class path)</li>
-   * <li>template-file.patterns:
-   * The patterns for reading as template resources. Default is {@code "*.sql"}</li>
-   * <li>dialect.prefix:
-   * The prefix name of dialect provided by this project. Default is {@code "mb"}</li>
-   * <li>dialect.like-escape-char:
-   * The escape character for wildcard of LIKE. Default is {@code '\'} (backslash)</li>
-   * <li>dialect.like-escape-clause-format:
-   * The format of escape clause. Default is {@code "ESCAPE '%s'"}</li>
-   * <li>dialect.like-additional-escape-target-chars:
-   * The additional escape target characters(custom wildcard characters) for LIKE condition. Default is nothing</li>
-   * </ul>
+   * <table border="1">
+   *   <caption>Supported properties</caption>
+   *   <tr>
+   *     <th>Property Key</th>
+   *     <th>Description</th>
+   *     <th>Default</th>
+   *   </tr>
+   *   <tr>
+   *     <th colspan="3">General configuration</th>
+   *   </tr>
+   *   <tr>
+   *     <td>use-2way</td>
+   *     <td>Whether use the 2-way SQL</td>
+   *     <td>{@code true}</td>
+   *   </tr>
+   *   <tr>
+   *     <td>customizer</td>
+   *     <td>
+   *       The implementation class for customizing a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf
+   *     </td>
+   *     <td>None</td>
+   *   </tr>
+   *   <tr>
+   *     <th colspan="3">Template file configuration</th>
+   *   </tr>
+   *   <tr>
+   *     <td>template-file.cache-enabled</td>
+   *     <td>Whether use the cache feature</td>
+   *     <td>{@code true}</td>
+   *   </tr>
+   *   <tr>
+   *     <td>template-file.cache-ttl</td>
+   *     <td>The cache TTL for resolved templates</td>
+   *     <td>None(use default value of Thymeleaf)</td>
+   *   </tr>
+   *   <tr>
+   *     <td>template-file.encoding</td>
+   *     <td>The character encoding for reading template resources</td>
+   *     <td>{@code "UTF-8"}</td>
+   *   </tr>
+   *   <tr>
+   *     <td>template-file.base-dir</td>
+   *     <td>The base directory for reading template resources</td>
+   *     <td>None(just under class path)</td>
+   *   </tr>
+   *   <tr>
+   *     <td>template-file.patterns</td>
+   *     <td>The patterns for reading as template resources</td>
+   *     <td>{@code "*.sql"}</td>
+   *   </tr>
+   *   <tr>
+   *     <th colspan="3">Dialect configuration</th>
+   *   </tr>
+   *   <tr>
+   *     <td>dialect.prefix</td>
+   *     <td>The prefix name of dialect provided by this project</td>
+   *     <td>{@code "mb"}</td>
+   *   </tr>
+   *   <tr>
+   *     <td>dialect.like-escape-char</td>
+   *     <td>The escape character for wildcard of LIKE</td>
+   *     <td>{@code '\'} (backslash)</td>
+   *   </tr>
+   *   <tr>
+   *     <td>dialect.like-escape-clause-format</td>
+   *     <td>The format of escape clause</td>
+   *     <td>{@code "ESCAPE '%s'"}</td>
+   *   </tr>
+   *   <tr>
+   *     <td>dialect.like-additional-escape-target-chars</td>
+   *     <td>The additional escape target characters(custom wildcard characters) for LIKE condition</td>
+   *     <td>None</td>
+   *   </tr>
+   * </table>
    *
    * @return a configuration instance
    */
