@@ -21,6 +21,8 @@
 :travis-ci-url: https://travis-ci.org/mybatis/thymeleaf-scripting
 :thymeleaf-doc-url: https://www.thymeleaf.org/doc/tutorials/3.0
 :github-organization-url: https://github.com/mybatis
+:github-url: {github-organization-url}/thymeleaf-scripting
+:github-wiki-url: {github-url}/wiki
 
 // Define dependency artifact versions
 :mybatis-version: y.y.y
@@ -30,7 +32,7 @@
 === What is MyBatis Thymeleaf ?
 
 The mybatis-thymeleaf is a plugin that helps applying the 2-way SQL/dynamic SQL feature to the MyBatis 3
-using the template(or natural template) mechanism provided by Thymeleaf 3.
+using the template mechanism provided by Thymeleaf 3.
 If you are not familiar with MyBatis and Thymeleaf, you can see following official documentations.
 
 * {mybatis-doc-url}[MyBatis 3 REFERENCE DOCUMENTATION^]
@@ -42,15 +44,15 @@ If you are not familiar with MyBatis and Thymeleaf, you can see following offici
 The 2-way SQL can be used by following *two way*.
 
 * It can be executed as-is in SQL execution tool (such as psql, mysql, sqlplus, plugins for IDE, etc...)
-* It can be used as a SQL template for creating a bindable and dynamically SQL on your application
+* It can be used as a SQL template for creating a bindable and dynamically SQL that can be parsed by MyBatis core module
 
 ==== Simple bindable 2-way SQL
 
-The mybatis-thymeleaf translate a simple bindable 2-way SQL that specified by natural template to as follow:
+The mybatis-thymeleaf support a simple bindable 2-way SQL as follow:
 
 
 [source,sql]
-.SQL Template using custom attribute tag provided by mybatis-thymeleaf
+.SQL Template
 ----
 SELECT * FROM names
   WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
@@ -59,10 +61,10 @@ SELECT * FROM names
 
 ==== Dynamically bindable 2-way SQL
 
-The mybatis-thymeleaf translate a dynamically bindable 2-way SQL that specified by natural template to as follow:
+The mybatis-thymeleaf support a dynamically bindable 2-way SQL as follow:
 
 [source,sql]
-.SQL Template using custom attribute tag provided by mybatis-thymeleaf
+.SQL Template
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -74,10 +76,10 @@ SELECT * FROM names
 
 ==== Dynamically bindable SQL
 
-The mybatis-thymeleaf translate a dynamically bindable SQL(non 2-way SQL) that specified by template to as follow:
+The mybatis-thymeleaf support a dynamically bindable SQL(non 2-way SQL) as follow:
 
 [source,sql]
-.SQL Template using custom attribute tag provided by mybatis-thymeleaf
+.SQL Template
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -96,8 +98,8 @@ for integrating with template engine provide by Thymeleaf.
 
 * Can write 2-way SQL/dynamic SQL
 * Can use a 2-way SQL/dynamic SQL via an annotation and mapper xml
-* Can read an SQL template from a template file on classpath
-* Can use a custom dialect(attribute tag and expression utility method) at a template
+* Can read an SQL template from a Thymeleaf template file on classpath
+* Can use a custom dialect(attribute tag and expression utility method) on your SQL template
 * Can fully customize a template engine configuration
 
 
@@ -456,7 +458,7 @@ SELECT * FROM names
 ----
 
 [source,sql]
-.2-way SQL template for generating string that can be parsed by MyBatis core module
+.SQL template for generating string that can be parsed by MyBatis core module
 ----
 SELECT * FROM names
   WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/ -- <2>
@@ -477,7 +479,7 @@ About usage of `mb:bind`, please see <<Attribute tag>>.
 === Dynamic SQL
 
 The Thymeleaf supports to create an any string dynamically using conditional evaluation
-and iterating evaluation feature. By using this feature, you can write a dynamic 2-way SQL.
+and iterating evaluation feature. By using this feature, you can write a dynamic SQL.
 
 * <<Using tag for specifying condition>>
 * <<Using tag for iteration>>
@@ -545,21 +547,21 @@ SELECT * FROM names
 
 <1> Specify an iterable object on `th:each`
 
-<2> Specify a 2-way SQL of binding value per iterable element.
-    A bind value specify by `mb:p="{variable name of iterable element}"` format.
+<2> Specify a SQL template of binding value per iterable element.
+    A bind value specify by `mb:p="{variable name of iterable element}"` format (e.g. `id`).
 
 <3> Append comma character when element position is not last.
-    You can access an iteration status object (`IterationStatusVar`) that named by `"{variable name of iterable element}Stat"` format.
+    You can access an iteration status object (`IterationStatusVar`) that named by `"{variable name of iterable element}Stat"` format (e.g. `idStat`).
 
 <4> Specify an end tag of iteration
 
 [TIP]
 ====
-Also, an above SQL template can be replaced using `mb:p` attribute tag with following SQL template.
+An above SQL template can be replaced using `mb:p` attribute tag with following SQL template.
 
 
 [source,sql]
-.Use `mb:p` for creating bind variables string of IN clause
+.Use mb:p for creating bind variables string of IN clause
 ----
 SELECT * FROM names
   WHERE 1 = 1
@@ -570,17 +572,17 @@ SELECT * FROM names
 ----
 ====
 
-About more advanced usage, please see <<Bulk insert>>.
+About more advanced usage of `th:each` , please see <<Bulk insert>>.
 
 === Fragment
 
 The Thymeleaf supports to insert template string from an another template file.
-By using this feature, you can share a 2-way SQL on multiple SQL template.
+By using this feature, you can share an SQL on multiple SQL template.
 
 The standard use case using this feature is paging query as follow:
 
 [source,java]
-.Mapper
+.Mapper interface
 ----
 // Count a total record number that matches for criteria
 @Select("/NameMapper/countByCriteria.sql")
@@ -670,7 +672,7 @@ SELECT * FROM names
 
 === Special variables
 
-The mybatis and mybatis-thymeleaf provides special variables that prefixed with `_` as follows:
+The MyBatis core module provides special variables that prefixed with `_` as follows:
 
 [cols="2,7,1",options="header"]
 .Special variables
@@ -684,7 +686,7 @@ The mybatis and mybatis-thymeleaf provides special variables that prefixed with 
 |Any type
 
 |`_databaseId`
-|The id for identifying the database
+|The id for identifying the database on current session
 (If you want to this variable, you should be enabled the link:{mybatis-doc-url}/configuration.html#databaseIdProvider[`DatabaseIdProvider` feature^] on MyBatis)
 |`String`
 |===
@@ -695,7 +697,7 @@ You can access the configuration properties of MyBatis from your SQL template.
 About configuration properties, please see the link:{mybatis-doc-url}/configuration.html#properties[MyBatis reference documentation^].
 
 [source,java]
-.Java based configuration
+.How to set configuration properties using Java based configuration
 ----
 Configuration configuration = new Configuration();
 Properties variables = new Properties();
@@ -704,7 +706,7 @@ configuration.setVariables(variables);
 ----
 
 [source,xml]
-.XML based configuration (mybatis-config.xml)
+.How to set configuration properties using XML based configuration (mybatis-config.xml)
 ----
 <properties>
   <property name="tableNameOfUser" value="accounts"/> <!--1-->
@@ -723,13 +725,13 @@ SELECT * FROM /*[(${tableNameOfUser} ?: 'users')]*/ users -- <2>
 Above SQL template translate to as follows:
 
 [source,sql]
-.Translated SQL (when `tableNameOfUser` is defined)
+.Translated SQL (when tableNameOfUser is defined)
 ----
 SELECT * FROM accounts
 ----
 
 [source,sql]
-.Translated SQL (when `tableNameOfUser` is not defined)
+.Translated SQL (when tableNameOfUser is not defined)
 ----
 SELECT * FROM users
 ----
@@ -787,10 +789,11 @@ SELECT * FROM names
 == Custom Dialect
 
 The mybatis-thymeleaf provide the custom dialect class(`org.mybatis.scripting.thymeleaf.MyBatisDialect`)
-that help for generating dynamic SQL.
+that help for generating SQL template.
 
 === Attribute tag
 
+The mybatis-thymeleaf provides following attribute tags.
 By default, you can use it using `mb` dialect prefix (default prefix is initial letter of "**M**y**B**atis").
 
 [cols="2,4,4",options="header"]
@@ -801,7 +804,7 @@ By default, you can use it using `mb` dialect prefix (default prefix is initial 
 ^|Attribute Value Format
 
 |<<mybatis-param,p>>
-a|Render bind variable(`#{...}`) that can parsed MyBatis and register an iteration object to the MyBatis's bind variables.
+a|Render bind variable(`#{...}`) that can be parsed by MyBatis core module and register an iteration object to the MyBatis's bind variables.
 a|`{variableName}(,{optionKey}={optionValue},...)` +
  +
  Valid format is same with link:{mybatis-doc-url}/sqlmap-xml.html#Parameters[MyBatis's inline parameter format^].
@@ -838,9 +841,9 @@ SELECT * FROM names
   WHERE id IN (/*[# mb:p="ids"]*/ 1 /*[/]*/) -- <3>
 ----
 
-<1> Render single bind variable(e.g. `#{id}`) that can parsed MyBatis when specify a simple value object
+<1> Render single bind variable(e.g. `#{id}`) that can be parsed by MyBatis core module when specify a simple value object
 <2> Can specify parameter options(`key=value` format) separate with comma
-<3> Render multiple bind variables(e.g. `#{ids[0]}, #{ids[1]}, ...`) that can parsed MyBatis when specify a collection or array object
+<3> Render multiple bind variables(e.g. `#{ids[0]}, #{ids[1]}, ...`) that can be parsed by MyBatis core module when specify a collection or array object
 
 
 [[mybatis-bind]]
@@ -902,13 +905,13 @@ The `#likes` expression provide utility methods for LIKE clause.
 !A target value
 !===
 
-|Return a value that escaped a wildcard character of LIKE condition
-(By default behavior, this method escape the `"%"`, `"_"` and `"\"`(escape character itself) using `"\"`)
+|Return a value that escaped a wildcard character of LIKE condition.
+By default behavior, this method escape the `"%"`, `"_"` and `"\"`(escape character itself) using `"\"`.
 
 |<<mybatis-likeEscapeClause,escapeClause>>
-| N/A
-|Return a escape clause string of LIKE condition
-( By default behavior, this method return `"ESCAPE '\'"`)
+| None
+|Return a escape clause string of LIKE condition.
+By default behavior, this method return `"ESCAPE '\'"`.
 |===
 
 
@@ -1246,4 +1249,26 @@ fun findById(id: Int): Name
 ''')
 Todo findById(int id);
 ----
+
+=== Related resources
+
+
+[cols="2,8",options="header"]
+.Related resource list
+|===
+^|Resource name
+^|Description
+
+|link:{github-url}[GiHub Page^]
+|The mybatis-thymeleaf GiHub top page
+
+|link:{github-wiki-url}/Usage-on-framework[Usage on framework^]
+|Explain how to integrate with an application framework
+
+|link:{github-wiki-url}/Code-completion[Code completion^]
+|Explain about code completion
+
+|link:{github-wiki-url}/Quick-Start[Quick Start^]
+|Explain how to use mybatis-thymeleaf quickly using the Spring Boot
+|===
 
