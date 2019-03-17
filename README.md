@@ -37,6 +37,19 @@ SELECT * FROM names
   ORDER BY id
 ```
 
+### Dynamic bindable SQL(non 2-way)
+
+```sql
+SELECT * FROM names
+  WHERE 1 = 1
+  [# th:if="${not #lists.isEmpty(ids)}"]
+    AND id IN (
+      [# mb:p="ids" /]
+    )
+  [/]
+  ORDER BY id
+```
+
 ## Requirements
 
   * Java 8, Java 11+
