@@ -25,6 +25,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  * The interface for customizing a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf. <br>
  * If you want to customize a default {@code TemplateEngine}, you implements class of this interface and you need to
  * specify the 'customizer' property of mybatis-thymeleaf.properties. <br>
+ * <br>
  * e.g.) Implementation class:
  * 
  * <pre>
@@ -37,7 +38,8 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  *   }
  * }
  * </pre>
- * 
+ *
+ * <br>
  * e.g.) Configuration file (mybatis-thymeleaf.properties):
  * 
  * <pre>
