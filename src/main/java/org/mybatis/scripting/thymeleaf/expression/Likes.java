@@ -23,8 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * The expression utility object that provide helper method for like feature.
- * <br>
+ * The expression utility object that provide helper method for like feature. <br>
  * This object can be access using {@code #likes}) as expression utility object.
  *
  * @author Kazuki Shimizu
@@ -46,10 +45,11 @@ public class Likes {
   }
 
   /**
-   * Escape for LIKE condition value.
-   * <br>
+   * Escape for LIKE condition value. <br>
    * By default configuration, this method escape the {@code "%"} and {@code "_"} using {@code "\"}.
-   * @param value A target condition value
+   * 
+   * @param value
+   *          A target condition value
    * @return A escaped value
    */
   public String escapeWildcard(String value) {
@@ -67,9 +67,9 @@ public class Likes {
   }
 
   /**
-   * Return a escape clause string of LIKE.
-   * <br>
+   * Return a escape clause string of LIKE. <br>
    * By default configuration, this method return {@code "ESCAPE '\'"}.
+   * 
    * @return A escape clause string of LIKE
    */
   public String escapeClause() {
@@ -78,6 +78,7 @@ public class Likes {
 
   /**
    * Creates a new builder instance for {@link Likes}.
+   * 
    * @return a new builder instance
    */
   public static Builder newBuilder() {
@@ -96,10 +97,11 @@ public class Likes {
     }
 
     /**
-     * Set an escape character for wildcard of LIKE.
-     * <br>
+     * Set an escape character for wildcard of LIKE. <br>
      * The default value is {@code '\'} (backslash)
-     * @param escapeChar A escape character
+     * 
+     * @param escapeChar
+     *          A escape character
      * @return A self instance
      */
     public Builder escapeChar(Character escapeChar) {
@@ -108,25 +110,25 @@ public class Likes {
     }
 
     /**
-     * Set additional escape target characters(custom wildcard characters) for LIKE condition.
-     * <br>
+     * Set additional escape target characters(custom wildcard characters) for LIKE condition. <br>
      * The default value is nothing.
      *
-     * @param additionalEscapeTargetChars escape target characters(custom wildcard characters)
+     * @param additionalEscapeTargetChars
+     *          escape target characters(custom wildcard characters)
      * @return A self instance
      */
     public Builder additionalEscapeTargetChars(Character... additionalEscapeTargetChars) {
-      Optional.ofNullable(additionalEscapeTargetChars).ifPresent(
-          v -> instance.additionalEscapeTargetChars = Arrays.stream(v).collect(Collectors.toSet()));
+      Optional.ofNullable(additionalEscapeTargetChars)
+          .ifPresent(v -> instance.additionalEscapeTargetChars = Arrays.stream(v).collect(Collectors.toSet()));
       return this;
     }
 
     /**
-     * Set a format of escape clause.
-     * <br>
+     * Set a format of escape clause. <br>
      * The default value is {@code "ESCAPE '%s'"}.
      *
-     * @param escapeClauseFormat a format of escape clause
+     * @param escapeClauseFormat
+     *          a format of escape clause
      * @return A self instance
      */
     public Builder escapeClauseFormat(String escapeClauseFormat) {
@@ -137,6 +139,7 @@ public class Likes {
 
     /**
      * Return a {@link Likes} instance .
+     * 
      * @return A {@link Likes} instance corresponding with specified option
      */
     public Likes build() {

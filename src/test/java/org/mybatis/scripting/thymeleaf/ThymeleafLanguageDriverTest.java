@@ -115,31 +115,31 @@ class ThymeleafLanguageDriverTest {
     new SqlSessionFactoryBuilder().build(configuration);
 
     TemplateEngine templateEngine = DefaultTemplateEngineCustomizer.templateEngine;
-    ClassLoaderTemplateResolver classLoaderTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
+    ClassLoaderTemplateResolver classLoaderTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
 
     Assertions.assertEquals(TemplateMode.CSS, classLoaderTemplateResolver.getTemplateMode());
     Assertions.assertTrue(classLoaderTemplateResolver.isCacheable());
     Assertions.assertNull(classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("UTF-8", classLoaderTemplateResolver.getCharacterEncoding());
     Assertions.assertEquals("", classLoaderTemplateResolver.getPrefix());
-    Assertions.assertEquals(new LinkedHashSet<>(Collections.singleton("*.sql")), classLoaderTemplateResolver.getResolvablePatterns());
+    Assertions.assertEquals(new LinkedHashSet<>(Collections.singleton("*.sql")),
+        classLoaderTemplateResolver.getResolvablePatterns());
 
-    StringTemplateResolver stringTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
+    StringTemplateResolver stringTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
     Assertions.assertEquals(TemplateMode.CSS, stringTemplateResolver.getTemplateMode());
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
     Assertions.assertNull(stringTemplateResolver.getCacheTTLMs());
 
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
-      Assertions.assertEquals("mb", v.getPrefix());
-      Likes expression = (Likes) v.getExpressionObjectFactory()
-          .buildObject(null, null);
-      Assertions.assertEquals("ESCAPE '\\'", expression.escapeClause());
-    });
+          Assertions.assertEquals("mb", v.getPrefix());
+          Likes expression = (Likes) v.getExpressionObjectFactory().buildObject(null, null);
+          Assertions.assertEquals("ESCAPE '\\'", expression.escapeClause());
+        });
   }
 
   @Test
@@ -151,31 +151,31 @@ class ThymeleafLanguageDriverTest {
     new SqlSessionFactoryBuilder().build(configuration);
 
     TemplateEngine templateEngine = CustomTemplateEngineCustomizer.templateEngine;
-    ClassLoaderTemplateResolver classLoaderTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
+    ClassLoaderTemplateResolver classLoaderTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
 
     Assertions.assertEquals(TemplateMode.TEXT, classLoaderTemplateResolver.getTemplateMode());
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
     Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
     Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
-    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")), classLoaderTemplateResolver.getResolvablePatterns());
+    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")),
+        classLoaderTemplateResolver.getResolvablePatterns());
 
-    StringTemplateResolver stringTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
+    StringTemplateResolver stringTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
     Assertions.assertEquals(TemplateMode.TEXT, stringTemplateResolver.getTemplateMode());
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
 
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
-      Assertions.assertEquals("mybatis", v.getPrefix());
-      Likes expression = (Likes) v.getExpressionObjectFactory()
-          .buildObject(null, null);
-      Assertions.assertEquals("escape '~'", expression.escapeClause());
-      Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
-    });
+          Assertions.assertEquals("mybatis", v.getPrefix());
+          Likes expression = (Likes) v.getExpressionObjectFactory().buildObject(null, null);
+          Assertions.assertEquals("escape '~'", expression.escapeClause());
+          Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
+        });
   }
 
   @Test
@@ -188,80 +188,81 @@ class ThymeleafLanguageDriverTest {
     new SqlSessionFactoryBuilder().build(configuration);
 
     TemplateEngine templateEngine = CustomTemplateEngineCustomizer.templateEngine;
-    ClassLoaderTemplateResolver classLoaderTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
+    ClassLoaderTemplateResolver classLoaderTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
 
     Assertions.assertEquals(TemplateMode.TEXT, classLoaderTemplateResolver.getTemplateMode());
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
     Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
     Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
-    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")), classLoaderTemplateResolver.getResolvablePatterns());
+    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")),
+        classLoaderTemplateResolver.getResolvablePatterns());
 
-    StringTemplateResolver stringTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
+    StringTemplateResolver stringTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
     Assertions.assertEquals(TemplateMode.TEXT, stringTemplateResolver.getTemplateMode());
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
 
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
-      Assertions.assertEquals("mybatis", v.getPrefix());
-      Likes expression = (Likes) v.getExpressionObjectFactory()
-          .buildObject(null, null);
-      Assertions.assertEquals("escape '~'", expression.escapeClause());
-      Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
-    });
+          Assertions.assertEquals("mybatis", v.getPrefix());
+          Likes expression = (Likes) v.getExpressionObjectFactory().buildObject(null, null);
+          Assertions.assertEquals("escape '~'", expression.escapeClause());
+          Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
+        });
   }
 
   @Test
   void testCustomWithCustomizerFunction() {
     System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-empty.properties");
     Configuration configuration = new Configuration();
-    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
-      c.setUse2way(false);
-      c.setCustomizer(CustomTemplateEngineCustomizer.class);
-      c.getTemplateFile().setCacheEnabled(false);
-      c.getTemplateFile().setCacheTtl(30000L);
-      c.getTemplateFile().setEncoding(StandardCharsets.ISO_8859_1);
-      c.getTemplateFile().setBaseDir("/templates/sqls/");
-      c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
-      c.getDialect().setPrefix("mbs");
-      c.getDialect().setLikeEscapeChar('~');
-      c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
-      c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
-    })));
+    configuration.getLanguageRegistry()
+        .register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
+          c.setUse2way(false);
+          c.setCustomizer(CustomTemplateEngineCustomizer.class);
+          c.getTemplateFile().setCacheEnabled(false);
+          c.getTemplateFile().setCacheTtl(30000L);
+          c.getTemplateFile().setEncoding(StandardCharsets.ISO_8859_1);
+          c.getTemplateFile().setBaseDir("/templates/sqls/");
+          c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
+          c.getDialect().setPrefix("mbs");
+          c.getDialect().setLikeEscapeChar('~');
+          c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
+          c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
+        })));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     new SqlSessionFactoryBuilder().build(configuration);
 
     TemplateEngine templateEngine = CustomTemplateEngineCustomizer.templateEngine;
-    ClassLoaderTemplateResolver classLoaderTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
+    ClassLoaderTemplateResolver classLoaderTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
 
     Assertions.assertEquals(TemplateMode.TEXT, classLoaderTemplateResolver.getTemplateMode());
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
     Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
     Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
-    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")), classLoaderTemplateResolver.getResolvablePatterns());
+    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")),
+        classLoaderTemplateResolver.getResolvablePatterns());
 
-    StringTemplateResolver stringTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
+    StringTemplateResolver stringTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
     Assertions.assertEquals(TemplateMode.TEXT, stringTemplateResolver.getTemplateMode());
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
 
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
-      Assertions.assertEquals("mbs", v.getPrefix());
-      Likes expression = (Likes) v.getExpressionObjectFactory()
-          .buildObject(null, null);
-      Assertions.assertEquals("escape '~'", expression.escapeClause());
-      Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
-    });
+          Assertions.assertEquals("mbs", v.getPrefix());
+          Likes expression = (Likes) v.getExpressionObjectFactory().buildObject(null, null);
+          Assertions.assertEquals("escape '~'", expression.escapeClause());
+          Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
+        });
   }
 
   @Test
@@ -281,37 +282,38 @@ class ThymeleafLanguageDriverTest {
     customProperties.setProperty("dialect.like-escape-clause-format", "escape '%s'");
     customProperties.setProperty("dialect.like-additional-escape-target-chars", "％,＿");
 
-    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(customProperties)));
+    configuration.getLanguageRegistry()
+        .register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(customProperties)));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     new SqlSessionFactoryBuilder().build(configuration);
 
     TemplateEngine templateEngine = CustomTemplateEngineCustomizer.templateEngine;
-    ClassLoaderTemplateResolver classLoaderTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
+    ClassLoaderTemplateResolver classLoaderTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, ClassLoaderTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a ClassLoaderTemplateResolver instance."));
 
     Assertions.assertEquals(TemplateMode.TEXT, classLoaderTemplateResolver.getTemplateMode());
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
     Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
     Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
-    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")), classLoaderTemplateResolver.getResolvablePatterns());
+    Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")),
+        classLoaderTemplateResolver.getResolvablePatterns());
 
-    StringTemplateResolver stringTemplateResolver =
-        TemplateEngineCustomizer.extractTemplateResolver(templateEngine, StringTemplateResolver.class)
-            .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
+    StringTemplateResolver stringTemplateResolver = TemplateEngineCustomizer
+        .extractTemplateResolver(templateEngine, StringTemplateResolver.class)
+        .orElseGet(() -> Assertions.fail("Cannot a StringTemplateResolver instance."));
     Assertions.assertEquals(TemplateMode.TEXT, stringTemplateResolver.getTemplateMode());
     Assertions.assertFalse(stringTemplateResolver.isCacheable());
 
     templateEngine.getDialects().stream().filter(MyBatisDialect.class::isInstance).findFirst()
         .map(MyBatisDialect.class::cast).ifPresent(v -> {
-      Assertions.assertEquals("mbs", v.getPrefix());
-      Likes expression = (Likes) v.getExpressionObjectFactory()
-          .buildObject(null, null);
-      Assertions.assertEquals("escape '~'", expression.escapeClause());
-      Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
-    });
+          Assertions.assertEquals("mbs", v.getPrefix());
+          Likes expression = (Likes) v.getExpressionObjectFactory().buildObject(null, null);
+          Assertions.assertEquals("escape '~'", expression.escapeClause());
+          Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
+        });
   }
 
   @Test
@@ -338,25 +340,32 @@ class ThymeleafLanguageDriverTest {
       configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
       Assertions.fail();
     } catch (ScriptingException e) {
-      Assertions.assertEquals("Failed to load language driver for org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver", e.getMessage());
+      Assertions.assertEquals(
+          "Failed to load language driver for org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver", e.getMessage());
       // Since mybatis 3.5.1, exception is wrapped by InvocationTargetException
       Throwable cause = e.getCause() instanceof InvocationTargetException ? e.getCause().getCause() : e.getCause();
-      Assertions.assertEquals("java.lang.ClassNotFoundException: Cannot find class: org.mybatis.scripting.thymeleaf.FooTemplateEngineCustomizer", cause.getMessage());
+      Assertions.assertEquals(
+          "java.lang.ClassNotFoundException: Cannot find class: org.mybatis.scripting.thymeleaf.FooTemplateEngineCustomizer",
+          cause.getMessage());
     }
   }
 
   @Test
   void testCustomizerNotCreation() {
-    System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-customizer-no-default-constructor.properties");
+    System.setProperty("mybatis-thymeleaf.config.file",
+        "mybatis-thymeleaf-customizer-no-default-constructor.properties");
     Configuration configuration = new Configuration();
     try {
       configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
       Assertions.fail();
     } catch (ScriptingException e) {
-      Assertions.assertEquals("Failed to load language driver for org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver", e.getMessage());
+      Assertions.assertEquals(
+          "Failed to load language driver for org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver", e.getMessage());
       // Since mybatis 3.5.1, exception is wrapped by InvocationTargetException
       Throwable cause = e.getCause() instanceof InvocationTargetException ? e.getCause().getCause() : e.getCause();
-      Assertions.assertEquals("Cannot create an instance for class: class org.mybatis.scripting.thymeleaf.NoDefaultConstructorTemplateEngineCustomizer", cause.getMessage());
+      Assertions.assertEquals(
+          "Cannot create an instance for class: class org.mybatis.scripting.thymeleaf.NoDefaultConstructorTemplateEngineCustomizer",
+          cause.getMessage());
     }
   }
 
@@ -376,7 +385,8 @@ class ThymeleafLanguageDriverTest {
       mapper.findUsingTemplateFile(new NameParam(3));
       Assertions.fail();
     } catch (PersistenceException e) {
-      Assertions.assertEquals("unexpected token: SQL in statement [sql/NameMapper/findById.sql]", e.getCause().getMessage());
+      Assertions.assertEquals("unexpected token: SQL in statement [sql/NameMapper/findById.sql]",
+          e.getCause().getMessage());
     }
   }
 

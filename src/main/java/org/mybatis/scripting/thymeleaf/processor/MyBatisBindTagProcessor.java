@@ -33,11 +33,10 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.util.StringUtils;
 
 /**
- * The processor class for handling the {@code mybatis:bind} tag.
- * <br>
- * This processor register an any value to the MyBatis’s bind variables
- * (similar to that of the {@code <bind>} provided by MyBatis core module)
- * This class's implementation was inspired with the {@code StandardWithTagProcessor} provide by Thymeleaf.
+ * The processor class for handling the {@code mybatis:bind} tag. <br>
+ * This processor register an any value to the MyBatis’s bind variables (similar to that of the {@code <bind>} provided
+ * by MyBatis core module) This class's implementation was inspired with the {@code StandardWithTagProcessor} provide by
+ * Thymeleaf.
  *
  * @author Kazuki Shimizu
  * @version 1.0.0
@@ -50,8 +49,11 @@ public class MyBatisBindTagProcessor extends AbstractAttributeTagProcessor {
 
   /**
    * Constructor that can be specified the template mode and dialect prefix.
-   * @param templateMode A target template mode
-   * @param prefix A target dialect prefix
+   * 
+   * @param templateMode
+   *          A target template mode
+   * @param prefix
+   *          A target dialect prefix
    */
   public MyBatisBindTagProcessor(final TemplateMode templateMode, final String prefix) {
     super(templateMode, prefix, null, false, ATTR_NAME, true, PRECEDENCE, true);
@@ -62,9 +64,8 @@ public class MyBatisBindTagProcessor extends AbstractAttributeTagProcessor {
    */
   @Override
   protected void doProcess(ITemplateContext context, IProcessableElementTag tag, AttributeName attributeName,
-          String attributeValue, IElementTagStructureHandler structureHandler) {
-    AssignationSequence assignations =
-        AssignationUtils.parseAssignationSequence(context, attributeValue, false);
+      String attributeValue, IElementTagStructureHandler structureHandler) {
+    AssignationSequence assignations = AssignationUtils.parseAssignationSequence(context, attributeValue, false);
 
     List<Assignation> assignationValues = assignations.getAssignations();
     assignationValues.forEach(assignation -> {

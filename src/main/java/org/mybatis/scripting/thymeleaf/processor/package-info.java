@@ -18,8 +18,8 @@
  * <p>
  * The mybatis-thymeleaf provides processors for following custom attribute tag.
  * <ul>
- *   <li>mb:p</li>
- *   <li>mb:bind</li>
+ * <li>mb:p</li>
+ * <li>mb:bind</li>
  * </ul>
  */
 package org.mybatis.scripting.thymeleaf.processor;

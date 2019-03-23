@@ -40,17 +40,19 @@ public class MyBatisBindingContext {
   /**
    * Load instance from {@link IContext} provided by Thymeleaf.
    *
-   * @param context a context of thymeleaf template processing
+   * @param context
+   *          a context of thymeleaf template processing
    * @return instance of this class
    */
   public static MyBatisBindingContext load(IContext context) {
-    return (MyBatisBindingContext)context.getVariable(CONTEXT_VARIABLE_NAME);
+    return (MyBatisBindingContext) context.getVariable(CONTEXT_VARIABLE_NAME);
   }
 
   /**
    * Constructor.
    *
-   * @param fallbackParameterObject whether use fallback parameter object when parameter is value object
+   * @param fallbackParameterObject
+   *          whether use fallback parameter object when parameter is value object
    */
   MyBatisBindingContext(boolean fallbackParameterObject) {
     this.fallbackParameterObject = fallbackParameterObject;
@@ -68,8 +70,10 @@ public class MyBatisBindingContext {
   /**
    * Set a value into custom bind variable.
    *
-   * @param name variable name
-   * @param value variable value
+   * @param name
+   *          variable name
+   * @param value
+   *          variable value
    */
   public void setCustomBindVariable(String name, Object value) {
     customBindVariables.put(name, value);
@@ -77,7 +81,9 @@ public class MyBatisBindingContext {
 
   /**
    * Return whether contains specified variable into custom bind variables.
-   * @param name variable name
+   * 
+   * @param name
+   *          variable name
    * @return If specified variable exists, return {@code true}
    */
   public boolean containsCustomBindVariable(String name) {
@@ -85,12 +91,13 @@ public class MyBatisBindingContext {
   }
 
   /**
-   * Generate an unique variable name per iteration object.
-   * <br>
+   * Generate an unique variable name per iteration object. <br>
    * Variable name rule is {@code {objectName}_{status list index}_{status.getIndex()}}.
    *
-   * @param objectName base object name
-   * @param status iteration status object
+   * @param objectName
+   *          base object name
+   * @param status
+   *          iteration status object
    * @return an unique variable name per iteration object
    */
   public String generateUniqueName(String objectName, IterationStatusVar status) {

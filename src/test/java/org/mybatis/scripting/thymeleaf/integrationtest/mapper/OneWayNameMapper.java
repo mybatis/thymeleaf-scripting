@@ -54,10 +54,7 @@ public interface OneWayNameMapper {
   @Select("sql/OneWayNameMapper/findByIdWithNestedParam.sql")
   List<Name> findByIdWithNestedParam(@Param("p") NameParam param);
 
-  @Select({
-      "SELECT * FROM names",
-      "[# th:insert=\"~{sql/OneWayNameMapper/findByIdWhere.sql}\" /]"
-  })
+  @Select({ "SELECT * FROM names", "[# th:insert=\"~{sql/OneWayNameMapper/findByIdWhere.sql}\" /]" })
   List<Name> findUsingScript(NameParam nameParam);
 
   @Select("sql/OneWayNameMapper/findById.sql")

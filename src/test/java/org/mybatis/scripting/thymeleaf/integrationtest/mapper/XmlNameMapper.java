@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,16 +22,27 @@ import java.util.List;
 
 public interface XmlNameMapper {
   void insert(Name name);
+
   void update(Name name);
+
   void delete(Name name);
+
   List<Name> getAllNames();
+
   List<Name> findByIds(@Param("ids") List<Integer> ids);
+
   List<Name> findByIdsWithoutParamAnnotation(List<Integer> ids);
+
   List<Name> findById(@Param("id") Integer id);
+
   List<Name> findByIdWithoutParamAnnotation(Integer id);
+
   List<Name> findByIdWithNestedParam(@Param("p") NameParam param);
+
   List<Name> findUsingScript(NameParam nameParam);
+
   List<Name> findUsingTemplateFile(NameParam nameParam);
+
   List<Name> findByName(NameParam param);
 
 }

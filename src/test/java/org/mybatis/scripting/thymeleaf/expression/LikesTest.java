@@ -28,8 +28,7 @@ class LikesTest {
   @Test
   void testEscapeWildcardValueWithAdditionalEscapeTargetChars() {
     Assertions.assertEquals("a\\％\\＿\\\\b",
-        Likes.newBuilder().additionalEscapeTargetChars('％','＿')
-            .build().escapeWildcard("a％＿\\b"));
+        Likes.newBuilder().additionalEscapeTargetChars('％', '＿').build().escapeWildcard("a％＿\\b"));
   }
 
 }

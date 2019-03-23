@@ -50,8 +50,8 @@ class MyBatisDialectTest {
     Environment environment = new Environment("development", transactionFactory, dataSource);
 
     Configuration configuration = new Configuration(environment);
-    configuration.getLanguageRegistry().
-        register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> c.getDialect().setPrefix("mybatis"))));
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(
+        ThymeleafLanguageDriverConfig.newInstance(c -> c.getDialect().setPrefix("mybatis"))));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
     configuration.getMapperRegistry().addMapper(Mapper.class);
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);

@@ -35,10 +35,8 @@ public interface PersonMapper {
   Integer getMaxMailId();
 
   @Select("SELECT id, name FROM persons WHERE id IN ([# mb:p='ids'/]) ORDER BY id")
-  @Results({
-      @Result(property = "id", column = "id", id = true),
-      @Result(property = "mails", column = "id", many = @Many(select = "selectPersonMails", fetchType = FetchType.EAGER))
-  })
+  @Results({ @Result(property = "id", column = "id", id = true),
+      @Result(property = "mails", column = "id", many = @Many(select = "selectPersonMails", fetchType = FetchType.EAGER)) })
   List<Person> selectPersons(@Param("ids") int... ids);
 
   @Select("SELECT id, person_id, address FROM person_mails WHERE person_id = #{id} ORDER BY id")

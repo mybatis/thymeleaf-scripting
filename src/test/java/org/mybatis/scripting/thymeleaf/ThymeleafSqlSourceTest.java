@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -59,10 +59,14 @@ class ThymeleafSqlSourceTest {
   void testErrorOnGetterMethod() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       try {
-        sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findUsing_parameter", new InvalidNameParam(4));
+        sqlSession.selectList(
+            "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findUsing_parameter",
+            new InvalidNameParam(4));
         Assertions.fail();
       } catch (PersistenceException e) {
-        Assertions.assertEquals("Cannot get a value for property named 'id' in 'class org.mybatis.scripting.thymeleaf.integrationtest.mapper.InvalidNameParam'", e.getCause().getCause().getMessage());
+        Assertions.assertEquals(
+            "Cannot get a value for property named 'id' in 'class org.mybatis.scripting.thymeleaf.integrationtest.mapper.InvalidNameParam'",
+            e.getCause().getCause().getMessage());
       }
     }
   }
@@ -71,13 +75,15 @@ class ThymeleafSqlSourceTest {
   void testConfigurationProperties() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       sqlSessionFactory.getConfiguration().getVariables().setProperty("tableNameOfNames", "names2");
-      List<Name> list = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findAllFormSpecifiedTable");
+      List<Name> list = sqlSession.selectList(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findAllFormSpecifiedTable");
       Assertions.assertEquals(1, list.size());
     } finally {
       sqlSessionFactory.getConfiguration().getVariables().remove("tableNameOfNames");
     }
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      List<Name> list = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findAllFormSpecifiedTable");
+      List<Name> list = sqlSession.selectList(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findAllFormSpecifiedTable");
       Assertions.assertEquals(7, list.size());
     }
   }

@@ -60,10 +60,7 @@ public interface NameMapper {
   @Select("sql/NameMapper/findByIdWithNestedParam.sql")
   List<Name> findByIdWithNestedParam(@Param("p") NameParam param);
 
-  @Select({
-      "SELECT * FROM names",
-      "/*[# th:insert=\"~{sql/NameMapper/findByIdWhere.sql}\" /]*/"
-  })
+  @Select({ "SELECT * FROM names", "/*[# th:insert=\"~{sql/NameMapper/findByIdWhere.sql}\" /]*/" })
   List<Name> findUsingScript(NameParam nameParam);
 
   @Select("sql/NameMapper/findById.sql")

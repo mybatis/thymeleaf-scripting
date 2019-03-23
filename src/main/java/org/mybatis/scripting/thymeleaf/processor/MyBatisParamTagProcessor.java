@@ -31,10 +31,9 @@ import org.thymeleaf.standard.expression.StandardExpressionExecutionContext;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * The processor class for handling the {@code mybatis:p} tag.
- * <br>
- * This processor render bind variable({@code #{…​}}) expression that can parsed MyBatis
- * and register an iteration object to the MyBatis’s bind variables.
+ * The processor class for handling the {@code mybatis:p} tag. <br>
+ * This processor render bind variable({@code #{…​}}) expression that can parsed MyBatis and register an iteration
+ * object to the MyBatis’s bind variables.
  *
  * @author Kazuki Shimizu
  * @version 1.0.0
@@ -49,13 +48,15 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
   /**
    * Constructor that can be specified the template mode and dialect prefix.
    *
-   * @param templateMode A target template mode
-   * @param prefix       A target dialect prefix
+   * @param templateMode
+   *          A target template mode
+   * @param prefix
+   *          A target dialect prefix
    */
   public MyBatisParamTagProcessor(final TemplateMode templateMode, final String prefix) {
     super(templateMode, prefix, null, false, ATTR_NAME, true, PRECEDENCE, true);
-    expressionExecutionContext = templateMode == TemplateMode.TEXT
-        ? StandardExpressionExecutionContext.RESTRICTED : StandardExpressionExecutionContext.NORMAL;
+    expressionExecutionContext = templateMode == TemplateMode.TEXT ? StandardExpressionExecutionContext.RESTRICTED
+        : StandardExpressionExecutionContext.NORMAL;
   }
 
   /**
@@ -63,7 +64,7 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
    */
   @Override
   protected void doProcess(ITemplateContext context, IProcessableElementTag tag, AttributeName attributeName,
-          String attributeValue, IElementTagStructureHandler structureHandler) {
+      String attributeValue, IElementTagStructureHandler structureHandler) {
     Pair parameterAndOptionPair = Pair.parse(attributeValue, ',');
     String parameterPath = parameterAndOptionPair.left;
     String options = parameterAndOptionPair.right;
@@ -104,9 +105,9 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
   }
 
   private Object getExpressionEvaluatedValue(ITemplateContext context, IProcessableElementTag tag,
-          AttributeName attributeName, String parameterValue) {
-    IStandardExpression expression = EngineEventUtils.computeAttributeExpression(
-        context, tag, attributeName, "${" + parameterValue + "}");
+      AttributeName attributeName, String parameterValue) {
+    IStandardExpression expression = EngineEventUtils.computeAttributeExpression(context, tag, attributeName,
+        "${" + parameterValue + "}");
     return expression.execute(context, this.expressionExecutionContext);
   }
 

@@ -74,7 +74,8 @@ class SqlSessionTest {
   @Test
   void testNoParam() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.getAllNames");
+      List<Name> names = sqlSession
+          .selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.getAllNames");
       Assertions.assertEquals(7, names.size());
     }
   }
@@ -82,7 +83,9 @@ class SqlSessionTest {
   @Test
   void testListParamUsing_include() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByIdsUsing_include", Arrays.asList(1, 3, 4));
+      List<Name> names = sqlSession.selectList(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByIdsUsing_include",
+          Arrays.asList(1, 3, 4));
       Assertions.assertEquals(3, names.size());
       Assertions.assertEquals(1, names.get(0).getId());
       Assertions.assertEquals(3, names.get(1).getId());
@@ -93,7 +96,9 @@ class SqlSessionTest {
   @Test
   void testParamObjectUsing_parameter() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findUsing_parameter", new NameParam(4));
+      List<Name> names = sqlSession.selectList(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findUsing_parameter",
+          new NameParam(4));
       Assertions.assertEquals(1, names.size());
       Name name = names.get(0);
       Assertions.assertEquals(4, name.getId());
@@ -103,7 +108,8 @@ class SqlSessionTest {
   @Test
   void testParamValueUsing_value() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", 4);
+      List<Name> names = sqlSession.selectList(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", 4);
       Assertions.assertEquals(1, names.size());
       Name name = names.get(0);
       Assertions.assertEquals(4, name.getId());
@@ -113,7 +119,9 @@ class SqlSessionTest {
   @Test
   void testParamObjectUsingTemplateFile() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findUsingTemplateFile", new NameParam(3));
+      List<Name> names = sqlSession.selectList(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findUsingTemplateFile",
+          new NameParam(3));
       Assertions.assertEquals(1, names.size());
       Name name = names.get(0);
       Assertions.assertEquals(3, name.getId());
@@ -123,7 +131,8 @@ class SqlSessionTest {
   @Test
   void testDatabaseId() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      String databaseId = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findDatabaseId");
+      String databaseId = sqlSession
+          .selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findDatabaseId");
       Assertions.assertEquals("hsql", databaseId);
     }
   }
@@ -131,7 +140,8 @@ class SqlSessionTest {
   @Test
   void testDatabaseIdWithH2() {
     try (SqlSession sqlSession = sqlSessionFactoryForH2.openSession()) {
-      String databaseId = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findDatabaseId");
+      String databaseId = sqlSession
+          .selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findDatabaseId");
       Assertions.assertEquals("h2", databaseId);
     }
   }
@@ -144,7 +154,9 @@ class SqlSessionTest {
       name.setLastName("MyBatis");
       sqlSession.insert("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.insert", name);
 
-      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
+      Name loadedName = sqlSession.selectOne(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value",
+          name.getId());
       Assertions.assertEquals(name.getFirstName(), loadedName.getFirstName());
       Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
     }
@@ -161,9 +173,12 @@ class SqlSessionTest {
       Name updatingName = new Name();
       updatingName.setId(name.getId());
       updatingName.setFirstName("Thymeleaf3");
-      sqlSession.update("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.update", updatingName);
+      sqlSession.update("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.update",
+          updatingName);
 
-      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
+      Name loadedName = sqlSession.selectOne(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value",
+          name.getId());
       Assertions.assertEquals(updatingName.getFirstName(), loadedName.getFirstName());
       Assertions.assertEquals(name.getLastName(), loadedName.getLastName());
     }
@@ -179,11 +194,12 @@ class SqlSessionTest {
 
       sqlSession.delete("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.delete", name);
 
-      Name loadedName = sqlSession.selectOne("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value", name.getId());
+      Name loadedName = sqlSession.selectOne(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findById_value",
+          name.getId());
       Assertions.assertNull(loadedName);
     }
   }
-
 
   @Test
   void testCustomBindVariables() {
@@ -191,7 +207,8 @@ class SqlSessionTest {
       Map<String, Object> params = new HashMap<>();
       params.put("firstName", "B");
       params.put("lastName", "Rub");
-      List<Name> names = sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByName", params);
+      List<Name> names = sqlSession.selectList(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByName", params);
       Assertions.assertEquals(2, names.size());
     }
   }
@@ -202,10 +219,13 @@ class SqlSessionTest {
       NameParam param = new NameParam();
       param.setFirstName("B");
       param.setLastName("Rub");
-      sqlSession.selectList("org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByNameBindNameIsEmpty", param);
+      sqlSession.selectList(
+          "org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameSqlSessionMapper.findByNameBindNameIsEmpty",
+          param);
       Assertions.fail();
     } catch (PersistenceException e) {
-      Assertions.assertTrue(e.getCause().getCause().getMessage().startsWith("Variable name expression evaluated as null or empty: \"${''}\" (template: \"/*[# mb:bind=\"${''}=1\" /]*/"));
+      Assertions.assertTrue(e.getCause().getCause().getMessage().startsWith(
+          "Variable name expression evaluated as null or empty: \"${''}\" (template: \"/*[# mb:bind=\"${''}=1\" /]*/"));
       Assertions.assertTrue(e.getCause().getCause().getMessage().endsWith("SELECT * FROM names\" - line 1, col 6)"));
     }
   }

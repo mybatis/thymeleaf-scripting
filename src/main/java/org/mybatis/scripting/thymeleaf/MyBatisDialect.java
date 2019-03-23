@@ -32,14 +32,13 @@ import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * The Dialect for integrating with MyBatis.
- * <br>
+ * The Dialect for integrating with MyBatis. <br>
  * This dialect provides following features. This dialect prefix is {@code "mb"} by default.
  *
  * <ul>
- *   <li>{@code #likes} expression : {@link Likes}</li>
- *   <li>{@code mb:p} attribute tag: {@link MyBatisParamTagProcessor}</li>
- *   <li>{@code mb:bind} attribute tag : {@link MyBatisBindTagProcessor}</li>
+ * <li>{@code #likes} expression : {@link Likes}</li>
+ * <li>{@code mb:p} attribute tag: {@link MyBatisParamTagProcessor}</li>
+ * <li>{@code mb:bind} attribute tag : {@link MyBatisBindTagProcessor}</li>
  * </ul>
  *
  * @author Kazuki Shimizu
@@ -61,16 +60,18 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
   /**
    * Constructor that can be specified the dialect prefix.
    *
-   * @param prefix A dialect prefix
+   * @param prefix
+   *          A dialect prefix
    */
   public MyBatisDialect(String prefix) {
     super("MyBatis Dialect", prefix, StandardDialect.PROCESSOR_PRECEDENCE);
   }
 
   /**
-   * Set an expression utility object that provide helper method for like feature.
-   * <br>
-   * @param likes An expression utility object that provide helper method for like feature
+   * Set an expression utility object that provide helper method for like feature. <br>
+   * 
+   * @param likes
+   *          An expression utility object that provide helper method for like feature
    */
   public void setLikes(Likes likes) {
     this.likes = likes;
@@ -81,12 +82,10 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
    */
   @Override
   public Set<IProcessor> getProcessors(String dialectPrefix) {
-    return new HashSet<>(Arrays.asList(
-        new MyBatisBindTagProcessor(TemplateMode.TEXT, dialectPrefix),
+    return new HashSet<>(Arrays.asList(new MyBatisBindTagProcessor(TemplateMode.TEXT, dialectPrefix),
         new MyBatisBindTagProcessor(TemplateMode.CSS, dialectPrefix),
         new MyBatisParamTagProcessor(TemplateMode.TEXT, dialectPrefix),
-        new MyBatisParamTagProcessor(TemplateMode.CSS, dialectPrefix)
-    ));
+        new MyBatisParamTagProcessor(TemplateMode.CSS, dialectPrefix)));
   }
 
   /**

@@ -38,7 +38,8 @@ public class MyBatisIntegratingEngineContextFactory implements IEngineContextFac
   /**
    * Constructor.
    *
-   * @param delegate A target context factory for delegating
+   * @param delegate
+   *          A target context factory for delegating
    */
   public MyBatisIntegratingEngineContextFactory(IEngineContextFactory delegate) {
     this.delegate = delegate;
@@ -49,18 +50,18 @@ public class MyBatisIntegratingEngineContextFactory implements IEngineContextFac
    */
   @Override
   public IEngineContext createEngineContext(IEngineConfiguration configuration, TemplateData templateData,
-          Map<String, Object> templateResolutionAttributes, IContext context) {
-    IEngineContext engineContext =
-        delegate.createEngineContext(configuration, templateData, templateResolutionAttributes, context);
-    return (IEngineContext) Proxy.newProxyInstance(classLoader, new Class[]{IEngineContext.class},
+      Map<String, Object> templateResolutionAttributes, IContext context) {
+    IEngineContext engineContext = delegate.createEngineContext(configuration, templateData,
+        templateResolutionAttributes, context);
+    return (IEngineContext) Proxy.newProxyInstance(classLoader, new Class[] { IEngineContext.class },
         (proxy, method, args) -> {
           if (method.getName().equals("getVariable")) {
             String name = (String) args[0];
             Object value;
             MyBatisBindingContext bindingContext = MyBatisBindingContext.load(engineContext);
             if (bindingContext.isFallbackParameterObject()) {
-              value = engineContext.containsVariable(name)
-                  ? engineContext.getVariable(name) : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);
+              value = engineContext.containsVariable(name) ? engineContext.getVariable(name)
+                  : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);
             } else {
               value = engineContext.getVariable(name);
             }

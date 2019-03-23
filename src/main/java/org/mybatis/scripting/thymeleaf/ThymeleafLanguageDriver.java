@@ -55,7 +55,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
   /**
    * Constructor for creating instance with user specified {@code Properties}.
    *
-   * @param config A user defined {@code ITemplateEngine} instance
+   * @param config
+   *          A user defined {@code ITemplateEngine} instance
    */
   public ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig config) {
     this.templateEngine = createDefaultTemplateEngine(config);
@@ -64,7 +65,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
   /**
    * Constructor for creating instance with user defined {@code ITemplateEngine}.
    *
-   * @param templateEngine A user defined {@code ITemplateEngine} instance
+   * @param templateEngine
+   *          A user defined {@code ITemplateEngine} instance
    */
   public ThymeleafLanguageDriver(ITemplateEngine templateEngine) {
     this.templateEngine = templateEngine;
@@ -72,11 +74,9 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
 
   private ITemplateEngine createDefaultTemplateEngine(ThymeleafLanguageDriverConfig config) {
     MyBatisDialect dialect = new MyBatisDialect(config.getDialect().getPrefix());
-    Likes likes = Likes.newBuilder()
-        .escapeChar(config.getDialect().getLikeEscapeChar())
+    Likes likes = Likes.newBuilder().escapeChar(config.getDialect().getLikeEscapeChar())
         .escapeClauseFormat(config.getDialect().getLikeEscapeClauseFormat())
-        .additionalEscapeTargetChars(config.getDialect().getLikeAdditionalEscapeTargetChars())
-        .build();
+        .additionalEscapeTargetChars(config.getDialect().getLikeAdditionalEscapeTargetChars()).build();
     dialect.setLikes(likes);
 
     // Create an ClassLoaderTemplateResolver instance
@@ -84,8 +84,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
     TemplateMode mode = config.isUse2way() ? TemplateMode.CSS : TemplateMode.TEXT;
     classLoaderTemplateResolver.setOrder(1);
     classLoaderTemplateResolver.setTemplateMode(mode);
-    classLoaderTemplateResolver.setResolvablePatterns(
-        Arrays.stream(config.getTemplateFile().getPatterns()).collect(Collectors.toSet()));
+    classLoaderTemplateResolver
+        .setResolvablePatterns(Arrays.stream(config.getTemplateFile().getPatterns()).collect(Collectors.toSet()));
     classLoaderTemplateResolver.setCharacterEncoding(config.getTemplateFile().getEncoding().name());
     classLoaderTemplateResolver.setCacheable(config.getTemplateFile().isCacheEnabled());
     classLoaderTemplateResolver.setCacheTTLMs(config.getTemplateFile().getCacheTtl());
@@ -105,15 +105,13 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
         new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
 
     // Create an TemplateEngineCustomizer instance and apply
-    final TemplateEngineCustomizer customizer = Optional.ofNullable(config.getCustomizer())
-        .map(v -> {
-          try {
-            return v.getConstructor().newInstance();
-          } catch (InstantiationException | IllegalAccessException
-              | InvocationTargetException | NoSuchMethodException e) {
-            throw new IllegalStateException("Cannot create an instance for class: " + v, e);
-          }
-        }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.BuiltIn.DO_NOTHING);
+    final TemplateEngineCustomizer customizer = Optional.ofNullable(config.getCustomizer()).map(v -> {
+      try {
+        return v.getConstructor().newInstance();
+      } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        throw new IllegalStateException("Cannot create an instance for class: " + v, e);
+      }
+    }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.BuiltIn.DO_NOTHING);
     customizer.accept(targetTemplateEngine);
 
     return targetTemplateEngine;
@@ -123,8 +121,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    * {@inheritDoc}
    */
   @Override
-  public ParameterHandler createParameterHandler(
-      MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
+  public ParameterHandler createParameterHandler(MappedStatement mappedStatement, Object parameterObject,
+      BoundSql boundSql) {
     return new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);
   }
 

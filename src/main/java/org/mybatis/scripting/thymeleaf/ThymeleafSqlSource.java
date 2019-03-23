@@ -53,13 +53,17 @@ class ThymeleafSqlSource implements SqlSource {
   /**
    * Constructor for for integrating with template engine provide by Thymeleaf.
    *
-   * @param configuration A configuration instance of MyBatis
-   * @param templateEngine A template engine provide by Thymeleaf
-   * @param sqlTemplate A template string of SQL (inline SQL or template file path)
-   * @param parameterType A parameter type that specified at mapper method argument or xml element
+   * @param configuration
+   *          A configuration instance of MyBatis
+   * @param templateEngine
+   *          A template engine provide by Thymeleaf
+   * @param sqlTemplate
+   *          A template string of SQL (inline SQL or template file path)
+   * @param parameterType
+   *          A parameter type that specified at mapper method argument or xml element
    */
-  ThymeleafSqlSource(Configuration configuration, ITemplateEngine templateEngine,
-                     String sqlTemplate, Class<?> parameterType) {
+  ThymeleafSqlSource(Configuration configuration, ITemplateEngine templateEngine, String sqlTemplate,
+      Class<?> parameterType) {
     this.configuration = configuration;
     this.templateEngine = templateEngine;
     this.sqlTemplate = sqlTemplate;
@@ -80,8 +84,7 @@ class ThymeleafSqlSource implements SqlSource {
     }
 
     MyBatisBindingContext bindingContext = new MyBatisBindingContext(
-        parameterObject != null && configuration.getTypeHandlerRegistry()
-            .hasTypeHandler(processingParameterType));
+        parameterObject != null && configuration.getTypeHandlerRegistry().hasTypeHandler(processingParameterType));
     DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);
     dynamicContext.bind(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);
 
@@ -92,8 +95,8 @@ class ThymeleafSqlSource implements SqlSource {
       context = new MapBasedContext(parameterMap, dynamicContext, configuration.getVariables());
     } else {
       MetaClass metaClass = MetaClass.forClass(processingParameterType, configuration.getReflectorFactory());
-      context = new MetaClassBasedContext(
-          parameterObject, metaClass, processingParameterType, dynamicContext, configuration.getVariables());
+      context = new MetaClassBasedContext(parameterObject, metaClass, processingParameterType, dynamicContext,
+          configuration.getVariables());
     }
 
     String sql = templateEngine.process(sqlTemplate, context);
@@ -168,10 +171,10 @@ class ThymeleafSqlSource implements SqlSource {
 
   private static class MapBasedContext extends AbstractContext {
 
-    private final Map<String,Object> variables;
+    private final Map<String, Object> variables;
 
     private MapBasedContext(Map<String, Object> parameterMap, DynamicContext dynamicContext,
-            Properties configurationProperties) {
+        Properties configurationProperties) {
       super(dynamicContext, configurationProperties);
       this.variables = parameterMap;
       addVariableNames(parameterMap.keySet());
@@ -194,7 +197,7 @@ class ThymeleafSqlSource implements SqlSource {
     private final Class<?> parameterType;
 
     private MetaClassBasedContext(Object parameterObject, MetaClass parameterMetaClass, Class<?> parameterType,
-            DynamicContext dynamicContext, Properties configurationProperties) {
+        DynamicContext dynamicContext, Properties configurationProperties) {
       super(dynamicContext, configurationProperties);
       this.parameterObject = parameterObject;
       this.parameterMetaClass = parameterMetaClass;

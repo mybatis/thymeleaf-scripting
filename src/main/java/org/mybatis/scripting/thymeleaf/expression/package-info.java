@@ -18,7 +18,7 @@
  * <p>
  * The mybatis-thymeleaf provides utility expression object.
  * <ul>
- *   <li>#likes</li>
+ * <li>#likes</li>
  * </ul>
  */
 package org.mybatis.scripting.thymeleaf.expression;

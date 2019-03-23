@@ -16,7 +16,7 @@
 /**
  * The mybatis-thymeleaf root package.
  * <p>
- * The mybatis-thymeleaf is a plugin that helps applying the 2-way SQL/dynamic SQL feature
- * to the MyBatis 3 using the template(or natural template) mechanism provided by Thymeleaf 3.
+ * The mybatis-thymeleaf is a plugin that helps applying the 2-way SQL/dynamic SQL feature to the MyBatis 3 using the
+ * template(or natural template) mechanism provided by Thymeleaf 3.
  */
 package org.mybatis.scripting.thymeleaf;
