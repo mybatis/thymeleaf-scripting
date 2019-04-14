@@ -249,11 +249,11 @@ About "Multiline String Literals", please see the <<Multiline String Literals>>.
 ====
 
 
-Also, you can specify an SQL on template file(e.g. `/NameMapper/findById.sql` on class path) as follow:
+Also, you can specify an SQL on template file(e.g. `NameMapper/findById.sql` on class path) as follow:
 
 [source,java]
 ----
-@Select("/NameMapper/findById.sql")
+@Select("NameMapper/findById.sql")
 Name findById(Integer id);
 ----
 
@@ -266,6 +266,12 @@ By default behavior, the mybatis-thymeleaf read a specified template file from j
 SELECT * FROM names
   WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 ----
+
+[TIP]
+====
+Since 1.0.1, we support to read a template file from under classpath automatically using the <<TemplateFilePathProvider, TemplateFilePathProvider>>.
+====
+
 
 ==== XML driven mapper
 
@@ -298,7 +304,7 @@ Also, you can specify an SQL on template file
 [source,xml]
 ----
 <select id="findById" resultType="com.example.Name">
-  /NameMapper/findById.sql
+  NameMapper/findById.sql
 </select>
 ----
 
@@ -585,11 +591,11 @@ The standard use case using this feature is paging query as follow:
 .Mapper interface
 ----
 // Count a total record number that matches for criteria
-@Select("/NameMapper/countByCriteria.sql")
+@Select("NameMapper/countByCriteria.sql")
 long countByCriteria(@Param("criteria") NameCriteria criteria);
 
 // Search records that matches for criteria and specified page
-@Select("/NameMapper/findPageByCriteria.sql")
+@Select("NameMapper/findPageByCriteria.sql")
 List<Name> findPageByCriteria(@Param("criteria") NameCriteria criteria, @Param("pageable") Pageable pageable);
 ----
 
@@ -655,14 +661,14 @@ You can insert a fragment SQL template file on each template as follow:
 [source,sql]
 ----
 SELECT COUNT(*) FROM names
-  /*[# th:insert="~{/NameMapper/whereByCriteria.sql}" /]*/ -- <1>
+  /*[# th:insert="~{NameMapper/whereByCriteria.sql}" /]*/ -- <1>
 ----
 
 .src/main/resources/NameMapper/findPageByCriteria.sql
 [source,sql]
 ----
 SELECT * FROM names
-  /*[# th:insert="~{/NameMapper/whereByCriteria.sql}" /]*/ -- <1>
+  /*[# th:insert="~{NameMapper/whereByCriteria.sql}" /]*/ -- <1>
   LIMIT /*[# mb:p="pageable.pageSize"]*/ 20 /*[/]*/
   OFFSET /*[# mb:p="pageable.offset"]*/ 0 /*[/]*/
   ORDER BY id
@@ -1157,7 +1163,7 @@ customizer = com.example.MyTemplateEngineCustomizer
 template-file.cache-enabled = true
 template-file.cache-ttl = 3600000
 template-file.encoding = UTF-8
-template-file.base-dir = /templates/sqls
+template-file.base-dir = templates/sqls/
 template-file.patterns = *sql, *.sql.template
 dialect.prefix = mybatis
 dialect.like-escape-char = ~
@@ -1178,7 +1184,7 @@ configuration.getLanguageRegistry().register(
   c.getTemplateFile().setCacheEnabled(false);
   c.getTemplateFile().setCacheTtl(3600000L);
   c.getTemplateFile().setEncoding(StandardCharsets.UTF_8);
-  c.getTemplateFile().setBaseDir("/templates/sqls/");
+  c.getTemplateFile().setBaseDir("templates/sqls/");
   c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
   c.getDialect().setPrefix("mybatis");
   c.getDialect().setLikeEscapeChar('~');
@@ -1227,10 +1233,10 @@ public class Mail {
 .Mapper methods
 ----
 @Options(useGeneratedKeys = true, keyProperty = "id")
-@Insert("/sqls/PersonMapper_insertByBulk.sql")
+@Insert("sqls/PersonMapper_insertByBulk.sql")
 void insertByBulk(List<Person> persons);
 
-@Insert("/sqls/PersonMapper_insertMailsByBulk.sql")
+@Insert("sqls/PersonMapper_insertMailsByBulk.sql")
 void insertMailsByBulk(List<Person> persons);
 ----
 
