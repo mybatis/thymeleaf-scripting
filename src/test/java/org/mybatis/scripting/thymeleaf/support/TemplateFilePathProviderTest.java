@@ -31,10 +31,6 @@ class TemplateFilePathProviderTest {
   @BeforeEach
   @AfterEach
   void clean() {
-    TemplateFilePathProvider.setPrefix(null);
-    TemplateFilePathProvider.setIncludesPackagePath(true);
-    TemplateFilePathProvider.setSeparateDirectoryPerMapper(true);
-    TemplateFilePathProvider.setIncludesMapperNameWhenSeparateDirectory(true);
     TemplateFilePathProvider.setCustomTemplateFilePathGenerator(null);
     TemplateFilePathProvider.setLanguageDriverConfig(null);
   }
@@ -93,10 +89,11 @@ class TemplateFilePathProviderTest {
 
   @Test
   void includesPackagePathAndSeparatesDirectoryPerMapperIsFalse() {
-    TemplateFilePathProvider.setIncludesPackagePath(false);
-    TemplateFilePathProvider.setSeparateDirectoryPerMapper(false);
-    TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig
-        .newInstance(c -> c.getTemplateFile().setBaseDir("org/mybatis/scripting/thymeleaf/support/sql")));
+    TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig.newInstance(c -> {
+      c.getTemplateFile().setBaseDir("org/mybatis/scripting/thymeleaf/support/sql");
+      c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
+      c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(false);
+    }));
     String path = TemplateFilePathProvider.providePath(TestMapper.class,
         extractMethod(TestMapper.class, "selectAllDesc"), null);
     Assertions.assertEquals("TestMapper-selectAllDesc.sql", path);
@@ -104,10 +101,11 @@ class TemplateFilePathProviderTest {
 
   @Test
   void baseDirEndWithSlash() {
-    TemplateFilePathProvider.setIncludesPackagePath(false);
-    TemplateFilePathProvider.setSeparateDirectoryPerMapper(false);
-    TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig
-        .newInstance(c -> c.getTemplateFile().setBaseDir("org/mybatis/scripting/thymeleaf/support/sql/")));
+    TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig.newInstance(c -> {
+      c.getTemplateFile().setBaseDir("org/mybatis/scripting/thymeleaf/support/sql/");
+      c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
+      c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(false);
+    }));
     String path = TemplateFilePathProvider.providePath(TestMapper.class,
         extractMethod(TestMapper.class, "selectAllDesc"), null);
     Assertions.assertEquals("TestMapper-selectAllDesc.sql", path);
@@ -115,7 +113,8 @@ class TemplateFilePathProviderTest {
 
   @Test
   void includesMapperNameWhenSeparateDirectoryIsFalse() {
-    TemplateFilePathProvider.setIncludesMapperNameWhenSeparateDirectory(false);
+    TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig
+        .newInstance(c -> c.getTemplateFile().getPathProvider().setIncludesMapperNameWhenSeparateDirectory(false)));
     String path = TemplateFilePathProvider.providePath(TestMapper.class,
         extractMethod(TestMapper.class, "selectAllAsc"), null);
     Assertions.assertEquals("org/mybatis/scripting/thymeleaf/support/TestMapper/selectAllAsc.sql", path);
@@ -123,9 +122,11 @@ class TemplateFilePathProviderTest {
 
   @Test
   void prefix() {
-    TemplateFilePathProvider.setPrefix("org/mybatis/scripting/thymeleaf/support/sql/");
-    TemplateFilePathProvider.setIncludesPackagePath(false);
-    TemplateFilePathProvider.setSeparateDirectoryPerMapper(false);
+    TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig.newInstance(c -> {
+      c.getTemplateFile().getPathProvider().setPrefix("org/mybatis/scripting/thymeleaf/support/sql/");
+      c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
+      c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(false);
+    }));
     String path = TemplateFilePathProvider.providePath(TestMapper.class,
         extractMethod(TestMapper.class, "selectAllDesc"), null);
     Assertions.assertEquals("org/mybatis/scripting/thymeleaf/support/sql/TestMapper-selectAllDesc.sql", path);

@@ -23,6 +23,7 @@ import org.apache.ibatis.builder.annotation.ProviderContext;
 import org.apache.ibatis.io.Resources;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriverConfig;
+import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriverConfig.TemplateFileConfig.PathProviderConfig;
 
 /**
  * The SQL provider class that return the SQL template file path. <br>
@@ -71,64 +72,8 @@ public class TemplateFilePathProvider {
   private static final ThymeleafLanguageDriverConfig DEFAULT_LANGUAGE_DRIVER_CONFIG = ThymeleafLanguageDriverConfig
       .newInstance();
 
-  private static String prefix = "";
-  private static boolean includesPackagePath = true;
-  private static boolean separateDirectoryPerMapper = true;
-  private static boolean includesMapperNameWhenSeparateDirectory = true;
   private static PathGenerator pathGenerator = DEFAULT_PATH_GENERATOR;
   private static ThymeleafLanguageDriverConfig languageDriverConfig = DEFAULT_LANGUAGE_DRIVER_CONFIG;
-
-  /**
-   * Set a prefix for adding to template file path.
-   * <p>
-   * Default is {@code ""}.
-   * </p>
-   * 
-   * @param prefix
-   *          a prefix for adding to template file path
-   */
-  public static void setPrefix(String prefix) {
-    TemplateFilePathProvider.prefix = Optional.ofNullable(prefix).orElse("");
-  }
-
-  /**
-   * Set whether includes package path part.
-   * <p>
-   * Default is {@code true}.
-   * </p>
-   * 
-   * @param includesPackagePath
-   *          If want to includes, set {@code true}
-   */
-  public static void setIncludesPackagePath(boolean includesPackagePath) {
-    TemplateFilePathProvider.includesPackagePath = includesPackagePath;
-  }
-
-  /**
-   * Set whether separate directory per mapper.
-   * <p>
-   * Default is {@code true}.
-   * </p>
-   * 
-   * @param separateDirectoryPerMapper
-   *          If want to separate directory, set {@code true}
-   */
-  public static void setSeparateDirectoryPerMapper(boolean separateDirectoryPerMapper) {
-    TemplateFilePathProvider.separateDirectoryPerMapper = separateDirectoryPerMapper;
-  }
-
-  /**
-   * Set whether includes mapper name into file name when separate directory per mapper.
-   * <p>
-   * Default is {@code true}.
-   * </p>
-   * 
-   * @param includesMapperNameWhenSeparateDirectory
-   *          If want to includes, set {@code true}
-   */
-  public static void setIncludesMapperNameWhenSeparateDirectory(boolean includesMapperNameWhenSeparateDirectory) {
-    TemplateFilePathProvider.includesMapperNameWhenSeparateDirectory = includesMapperNameWhenSeparateDirectory;
-  }
 
   /**
    * Set custom implementation for {@link PathGenerator}.
@@ -173,15 +118,6 @@ public class TemplateFilePathProvider {
    * database)</li>
    * </ul>
    * <br>
-   * If you want to customize path format, please call the following methods.
-   * <ul>
-   * <li>{@link #setPrefix(String)}</li>
-   * <li>{@link #setIncludesPackagePath(boolean)}</li>
-   * <li>{@link #setSeparateDirectoryPerMapper(boolean)}</li>
-   * <li>{@link #setIncludesMapperNameWhenSeparateDirectory(boolean)}</li>
-   * <li>{@link #setLanguageDriverConfig(ThymeleafLanguageDriverConfig)}</li>
-   * <li>{@link #setCustomTemplateFilePathGenerator(PathGenerator)}</li>
-   * </ul>
    *
    * @param context
    *          a context of SQL provider
@@ -225,17 +161,18 @@ public class TemplateFilePathProvider {
     String packageName = pkg == null ? "" : pkg.getName();
     String className = type.getName().substring(packageName.length() + (packageName.length() == 0 ? 0 : 1));
 
+    PathProviderConfig pathProviderConfig = languageDriverConfig.getTemplateFile().getPathProvider();
     StringBuilder path = new StringBuilder();
-    if (!prefix.isEmpty()) {
-      path.append(prefix);
+    if (!pathProviderConfig.getPrefix().isEmpty()) {
+      path.append(pathProviderConfig.getPrefix());
     }
-    if (includesPackagePath && !packageName.isEmpty()) {
+    if (pathProviderConfig.isIncludesPackagePath() && !packageName.isEmpty()) {
       path.append(packageName.replace('.', '/')).append('/');
     }
     path.append(className);
-    if (separateDirectoryPerMapper) {
+    if (pathProviderConfig.isSeparateDirectoryPerMapper()) {
       path.append('/');
-      if (includesMapperNameWhenSeparateDirectory) {
+      if (pathProviderConfig.isIncludesMapperNameWhenSeparateDirectory()) {
         path.append(className).append('-');
       }
     } else {
@@ -246,6 +183,7 @@ public class TemplateFilePathProvider {
       path.append('-').append(databaseId);
     }
     path.append(".sql");
+    System.out.println(path);
     return path.toString();
   }
 

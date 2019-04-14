@@ -180,6 +180,11 @@ public class ThymeleafLanguageDriverConfig {
     private Long cacheTtl;
 
     /**
+     * The template file path provider configuration.
+     */
+    private final PathProviderConfig pathProvider = new PathProviderConfig();
+
+    /**
      * Get the character encoding for reading template resource file.
      * <p>
      * Default is {@code UTF-8}.
@@ -287,6 +292,136 @@ public class ThymeleafLanguageDriverConfig {
      */
     public void setCacheTtl(Long cacheTtl) {
       this.cacheTtl = cacheTtl;
+    }
+
+    /**
+     * Get the template file path provider configuration.
+     *
+     * @return the template file path provider configuration
+     * @since 1.0.1
+     */
+    public PathProviderConfig getPathProvider() {
+      return pathProvider;
+    }
+
+    /**
+     * The template file path provider configuration.
+     *
+     * @since 1.0.1
+     */
+    public static class PathProviderConfig {
+
+      /**
+       * The prefix for adding to template file path.
+       */
+      private String prefix = "";
+
+      /**
+       * Whether includes package path part.
+       */
+      private boolean includesPackagePath = true;
+
+      /**
+       * Whether separate directory per mapper.
+       */
+      private boolean separateDirectoryPerMapper = true;
+
+      /**
+       * Whether includes mapper name into file name when separate directory per mapper.
+       */
+      private boolean includesMapperNameWhenSeparateDirectory = true;
+
+      /**
+       * Get a prefix for adding to template file path.
+       * <p>
+       * Default is {@code ""}.
+       * </p>
+       *
+       * @return a prefix for adding to template file path
+       */
+      public String getPrefix() {
+        return prefix;
+      }
+
+      /**
+       * Set the prefix for adding to template file path.
+       *
+       * @param prefix
+       *          The prefix for adding to template file path
+       */
+      public void setPrefix(String prefix) {
+        this.prefix = prefix;
+      }
+
+      /**
+       * Get whether includes package path part.
+       * <p>
+       * Default is {@code true}.
+       * </p>
+       *
+       * @return If includes package path, return {@code true}
+       */
+      public boolean isIncludesPackagePath() {
+        return includesPackagePath;
+      }
+
+      /**
+       * Set whether includes package path part.
+       *
+       * @param includesPackagePath
+       *          If want to includes, set {@code true}
+       */
+      public void setIncludesPackagePath(boolean includesPackagePath) {
+        this.includesPackagePath = includesPackagePath;
+      }
+
+      /**
+       * Get whether separate directory per mapper.
+       *
+       * @return If separate directory per mapper, return {@code true}
+       */
+      public boolean isSeparateDirectoryPerMapper() {
+        return separateDirectoryPerMapper;
+      }
+
+      /**
+       * Set whether separate directory per mapper.
+       * <p>
+       * Default is {@code true}.
+       * </p>
+       *
+       * @param separateDirectoryPerMapper
+       *          If want to separate directory, set {@code true}
+       */
+      public void setSeparateDirectoryPerMapper(boolean separateDirectoryPerMapper) {
+        this.separateDirectoryPerMapper = separateDirectoryPerMapper;
+      }
+
+      /**
+       * Get whether includes mapper name into file name when separate directory per mapper.
+       * <p>
+       * Default is {@code true}.
+       * </p>
+       *
+       * @return If includes mapper name, set {@code true}
+       */
+      public boolean isIncludesMapperNameWhenSeparateDirectory() {
+        return includesMapperNameWhenSeparateDirectory;
+      }
+
+      /**
+       * Set whether includes mapper name into file name when separate directory per mapper.
+       * <p>
+       * Default is {@code true}.
+       * </p>
+       *
+       * @param includesMapperNameWhenSeparateDirectory
+       *          If want to includes, set {@code true}
+       */
+      public void setIncludesMapperNameWhenSeparateDirectory(boolean includesMapperNameWhenSeparateDirectory) {
+        this.includesMapperNameWhenSeparateDirectory = includesMapperNameWhenSeparateDirectory;
+      }
+
     }
 
   }
@@ -463,6 +598,33 @@ public class ThymeleafLanguageDriverConfig {
    * <td>template-file.patterns</td>
    * <td>The patterns for reading as template resources</td>
    * <td>{@code "*.sql"}</td>
+   * </tr>
+   * <tr>
+   * <tr>
+   * <th colspan="3">Template file path provider configuration(TemplateFilePathProvider)</th>
+   * </tr>
+   * <tr>
+   * <td>template-file.path-provider.prefix</td>
+   * <td>The prefix for adding to template file path</td>
+   * <td>{@code ""}</td>
+   * </tr>
+   * <tr>
+   * <tr>
+   * <td>template-file.path-provider.includes-package-path</td>
+   * <td>Whether includes package path part</td>
+   * <td>{@code true}</td>
+   * </tr>
+   * <tr>
+   * <tr>
+   * <td>template-file.patterns</td>
+   * <td>Whether separate directory per mapper</td>
+   * <td>{@code true}</td>
+   * </tr>
+   * <tr>
+   * <tr>
+   * <td>template-file.patterns</td>
+   * <td>Whether includes mapper name into file name when separate directory per mapper</td>
+   * <td>{@code true}</td>
    * </tr>
    * <tr>
    * <th colspan="3">Dialect configuration</th>

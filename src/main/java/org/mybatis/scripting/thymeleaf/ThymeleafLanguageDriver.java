@@ -29,6 +29,7 @@ import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.scripting.thymeleaf.expression.Likes;
+import org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -60,6 +61,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    */
   public ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig config) {
     this.templateEngine = createDefaultTemplateEngine(config);
+    TemplateFilePathProvider.setLanguageDriverConfig(config);
   }
 
   /**
