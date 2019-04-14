@@ -46,7 +46,6 @@ import org.mybatis.scripting.thymeleaf.expression.Likes;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
-import org.mybatis.scripting.thymeleaf.integrationtest.mapper.TemplateFilePathProviderMapper;
 import org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
