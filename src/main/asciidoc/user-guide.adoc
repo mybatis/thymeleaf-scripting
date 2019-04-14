@@ -963,6 +963,76 @@ using <<Configuration properties, Configuration properties>>.
   AND firstName LIKE #{patternFirstName} ESCAPE '\'
 ----
 
+== Support classes
+
+We provides useful classes for supporting development.
+
+=== TemplateFilePathProvider
+
+The `TemplateFilePathProvider` is SQL provider class that return the SQL template file path(Available since 1.0.1).
+This class use with SQL provider annotation(`@InsertProvider`, `@UpdateProvider`, `@DeleteProvider` and `@SelectProvider`}) as follow:
+
+[NOTE]
+====
+**This class required to use on MyBatis 3.5.1+.**
+====
+
+.Usage:
+
+[source, java]
+----
+package com.example.mapper;
+
+public interface BaseMapper<T> {
+
+  @Options(useGeneratedKeys = true, keyProperty = "id")
+  @InsertProvider(type = TemplateFilePathProvider.class)
+  void insert(T entity);
+
+  @UpdateProvider(type = TemplateFilePathProvider.class)
+  void update(T entity);
+
+  @DeleteProvider(type = TemplateFilePathProvider.class)
+  void delete(T entity);
+
+  @SelectProvider(type = TemplateFilePathProvider.class)
+  T findById(Integer id);
+
+}
+----
+
+[source, java]
+----
+package com.example.mapper;
+
+public interface NameMapper extends BaseMapper {
+
+  @SelectProvider(type = TemplateFilePathProvider.class)
+  List<Name> findByCondition(NameCondition condition);
+
+}
+----
+
+By default implementation, a template file path resolve following format and priority order.
+If does not match all, it throw an exception that indicate not found a template file.
+
+* `com/example/mapper/NameMapper/NameMapper-{methodName}-{databaseId}.sql`
+* `com/example/mapper/NameMapper/NameMapper-{methodName}.sql` +
+  (fallback using default database)
+* `com/example/mapper/BaseMapper/BaseMapper-{methodName}-{databaseId}.sql` +
+  (fallback using declaring class of mapper method)
+* `com/example/mapper/BaseMapper/BaseMapper-{methodName}.sql` +
+  (fallback using declaring class of mapper method and default database)
+
+If you want to customize the template file path format,
+please call static setter methods of the `TemplateFilePathProvider` **before initialize the MyBatis module**.
+
+[NOTE]
+====
+If you applied an user defined `ThymeleafLanguageDriverConfig` for `ThymeleafLanguageDriver`,
+please apply same instance to the `TemplateFilePathProvider` using the `setLanguageDriverConfig` method.
+====
+
 
 == Cautions for usage
 
