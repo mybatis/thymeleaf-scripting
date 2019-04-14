@@ -1030,8 +1030,7 @@ If does not match all, it throw an exception that indicate not found a template 
 * `com/example/mapper/BaseMapper/BaseMapper-{methodName}.sql` +
   (fallback using declaring class of mapper method and default database)
 
-If you want to customize the template file path format,
-please call static setter methods of the `TemplateFilePathProvider` **before initialize the MyBatis module**.
+If you want to customize the template file path format, please call static setter methods of the `TemplateFilePathProvider`.
 
 [NOTE]
 ====

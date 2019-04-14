@@ -173,7 +173,7 @@ public class TemplateFilePathProvider {
    * database)</li>
    * </ul>
    * <br>
-   * If you want to customize path format, please call the following methods on application initialize phase.
+   * If you want to customize path format, please call the following methods.
    * <ul>
    * <li>{@link #setPrefix(String)}</li>
    * <li>{@link #setIncludesPackagePath(boolean)}</li>
