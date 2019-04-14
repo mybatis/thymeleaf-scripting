@@ -6,10 +6,10 @@ jdk:
   - oraclejdk8
 
 script:
-  # build using mybatis latest version
+  # build using mybatis latest released version
   - ./mvnw clean verify
-  # build using mybatis 3.4.x line
-  - ./mvnw clean verify -Dmybatis.version=3.4.6
+  # test using mybatis 3.4.x line
+  - ./mvnw test -Dmybatis.version=3.4.6
   # build using mybatis 3.5.x snapshot
   - ./mvnw clean verify -Dmybatis.version=3.5.2-SNAPSHOT
 
