@@ -16,7 +16,6 @@
 package org.mybatis.scripting.thymeleaf;
 
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -47,6 +46,8 @@ import org.mybatis.scripting.thymeleaf.expression.Likes;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameMapper;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
+import org.mybatis.scripting.thymeleaf.integrationtest.mapper.TemplateFilePathProviderMapper;
+import org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -85,6 +86,12 @@ class ThymeleafLanguageDriverTest {
 
     configuration.addMapper(NameMapper.class);
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+  }
+
+  @BeforeEach
+  @AfterEach
+  void cleanup() {
+    TemplateFilePathProvider.setLanguageDriverConfig(null);
   }
 
   @BeforeEach
@@ -159,7 +166,7 @@ class ThymeleafLanguageDriverTest {
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
     Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
-    Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
+    Assertions.assertEquals("templates/", classLoaderTemplateResolver.getPrefix());
     Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")),
         classLoaderTemplateResolver.getResolvablePatterns());
 
@@ -180,9 +187,10 @@ class ThymeleafLanguageDriverTest {
 
   @Test
   void testCustomWithCustomConfigFileUsingMethodArgument() {
+    ThymeleafLanguageDriverConfig thymeleafLanguageDriverConfig = ThymeleafLanguageDriverConfig
+        .newInstance("mybatis-thymeleaf-custom.properties");
     Configuration configuration = new Configuration();
-    configuration.getLanguageRegistry().register(
-        new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance("mybatis-thymeleaf-custom.properties")));
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(thymeleafLanguageDriverConfig));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     new SqlSessionFactoryBuilder().build(configuration);
@@ -196,7 +204,7 @@ class ThymeleafLanguageDriverTest {
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
     Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
-    Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
+    Assertions.assertEquals("templates/", classLoaderTemplateResolver.getPrefix());
     Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")),
         classLoaderTemplateResolver.getResolvablePatterns());
 
@@ -213,26 +221,38 @@ class ThymeleafLanguageDriverTest {
           Assertions.assertEquals("escape '~'", expression.escapeClause());
           Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
         });
+
+    Assertions.assertEquals("sqls/", thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().getPrefix());
+    Assertions.assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesPackagePath());
+    Assertions
+        .assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isSeparateDirectoryPerMapper());
+    Assertions.assertFalse(
+        thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesMapperNameWhenSeparateDirectory());
+
   }
 
   @Test
   void testCustomWithCustomizerFunction() {
     System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-empty.properties");
+    ThymeleafLanguageDriverConfig thymeleafLanguageDriverConfig = ThymeleafLanguageDriverConfig.newInstance(c -> {
+      c.setUse2way(false);
+      c.setCustomizer(CustomTemplateEngineCustomizer.class);
+      c.getTemplateFile().setCacheEnabled(false);
+      c.getTemplateFile().setCacheTtl(30000L);
+      c.getTemplateFile().setEncoding(StandardCharsets.ISO_8859_1);
+      c.getTemplateFile().setBaseDir("templates/");
+      c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
+      c.getTemplateFile().getPathProvider().setPrefix("sqls/");
+      c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
+      c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(false);
+      c.getTemplateFile().getPathProvider().setIncludesMapperNameWhenSeparateDirectory(false);
+      c.getDialect().setPrefix("mbs");
+      c.getDialect().setLikeEscapeChar('~');
+      c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
+      c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
+    });
     Configuration configuration = new Configuration();
-    configuration.getLanguageRegistry()
-        .register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
-          c.setUse2way(false);
-          c.setCustomizer(CustomTemplateEngineCustomizer.class);
-          c.getTemplateFile().setCacheEnabled(false);
-          c.getTemplateFile().setCacheTtl(30000L);
-          c.getTemplateFile().setEncoding(StandardCharsets.ISO_8859_1);
-          c.getTemplateFile().setBaseDir("/templates/sqls/");
-          c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
-          c.getDialect().setPrefix("mbs");
-          c.getDialect().setLikeEscapeChar('~');
-          c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
-          c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
-        })));
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(thymeleafLanguageDriverConfig));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     new SqlSessionFactoryBuilder().build(configuration);
@@ -246,7 +266,7 @@ class ThymeleafLanguageDriverTest {
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
     Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
-    Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
+    Assertions.assertEquals("templates/", classLoaderTemplateResolver.getPrefix());
     Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")),
         classLoaderTemplateResolver.getResolvablePatterns());
 
@@ -263,6 +283,13 @@ class ThymeleafLanguageDriverTest {
           Assertions.assertEquals("escape '~'", expression.escapeClause());
           Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
         });
+
+    Assertions.assertEquals("sqls/", thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().getPrefix());
+    Assertions.assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesPackagePath());
+    Assertions
+        .assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isSeparateDirectoryPerMapper());
+    Assertions.assertFalse(
+        thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesMapperNameWhenSeparateDirectory());
   }
 
   @Test
@@ -275,15 +302,21 @@ class ThymeleafLanguageDriverTest {
     customProperties.setProperty("template-file.cache-enabled", "false");
     customProperties.setProperty("template-file.cache-ttl", "30000");
     customProperties.setProperty("template-file.encoding", "ISO-8859-1");
-    customProperties.setProperty("template-file.base-dir", "/templates/sqls/");
+    customProperties.setProperty("template-file.base-dir", "templates/");
     customProperties.setProperty("template-file.patterns", "*.sql, *.sql.template");
+    customProperties.setProperty("template-file.path-provider.prefix", "sqls/");
+    customProperties.setProperty("template-file.path-provider.includes-package-path", "false");
+    customProperties.setProperty("template-file.path-provider.separate-directory-per-mapper", "false");
+    customProperties.setProperty("template-file.path-provider.includes-mapper-name-when-separate-directory", "false");
     customProperties.setProperty("dialect.prefix", "mbs");
     customProperties.setProperty("dialect.like-escape-char", "~");
     customProperties.setProperty("dialect.like-escape-clause-format", "escape '%s'");
     customProperties.setProperty("dialect.like-additional-escape-target-chars", "％,＿");
 
-    configuration.getLanguageRegistry()
-        .register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(customProperties)));
+    ThymeleafLanguageDriverConfig thymeleafLanguageDriverConfig = ThymeleafLanguageDriverConfig
+        .newInstance(customProperties);
+
+    configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(thymeleafLanguageDriverConfig));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     new SqlSessionFactoryBuilder().build(configuration);
@@ -297,7 +330,7 @@ class ThymeleafLanguageDriverTest {
     Assertions.assertFalse(classLoaderTemplateResolver.isCacheable());
     Assertions.assertEquals(Long.valueOf(30000), classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("ISO-8859-1", classLoaderTemplateResolver.getCharacterEncoding());
-    Assertions.assertEquals("/templates/sqls/", classLoaderTemplateResolver.getPrefix());
+    Assertions.assertEquals("templates/", classLoaderTemplateResolver.getPrefix());
     Assertions.assertEquals(new LinkedHashSet<>(Arrays.asList("*.sql", "*.sql.template")),
         classLoaderTemplateResolver.getResolvablePatterns());
 
@@ -314,6 +347,13 @@ class ThymeleafLanguageDriverTest {
           Assertions.assertEquals("escape '~'", expression.escapeClause());
           Assertions.assertEquals("a~％~＿~~b", expression.escapeWildcard("a％＿~b"));
         });
+
+    Assertions.assertEquals("sqls/", thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().getPrefix());
+    Assertions.assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesPackagePath());
+    Assertions
+        .assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isSeparateDirectoryPerMapper());
+    Assertions.assertFalse(
+        thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesMapperNameWhenSeparateDirectory());
   }
 
   @Test

@@ -33,9 +33,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
+import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriverConfig;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.TemplateFilePathProviderMapper;
-import org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider;
 
 @DisabledIfSystemProperty(named = "mybatis.version", matches = "3\\.4\\..*|3\\.5\\.0")
 class TemplateFilePathProviderMapperTest {
@@ -59,14 +59,16 @@ class TemplateFilePathProviderMapperTest {
       }
     }
 
-    TemplateFilePathProvider.setPrefix("sql/");
-    TemplateFilePathProvider.setIncludesPackagePath(false);
-
     TransactionFactory transactionFactory = new JdbcTransactionFactory();
     Environment environment = new Environment("development", transactionFactory, dataSource);
 
     Configuration configuration = new Configuration(environment);
     configuration.setMapUnderscoreToCamelCase(true);
+    configuration.getLanguageRegistry()
+        .register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
+          c.getTemplateFile().getPathProvider().setPrefix("sql/");
+          c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
+        })));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 
     configuration.addMapper(TemplateFilePathProviderMapper.class);

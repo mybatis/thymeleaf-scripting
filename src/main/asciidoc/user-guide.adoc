@@ -1030,13 +1030,8 @@ If does not match all, it throw an exception that indicate not found a template 
 * `com/example/mapper/BaseMapper/BaseMapper-{methodName}.sql` +
   (fallback using declaring class of mapper method and default database)
 
-If you want to customize the template file path format, please call static setter methods of the `TemplateFilePathProvider`.
-
-[NOTE]
-====
-If you applied an user defined `ThymeleafLanguageDriverConfig` for `ThymeleafLanguageDriver`,
-please apply same instance to the `TemplateFilePathProvider` using the `setLanguageDriverConfig` method.
-====
+If you want to customize the template file path format,
+you can customize using the <<Configuration properties, configuration properties>> that start with `template-file.path-provider`.
 
 
 == Cautions for usage
@@ -1129,6 +1124,28 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`String[]`
 |`"*.sql"`
 
+4+|*Template file path provider configuration(TemplateFilePathProvider)*
+
+|`template-file.path-provider.prefix`
+|The prefix for adding to template file path
+|`String`
+|`""`
+
+|`template-file.path-provider.includes-package-path`
+|Whether includes package path part
+|`Boolean`
+|`true` (includes package path)
+
+|`template-file.path-provider.separate-directory-per-mapper`
+|Whether separate directory per mapper
+|`Boolean`
+|`true` (separate directory per mapper)
+
+|`template-file.path-provider.includes-mapper-name-when-separate-directory`
+|Whether includes mapper name into file name when separate directory per mapper
+|`Boolean`
+|`true` (includes mapper name)
+
 4+|*Dialect configuration*
 
 |`dialect.prefix`
@@ -1157,13 +1174,17 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 [source,properties]
 .src/main/resources/mybatis-thymeleaf.properties
 ----
-use-2way = true
+use-2way = false
 customizer = com.example.MyTemplateEngineCustomizer
 template-file.cache-enabled = true
 template-file.cache-ttl = 3600000
 template-file.encoding = UTF-8
-template-file.base-dir = templates/sqls/
+template-file.base-dir = templates/
 template-file.patterns = *sql, *.sql.template
+template-file.path-provider.prefix = sqls/
+template-file.path-provider.includes-package-path = false
+template-file.path-provider.separate-directory-per-mapper = false
+template-file.path-provider.includes-mapper-name-when-separate-directory = false
 dialect.prefix = mybatis
 dialect.like-escape-char = ~
 dialect.like-escape-clause-format = escape '%s'
@@ -1178,13 +1199,17 @@ These properties can be specified via factory method of `ThymeleafLanguageDriver
 ----
 configuration.getLanguageRegistry().register(
   new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
-  c.setUse2way(true);
+  c.setUse2way(false);
   c.setCustomizer(CustomTemplateEngineCustomizer.class);
   c.getTemplateFile().setCacheEnabled(false);
   c.getTemplateFile().setCacheTtl(3600000L);
   c.getTemplateFile().setEncoding(StandardCharsets.UTF_8);
-  c.getTemplateFile().setBaseDir("templates/sqls/");
+  c.getTemplateFile().setBaseDir("templates/");
   c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
+  c.getTemplateFile().getPathProvider().setPrefix("sqls/");
+  c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
+  c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(false);
+  c.getTemplateFile().getPathProvider().setIncludesMapperNameWhenSeparateDirectory(false);
   c.getDialect().setPrefix("mybatis");
   c.getDialect().setLikeEscapeChar('~');
   c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
