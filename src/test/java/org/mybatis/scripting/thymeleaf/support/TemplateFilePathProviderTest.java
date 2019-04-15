@@ -88,6 +88,27 @@ class TemplateFilePathProviderTest {
   }
 
   @Test
+  void notFoundSqlFileWithoutDatabaseId() {
+    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> {
+      TemplateFilePathProvider.providePath(TestMapper.class, extractMethod(TestMapper.class, "selectOne"), null);
+    });
+    Assertions.assertEquals(
+        "The SQL template file not found. mapperType:[interface org.mybatis.scripting.thymeleaf.support.TestMapper] mapperMethod:[public abstract java.lang.Object org.mybatis.scripting.thymeleaf.support.BaseMapper.selectOne(int)] databaseId:[null]",
+        e.getMessage());
+  }
+
+  @Test
+  void notFoundSqlFileWithoutFallbackDeclaringClass() {
+    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> {
+      TemplateFilePathProvider.providePath(TestMapper.class, extractMethod(TestMapper.class, "selectAllByFirstName"),
+          null);
+    });
+    Assertions.assertEquals(
+        "The SQL template file not found. mapperType:[interface org.mybatis.scripting.thymeleaf.support.TestMapper] mapperMethod:[public abstract java.lang.Object org.mybatis.scripting.thymeleaf.support.TestMapper.selectAllByFirstName(String)] databaseId:[null]",
+        e.getMessage());
+  }
+
+  @Test
   void includesPackagePathAndSeparatesDirectoryPerMapperIsFalse() {
     TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig.newInstance(c -> {
       c.getTemplateFile().setBaseDir("org/mybatis/scripting/thymeleaf/support/sql");
@@ -130,6 +151,26 @@ class TemplateFilePathProviderTest {
     String path = TemplateFilePathProvider.providePath(TestMapper.class,
         extractMethod(TestMapper.class, "selectAllDesc"), null);
     Assertions.assertEquals("org/mybatis/scripting/thymeleaf/support/sql/TestMapper-selectAllDesc.sql", path);
+  }
+
+  @Test
+  void defaultPackageMapper() throws ClassNotFoundException {
+    TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig
+        .newInstance(c -> c.getTemplateFile().setBaseDir("org/mybatis/scripting/thymeleaf/support/")));
+    Class<?> mapperType = Class.forName("DefaultPackageNameMapper");
+    String path = TemplateFilePathProvider.providePath(mapperType, extractMethod(mapperType, "selectAllDesc"), null);
+    Assertions.assertEquals("DefaultPackageNameMapper/DefaultPackageNameMapper-selectAllDesc.sql", path);
+  }
+
+  @Test
+  void defaultPackageMapperWithIncludesPackagePathIsFalse() throws ClassNotFoundException {
+    TemplateFilePathProvider.setLanguageDriverConfig(ThymeleafLanguageDriverConfig.newInstance(c -> {
+      c.getTemplateFile().setBaseDir("org/mybatis/scripting/thymeleaf/support/");
+      c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
+    }));
+    Class<?> mapperType = Class.forName("DefaultPackageNameMapper");
+    String path = TemplateFilePathProvider.providePath(mapperType, extractMethod(mapperType, "selectAllDesc"), null);
+    Assertions.assertEquals("DefaultPackageNameMapper/DefaultPackageNameMapper-selectAllDesc.sql", path);
   }
 
   @Test

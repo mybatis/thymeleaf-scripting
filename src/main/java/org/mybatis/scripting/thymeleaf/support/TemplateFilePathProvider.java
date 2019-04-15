@@ -79,6 +79,10 @@ public class TemplateFilePathProvider {
 
   private static ConcurrentMap<ProviderContext, String> cache = new ConcurrentHashMap<>();
 
+  private TemplateFilePathProvider() {
+    // NOP
+  }
+
   /**
    * Set custom implementation for {@link PathGenerator}.
    *
