@@ -172,7 +172,7 @@ public class TemplateFilePathProvider {
   private static String generateTemplatePath(Class<?> type, Method method, String databaseId) {
     Package pkg = type.getPackage();
     String packageName = pkg == null ? "" : pkg.getName();
-    String className = type.getName().substring(packageName.length() + (packageName.length() == 0 ? 0 : 1));
+    String className = type.getName().substring(packageName.length() + (packageName.isEmpty() ? 0 : 1));
 
     PathProviderConfig pathProviderConfig = languageDriverConfig.getTemplateFile().getPathProvider();
     StringBuilder path = new StringBuilder();
@@ -200,14 +200,8 @@ public class TemplateFilePathProvider {
   }
 
   private static boolean exists(String path) {
-    String actualPath;
-    if (languageDriverConfig.getTemplateFile().getBaseDir().isEmpty()) {
-      actualPath = path;
-    } else {
-      actualPath = languageDriverConfig.getTemplateFile().getBaseDir().endsWith("/")
-          ? languageDriverConfig.getTemplateFile().getBaseDir() + path
-          : languageDriverConfig.getTemplateFile().getBaseDir() + "/" + path;
-    }
+    String basePath = languageDriverConfig.getTemplateFile().getBaseDir();
+    String actualPath = basePath.isEmpty() ? path : basePath + (basePath.endsWith("/") ? "" : "/") + path;
     try {
       return Resources.getResourceAsFile(actualPath).exists();
     } catch (IOException e) {
