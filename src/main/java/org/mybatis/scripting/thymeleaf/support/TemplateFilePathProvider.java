@@ -145,11 +145,11 @@ public class TemplateFilePathProvider {
       if (exists(path)) {
         return path;
       }
-    }
-    if (fallbackDatabase) {
-      path = pathGenerator.generatePath(mapperMethod.getDeclaringClass(), mapperMethod, null);
-      if (exists(path)) {
-        return path;
+      if (fallbackDatabase) {
+        path = pathGenerator.generatePath(mapperMethod.getDeclaringClass(), mapperMethod, null);
+        if (exists(path)) {
+          return path;
+        }
       }
     }
     throw new IllegalStateException("The SQL template file not found. mapperType:[" + mapperType + "] mapperMethod:["
