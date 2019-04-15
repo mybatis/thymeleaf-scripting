@@ -227,6 +227,7 @@ class ThymeleafLanguageDriverTest {
         .assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isSeparateDirectoryPerMapper());
     Assertions.assertFalse(
         thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesMapperNameWhenSeparateDirectory());
+    Assertions.assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isCacheEnabled());
 
   }
 
@@ -245,6 +246,7 @@ class ThymeleafLanguageDriverTest {
       c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
       c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(false);
       c.getTemplateFile().getPathProvider().setIncludesMapperNameWhenSeparateDirectory(false);
+      c.getTemplateFile().getPathProvider().setCacheEnabled(false);
       c.getDialect().setPrefix("mbs");
       c.getDialect().setLikeEscapeChar('~');
       c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
@@ -289,6 +291,7 @@ class ThymeleafLanguageDriverTest {
         .assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isSeparateDirectoryPerMapper());
     Assertions.assertFalse(
         thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesMapperNameWhenSeparateDirectory());
+    Assertions.assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isCacheEnabled());
   }
 
   @Test
@@ -307,6 +310,7 @@ class ThymeleafLanguageDriverTest {
     customProperties.setProperty("template-file.path-provider.includes-package-path", "false");
     customProperties.setProperty("template-file.path-provider.separate-directory-per-mapper", "false");
     customProperties.setProperty("template-file.path-provider.includes-mapper-name-when-separate-directory", "false");
+    customProperties.setProperty("template-file.path-provider.cache-enabled", "false");
     customProperties.setProperty("dialect.prefix", "mbs");
     customProperties.setProperty("dialect.like-escape-char", "~");
     customProperties.setProperty("dialect.like-escape-clause-format", "escape '%s'");
@@ -353,6 +357,7 @@ class ThymeleafLanguageDriverTest {
         .assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isSeparateDirectoryPerMapper());
     Assertions.assertFalse(
         thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isIncludesMapperNameWhenSeparateDirectory());
+    Assertions.assertFalse(thymeleafLanguageDriverConfig.getTemplateFile().getPathProvider().isCacheEnabled());
   }
 
   @Test

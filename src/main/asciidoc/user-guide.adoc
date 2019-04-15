@@ -1124,7 +1124,7 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`String[]`
 |`"*.sql"`
 
-4+|*Template file path provider configuration(TemplateFilePathProvider)*
+4+|*Template file path provider configuration(for TemplateFilePathProvider)*
 
 |`template-file.path-provider.prefix`
 |The prefix for adding to template file path
@@ -1145,6 +1145,11 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |Whether includes mapper name into file name when separate directory per mapper
 |`Boolean`
 |`true` (includes mapper name)
+
+|`template-file.path-provider.cache-enabled`
+|Whether cache a resolved template file path
+|`Boolean`
+|`true` (cache a resolved template file path)
 
 4+|*Dialect configuration*
 

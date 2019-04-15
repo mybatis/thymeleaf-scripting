@@ -28,7 +28,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.hsqldb.jdbc.JDBCDataSource;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,17 +36,10 @@ import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
 import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriverConfig;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.TemplateFilePathProviderMapper;
-import org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider;
 
 @DisabledIfSystemProperty(named = "mybatis.version", matches = "3\\.4\\..*|3\\.5\\.0")
-class TemplateFilePathProviderMapperTest {
+class TemplateFilePathProviderMapperNoCacheTest {
   private static SqlSessionFactory sqlSessionFactory;
-
-  @BeforeAll
-  @AfterAll
-  static void cleanup() {
-    TemplateFilePathProvider.clearCache();
-  }
 
   @BeforeAll
   static void setUp() throws Exception {
@@ -76,6 +68,7 @@ class TemplateFilePathProviderMapperTest {
         .register(new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
           c.getTemplateFile().getPathProvider().setPrefix("sql/");
           c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
+          c.getTemplateFile().getPathProvider().setCacheEnabled(false);
         })));
     configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);
 

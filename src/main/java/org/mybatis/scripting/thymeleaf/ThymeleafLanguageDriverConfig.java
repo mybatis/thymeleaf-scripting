@@ -332,6 +332,11 @@ public class ThymeleafLanguageDriverConfig {
       private boolean includesMapperNameWhenSeparateDirectory = true;
 
       /**
+       * Whether cache a resolved template file path.
+       */
+      private boolean cacheEnabled = true;
+
+      /**
        * Get a prefix for adding to template file path.
        * <p>
        * Default is {@code ""}.
@@ -403,7 +408,7 @@ public class ThymeleafLanguageDriverConfig {
        * Default is {@code true}.
        * </p>
        *
-       * @return If includes mapper name, set {@code true}
+       * @return If includes mapper name, return {@code true}
        */
       public boolean isIncludesMapperNameWhenSeparateDirectory() {
         return includesMapperNameWhenSeparateDirectory;
@@ -420,6 +425,28 @@ public class ThymeleafLanguageDriverConfig {
        */
       public void setIncludesMapperNameWhenSeparateDirectory(boolean includesMapperNameWhenSeparateDirectory) {
         this.includesMapperNameWhenSeparateDirectory = includesMapperNameWhenSeparateDirectory;
+      }
+
+      /**
+       * Get whether cache a resolved template file path.
+       * <p>
+       * Default is {@code true}.
+       * </p>
+       *
+       * @return If cache a resolved template file path, return {@code true}
+       */
+      public boolean isCacheEnabled() {
+        return cacheEnabled;
+      }
+
+      /**
+       * Set whether cache a resolved template file path.
+       *
+       * @param cacheEnabled
+       *          If want to cache, set {@code true}
+       */
+      public void setCacheEnabled(boolean cacheEnabled) {
+        this.cacheEnabled = cacheEnabled;
       }
 
     }
@@ -600,7 +627,6 @@ public class ThymeleafLanguageDriverConfig {
    * <td>{@code "*.sql"}</td>
    * </tr>
    * <tr>
-   * <tr>
    * <th colspan="3">Template file path provider configuration(TemplateFilePathProvider)</th>
    * </tr>
    * <tr>
@@ -609,21 +635,23 @@ public class ThymeleafLanguageDriverConfig {
    * <td>{@code ""}</td>
    * </tr>
    * <tr>
-   * <tr>
    * <td>template-file.path-provider.includes-package-path</td>
    * <td>Whether includes package path part</td>
    * <td>{@code true}</td>
    * </tr>
    * <tr>
-   * <tr>
-   * <td>template-file.patterns</td>
+   * <td>template-file.path-provider.separate-directory-per-mapper</td>
    * <td>Whether separate directory per mapper</td>
    * <td>{@code true}</td>
    * </tr>
    * <tr>
-   * <tr>
-   * <td>template-file.patterns</td>
+   * <td>template-file.path-provider.includes-mapper-name-when-separate-directory</td>
    * <td>Whether includes mapper name into file name when separate directory per mapper</td>
+   * <td>{@code true}</td>
+   * </tr>
+   * <tr>
+   * <td>template-file.path-provider.cache-enabled</td>
+   * <td>Whether cache a resolved template file path</td>
    * <td>{@code true}</td>
    * </tr>
    * <tr>
