@@ -79,9 +79,8 @@ class TemplateFilePathProviderTest {
 
   @Test
   void notFoundSqlFile() {
-    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> {
-      TemplateFilePathProvider.providePath(TestMapper.class, extractMethod(TestMapper.class, "selectOne"), "h2");
-    });
+    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> TemplateFilePathProvider
+        .providePath(TestMapper.class, extractMethod(TestMapper.class, "selectOne"), "h2"));
     Assertions.assertEquals(
         "The SQL template file not found. mapperType:[interface org.mybatis.scripting.thymeleaf.support.TestMapper] mapperMethod:[public abstract java.lang.Object org.mybatis.scripting.thymeleaf.support.BaseMapper.selectOne(int)] databaseId:[h2]",
         e.getMessage());
@@ -89,9 +88,8 @@ class TemplateFilePathProviderTest {
 
   @Test
   void notFoundSqlFileWithoutDatabaseId() {
-    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> {
-      TemplateFilePathProvider.providePath(TestMapper.class, extractMethod(TestMapper.class, "selectOne"), null);
-    });
+    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> TemplateFilePathProvider
+        .providePath(TestMapper.class, extractMethod(TestMapper.class, "selectOne"), null));
     Assertions.assertEquals(
         "The SQL template file not found. mapperType:[interface org.mybatis.scripting.thymeleaf.support.TestMapper] mapperMethod:[public abstract java.lang.Object org.mybatis.scripting.thymeleaf.support.BaseMapper.selectOne(int)] databaseId:[null]",
         e.getMessage());
@@ -99,10 +97,8 @@ class TemplateFilePathProviderTest {
 
   @Test
   void notFoundSqlFileWithoutFallbackDeclaringClass() {
-    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> {
-      TemplateFilePathProvider.providePath(TestMapper.class, extractMethod(TestMapper.class, "selectAllByFirstName"),
-          null);
-    });
+    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> TemplateFilePathProvider
+        .providePath(TestMapper.class, extractMethod(TestMapper.class, "selectAllByFirstName"), null));
     Assertions.assertEquals(
         "The SQL template file not found. mapperType:[interface org.mybatis.scripting.thymeleaf.support.TestMapper] mapperMethod:[public abstract java.util.List org.mybatis.scripting.thymeleaf.support.TestMapper.selectAllByFirstName(java.lang.String)] databaseId:[null]",
         e.getMessage());
