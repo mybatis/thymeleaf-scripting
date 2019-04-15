@@ -104,7 +104,7 @@ class TemplateFilePathProviderTest {
           null);
     });
     Assertions.assertEquals(
-        "The SQL template file not found. mapperType:[interface org.mybatis.scripting.thymeleaf.support.TestMapper] mapperMethod:[public abstract java.lang.Object org.mybatis.scripting.thymeleaf.support.TestMapper.selectAllByFirstName(String)] databaseId:[null]",
+        "The SQL template file not found. mapperType:[interface org.mybatis.scripting.thymeleaf.support.TestMapper] mapperMethod:[public abstract java.util.List org.mybatis.scripting.thymeleaf.support.TestMapper.selectAllByFirstName(java.lang.String)] databaseId:[null]",
         e.getMessage());
   }
 
