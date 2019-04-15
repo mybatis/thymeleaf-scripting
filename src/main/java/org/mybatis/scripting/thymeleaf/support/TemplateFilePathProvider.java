@@ -18,6 +18,8 @@ package org.mybatis.scripting.thymeleaf.support;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.ibatis.builder.annotation.ProviderContext;
 import org.apache.ibatis.io.Resources;
@@ -75,6 +77,8 @@ public class TemplateFilePathProvider {
   private static PathGenerator pathGenerator = DEFAULT_PATH_GENERATOR;
   private static ThymeleafLanguageDriverConfig languageDriverConfig = DEFAULT_LANGUAGE_DRIVER_CONFIG;
 
+  private static ConcurrentMap<ProviderContext, String> cache = new ConcurrentHashMap<>();
+
   /**
    * Set custom implementation for {@link PathGenerator}.
    *
@@ -124,7 +128,16 @@ public class TemplateFilePathProvider {
    * @return an SQL scripting string(template file path)
    */
   public static String provideSql(ProviderContext context) {
-    return providePath(context.getMapperType(), context.getMapperMethod(), context.getDatabaseId());
+    return languageDriverConfig.getTemplateFile().getPathProvider().isCacheEnabled()
+        ? cache.computeIfAbsent(context, c -> providePath(c.getMapperType(), c.getMapperMethod(), c.getDatabaseId()))
+        : providePath(context.getMapperType(), context.getMapperMethod(), context.getDatabaseId());
+  }
+
+  /**
+   * Clear cache.
+   */
+  public static void clearCache() {
+    cache.clear();
   }
 
   static String providePath(Class<?> mapperType, Method mapperMethod, String databaseId) {
@@ -183,7 +196,6 @@ public class TemplateFilePathProvider {
       path.append('-').append(databaseId);
     }
     path.append(".sql");
-    System.out.println(path);
     return path.toString();
   }
 
