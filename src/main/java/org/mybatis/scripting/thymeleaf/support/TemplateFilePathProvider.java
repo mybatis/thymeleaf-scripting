@@ -86,11 +86,11 @@ public class TemplateFilePathProvider {
   /**
    * Set custom implementation for {@link PathGenerator}.
    *
-   * @param generator
+   * @param pathGenerator
    *          a instance for generating a template file path
    */
-  public static void setCustomTemplateFilePathGenerator(PathGenerator generator) {
-    TemplateFilePathProvider.pathGenerator = Optional.ofNullable(generator).orElse(DEFAULT_PATH_GENERATOR);
+  public static void setCustomTemplateFilePathGenerator(PathGenerator pathGenerator) {
+    TemplateFilePathProvider.pathGenerator = Optional.ofNullable(pathGenerator).orElse(DEFAULT_PATH_GENERATOR);
   }
 
   /**
