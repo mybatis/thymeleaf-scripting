@@ -426,7 +426,7 @@ you can apply a user-defined template engine(full managed template engine) to th
 TemplateEngine templateEngine = new TemplateEngine(); // <1>
 templateEngine.addDialect(new MyBatisDialect());
 templateEngine.setEngineContextFactory(new MyBatisIntegratingEngineContextFactory(
-    targetTemplateEngine.getEngineContextFactory()));
+    templateEngine.getEngineContextFactory()));
 // ...
 
 Configuration configuration = new Configuration();
