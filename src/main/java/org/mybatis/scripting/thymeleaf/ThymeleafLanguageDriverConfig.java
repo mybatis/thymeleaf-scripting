@@ -588,7 +588,7 @@ public class ThymeleafLanguageDriverConfig {
    * <th colspan="3">General configuration</th>
    * </tr>
    * <tr>
-   * <td>use-2way</td>
+   * <td>use2way</td>
    * <td>Whether use the 2-way SQL</td>
    * <td>{@code true}</td>
    * </tr>

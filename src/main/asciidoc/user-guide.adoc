@@ -759,7 +759,7 @@ This configuration is optional. The non 2-way SQL can be use on the 2-way SQL mo
 [source,properties]
 .How to configure using configuration properties file(src/main/resources/mybatis-thymeleaf.properties)
 ----
-use-2way = false # <1>
+use2way = false # <1>
 ----
 
 or
@@ -771,7 +771,7 @@ configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(
         ThymeleafLanguageDriverConfig.newInstance(c -> c.setUse2Way(false)))); // <2>
 ----
 
-<1> Set the `use-2way` to `false`
+<1> Set the `use2way` to `false`
 <2> Set the `use2way` property to `false`
 
 
@@ -1084,7 +1084,7 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 
 4+|*General configuration*
 
-|`use-2way`
+|`use2way`
 |Whether use the 2-way SQL feature
 |`Boolean`
 |`true` (enable the 2-way SQL feature)
@@ -1179,7 +1179,7 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 [source,properties]
 .src/main/resources/mybatis-thymeleaf.properties
 ----
-use-2way = false
+use2way = false
 customizer = com.example.MyTemplateEngineCustomizer
 template-file.cache-enabled = true
 template-file.cache-ttl = 3600000

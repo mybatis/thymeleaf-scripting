@@ -299,7 +299,7 @@ class ThymeleafLanguageDriverTest {
     System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-empty.properties");
     Configuration configuration = new Configuration();
     Properties customProperties = new Properties();
-    customProperties.setProperty("use-2way", "false");
+    customProperties.setProperty("use2way", "false");
     customProperties.setProperty("customizer", "org.mybatis.scripting.thymeleaf.CustomTemplateEngineCustomizer");
     customProperties.setProperty("template-file.cache-enabled", "false");
     customProperties.setProperty("template-file.cache-ttl", "30000");
