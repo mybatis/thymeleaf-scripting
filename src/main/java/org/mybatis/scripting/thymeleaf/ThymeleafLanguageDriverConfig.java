@@ -48,7 +48,7 @@ public class ThymeleafLanguageDriverConfig {
   private static final String PROPERTY_KEY_CONFIG_FILE = "mybatis-thymeleaf.config.file";
   private static final String PROPERTY_KEY_CONFIG_ENCODING = "mybatis-thymeleaf.config.encoding";
   private static final String DEFAULT_PROPERTIES_FILE = "mybatis-thymeleaf.properties";
-  private static Map<Class<?>, Function<String, Object>> TYPE_CONVERTERS;
+  private static final Map<Class<?>, Function<String, Object>> TYPE_CONVERTERS;
 
   static {
     Map<Class<?>, Function<String, Object>> converters = new HashMap<>();
