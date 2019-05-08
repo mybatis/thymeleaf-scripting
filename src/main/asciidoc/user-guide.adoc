@@ -976,7 +976,7 @@ We provides useful classes for supporting development.
 === TemplateFilePathProvider
 
 The `TemplateFilePathProvider` is SQL provider class that return the SQL template file path(Available since 1.0.1).
-This class use with SQL provider annotation(`@InsertProvider`, `@UpdateProvider`, `@DeleteProvider` and `@SelectProvider`}) as follow:
+This class use with SQL provider annotation(`@InsertProvider`, `@UpdateProvider`, `@DeleteProvider` and `@SelectProvider`) as follow:
 
 [NOTE]
 ====
