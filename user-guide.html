@@ -40,8 +40,8 @@
 <h1>MyBatis Thymeleaf User&#8217;s Guide</h1>
 <div class="details">
 <span id="author" class="author">The MyBatis Team</span><br>
-<span id="revnumber">version 1.0.0,</span>
-<span id="revdate">2019-04-07</span>
+<span id="revnumber">version 1.0.1,</span>
+<span id="revdate">2019-07-15</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -94,17 +94,22 @@
 <li><a href="#_expression_utility_method">7.2. Expression utility method</a></li>
 </ul>
 </li>
-<li><a href="#_cautions_for_usage">8. Cautions for usage</a>
+<li><a href="#_support_classes">8. Support classes</a>
 <ul class="sectlevel2">
-<li><a href="#_using_backslash">8.1. Using '\'(backslash)</a></li>
+<li><a href="#_templatefilepathprovider">8.1. TemplateFilePathProvider</a></li>
 </ul>
 </li>
-<li><a href="#_appendix">9. Appendix</a>
+<li><a href="#_cautions_for_usage">9. Cautions for usage</a>
 <ul class="sectlevel2">
-<li><a href="#_configuration_properties">9.1. Configuration properties</a></li>
-<li><a href="#_bulk_insert">9.2. Bulk insert</a></li>
-<li><a href="#_multiline_string_literals">9.3. Multiline String Literals</a></li>
-<li><a href="#_related_resources">9.4. Related resources</a></li>
+<li><a href="#_using_backslash">9.1. Using '\'(backslash)</a></li>
+</ul>
+</li>
+<li><a href="#_appendix">10. Appendix</a>
+<ul class="sectlevel2">
+<li><a href="#_configuration_properties">10.1. Configuration properties</a></li>
+<li><a href="#_bulk_insert">10.2. Bulk insert</a></li>
+<li><a href="#_multiline_string_literals">10.3. Multiline String Literals</a></li>
+<li><a href="#_related_resources">10.4. Related resources</a></li>
 </ul>
 </li>
 </ul>
@@ -347,12 +352,12 @@ for integrating with template engine provide by Thymeleaf.</p>
   <span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.mybatis<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>mybatis<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>3.5.0<span class="tag">&lt;/version&gt;</span> <span class="comment">&lt;!-- Adjust to your application --&gt;</span>
+    <span class="tag">&lt;version&gt;</span>3.5.2<span class="tag">&lt;/version&gt;</span> <span class="comment">&lt;!-- Adjust to your application --&gt;</span>
   <span class="tag">&lt;/dependency&gt;</span>
   <span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.mybatis.scripting<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>mybatis-thymeleaf<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>1.0.0<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;version&gt;</span>1.0.1<span class="tag">&lt;/version&gt;</span>
   <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;/dependencies&gt;</span></code></pre>
 </div>
@@ -383,8 +388,8 @@ for using the "Sonatype OSS Snapshots Repository" as follow:</p>
 <div class="title">build.gradle (dependencies)</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis:mybatis:3.5.0</span><span class="delimiter">&quot;</span></span>) <span class="comment">// Adjust version to your application</span>
-  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting:mybatis-thymeleaf:1.0.0</span><span class="delimiter">&quot;</span></span>)
+  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis:mybatis:3.5.2</span><span class="delimiter">&quot;</span></span>) <span class="comment">// Adjust version to your application</span>
+  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting:mybatis-thymeleaf:1.0.1</span><span class="delimiter">&quot;</span></span>)
 }</code></pre>
 </div>
 </div>
@@ -451,18 +456,18 @@ configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);</code>
 <td class="content">
 <div class="paragraph">
 <p>You can specify a readable SQL on annotation using "Multiline String Literals" provided by some JVM language.
-About "Multiline String Literals", please see the <a href="#_multiline_string_literals">Section 9.3, &#8220;Multiline String Literals&#8221;</a>.</p>
+About "Multiline String Literals", please see the <a href="#_multiline_string_literals">Section 10.3, &#8220;Multiline String Literals&#8221;</a>.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Also, you can specify an SQL on template file(e.g. <code>/NameMapper/findById.sql</code> on class path) as follow:</p>
+<p>Also, you can specify an SQL on template file(e.g. <code>NameMapper/findById.sql</code> on class path) as follow:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/NameMapper/findById.sql</span><span class="delimiter">&quot;</span></span>)
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">NameMapper/findById.sql</span><span class="delimiter">&quot;</span></span>)
 <span class="predefined-type">Name</span> findById(<span class="predefined-type">Integer</span> id);</code></pre>
 </div>
 </div>
@@ -475,6 +480,20 @@ About "Multiline String Literals", please see the <a href="#_multiline_string_li
 <pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> names
   <span class="keyword">WHERE</span> id = <span class="comment">/*[# mb:p=&quot;id&quot;]*/</span> <span class="integer">1</span> <span class="comment">/*[/]*/</span></code></pre>
 </div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Since 1.0.1, we support to read a template file from under classpath automatically using the <a href="#_templatefilepathprovider">TemplateFilePathProvider</a>.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
@@ -510,7 +529,7 @@ About "Multiline String Literals", please see the <a href="#_multiline_string_li
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;select</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">findById</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">resultType</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">com.example.Name</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
-  /NameMapper/findById.sql
+  NameMapper/findById.sql
 <span class="tag">&lt;/select&gt;</span></code></pre>
 </div>
 </div>
@@ -603,7 +622,7 @@ SqlSessionFactory sqlSessionFactory = <span class="keyword">new</span> SqlSessio
 <div class="paragraph">
 <p>The mybatis-thymeleaf provide the special properties file for customizing default configuration.
 By default behavior, the mybatis-thymeleaf load the <code>mybatis-thymeleaf.properties</code> stored just under classpath.
-About supported properties, please see the <a href="#_configuration_properties">Section 9.1, &#8220;Configuration properties&#8221;</a>.</p>
+About supported properties, please see the <a href="#_configuration_properties">Section 10.1, &#8220;Configuration properties&#8221;</a>.</p>
 </div>
 <div class="sect4">
 <h5 id="_using_an_any_properties_file"><a class="link" href="#_using_an_any_properties_file">Using an any properties file</a></h5>
@@ -681,7 +700,7 @@ you can apply a user-defined template engine(full managed template engine) to th
 <pre class="CodeRay highlight"><code data-lang="java">TemplateEngine templateEngine = <span class="keyword">new</span> TemplateEngine(); <i class="conum" data-value="1"></i><b>(1)</b>
 templateEngine.addDialect(<span class="keyword">new</span> MyBatisDialect());
 templateEngine.setEngineContextFactory(<span class="keyword">new</span> MyBatisIntegratingEngineContextFactory(
-    targetTemplateEngine.getEngineContextFactory()));
+    templateEngine.getEngineContextFactory()));
 <span class="comment">// ...</span>
 
 <span class="predefined-type">Configuration</span> configuration = <span class="keyword">new</span> <span class="predefined-type">Configuration</span>();
@@ -723,7 +742,7 @@ configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); <i cla
 </td>
 <td class="content">
 <div class="paragraph">
-<p>About cautions for usage 2-way SQL, please see the <a href="#_cautions_for_usage">Section 8, &#8220;Cautions for usage&#8221;</a>.</p>
+<p>About cautions for usage 2-way SQL, please see the <a href="#_cautions_for_usage">Section 9, &#8220;Cautions for usage&#8221;</a>.</p>
 </div>
 </td>
 </tr>
@@ -933,7 +952,7 @@ You can access an iteration status object (<code>IterationStatusVar</code>) that
 </table>
 </div>
 <div class="paragraph">
-<p>About more advanced usage of <code>th:each</code> , please see <a href="#_bulk_insert">Section 9.2, &#8220;Bulk insert&#8221;</a>.</p>
+<p>About more advanced usage of <code>th:each</code> , please see <a href="#_bulk_insert">Section 10.2, &#8220;Bulk insert&#8221;</a>.</p>
 </div>
 </div>
 </div>
@@ -950,11 +969,11 @@ By using this feature, you can share an SQL on multiple SQL template.</p>
 <div class="title">Mapper interface</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="comment">// Count a total record number that matches for criteria</span>
-<span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/NameMapper/countByCriteria.sql</span><span class="delimiter">&quot;</span></span>)
+<span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">NameMapper/countByCriteria.sql</span><span class="delimiter">&quot;</span></span>)
 <span class="type">long</span> countByCriteria(<span class="annotation">@Param</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">criteria</span><span class="delimiter">&quot;</span></span>) NameCriteria criteria);
 
 <span class="comment">// Search records that matches for criteria and specified page</span>
-<span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/NameMapper/findPageByCriteria.sql</span><span class="delimiter">&quot;</span></span>)
+<span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">NameMapper/findPageByCriteria.sql</span><span class="delimiter">&quot;</span></span>)
 <span class="predefined-type">List</span>&lt;<span class="predefined-type">Name</span>&gt; findPageByCriteria(<span class="annotation">@Param</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">criteria</span><span class="delimiter">&quot;</span></span>) NameCriteria criteria, <span class="annotation">@Param</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">pageable</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">Pageable</span> pageable);</code></pre>
 </div>
 </div>
@@ -1033,14 +1052,14 @@ In such case, you can share any SQL part by multiple SQL using fragment feature.
 <div class="title">src/main/resources/NameMapper/countByCriteria.sql</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> <span class="predefined">COUNT</span>(*) <span class="keyword">FROM</span> names
-  <span class="comment">/*[# th:insert=&quot;~{/NameMapper/whereByCriteria.sql}&quot; /]*/</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+  <span class="comment">/*[# th:insert=&quot;~{NameMapper/whereByCriteria.sql}&quot; /]*/</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/NameMapper/findPageByCriteria.sql</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> names
-  <span class="comment">/*[# th:insert=&quot;~{/NameMapper/whereByCriteria.sql}&quot; /]*/</span> <i class="conum" data-value="1"></i><b>(1)</b>
+  <span class="comment">/*[# th:insert=&quot;~{NameMapper/whereByCriteria.sql}&quot; /]*/</span> <i class="conum" data-value="1"></i><b>(1)</b>
   LIMIT <span class="comment">/*[# mb:p=&quot;pageable.pageSize&quot;]*/</span> <span class="integer">20</span> <span class="comment">/*[/]*/</span>
   OFFSET <span class="comment">/*[# mb:p=&quot;pageable.offset&quot;]*/</span> <span class="integer">0</span> <span class="comment">/*[/]*/</span>
   <span class="keyword">ORDER</span> <span class="keyword">BY</span> id</code></pre>
@@ -1178,7 +1197,7 @@ Therefore you should be configure explicitly to use the non 2-way SQL mode using
 <div class="listingblock">
 <div class="title">How to configure using configuration properties file(src/main/resources/mybatis-thymeleaf.properties)</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">use-2way = false <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties">use2way = false <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1195,7 +1214,7 @@ Therefore you should be configure explicitly to use the non 2-way SQL mode using
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Set the <code>use-2way</code> to <code>false</code></td>
+<td>Set the <code>use2way</code> to <code>false</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -1501,7 +1520,98 @@ using <a href="#_configuration_properties">Configuration properties</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_cautions_for_usage"><a class="link" href="#_cautions_for_usage">8. Cautions for usage</a></h2>
+<h2 id="_support_classes"><a class="link" href="#_support_classes">8. Support classes</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We provides useful classes for supporting development.</p>
+</div>
+<div class="sect2">
+<h3 id="_templatefilepathprovider"><a class="link" href="#_templatefilepathprovider">8.1. TemplateFilePathProvider</a></h3>
+<div class="paragraph">
+<p>The <code>TemplateFilePathProvider</code> is SQL provider class that return the SQL template file path(Available since 1.0.1).
+This class use with SQL provider annotation(<code>@InsertProvider</code>, <code>@UpdateProvider</code>, <code>@DeleteProvider</code> and <code>@SelectProvider</code>) as follow:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>This class required to use on MyBatis 3.5.1+.</strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Usage:</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">com.example.mapper</span>;
+
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">BaseMapper</span>&lt;T&gt; {
+
+  <span class="annotation">@Options</span>(useGeneratedKeys = <span class="predefined-constant">true</span>, keyProperty = <span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>)
+  <span class="annotation">@InsertProvider</span>(type = TemplateFilePathProvider.class)
+  <span class="type">void</span> insert(T entity);
+
+  <span class="annotation">@UpdateProvider</span>(type = TemplateFilePathProvider.class)
+  <span class="type">void</span> update(T entity);
+
+  <span class="annotation">@DeleteProvider</span>(type = TemplateFilePathProvider.class)
+  <span class="type">void</span> delete(T entity);
+
+  <span class="annotation">@SelectProvider</span>(type = TemplateFilePathProvider.class)
+  T findById(<span class="predefined-type">Integer</span> id);
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">com.example.mapper</span>;
+
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">NameMapper</span> <span class="directive">extends</span> BaseMapper {
+
+  <span class="annotation">@SelectProvider</span>(type = TemplateFilePathProvider.class)
+  <span class="predefined-type">List</span>&lt;<span class="predefined-type">Name</span>&gt; findByCondition(NameCondition condition);
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By default implementation, a template file path resolve following format and priority order.
+If does not match all, it throw an exception that indicate not found a template file.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>com/example/mapper/NameMapper/NameMapper-{methodName}-{databaseId}.sql</code></p>
+</li>
+<li>
+<p><code>com/example/mapper/NameMapper/NameMapper-{methodName}.sql</code><br>
+(fallback using default database)</p>
+</li>
+<li>
+<p><code>com/example/mapper/BaseMapper/BaseMapper-{methodName}-{databaseId}.sql</code><br>
+(fallback using declaring class of mapper method)</p>
+</li>
+<li>
+<p><code>com/example/mapper/BaseMapper/BaseMapper-{methodName}.sql</code><br>
+(fallback using declaring class of mapper method and default database)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you want to customize the template file path format,
+you can customize using the <a href="#_configuration_properties">configuration properties</a> that start with <code>template-file.path-provider</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cautions_for_usage"><a class="link" href="#_cautions_for_usage">9. Cautions for usage</a></h2>
 <div class="sectionbody">
 <div class="admonitionblock caution">
 <table>
@@ -1519,13 +1629,13 @@ Therefore there are some cautions for usage.</p>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_using_backslash"><a class="link" href="#_using_backslash">8.1. Using '\'(backslash)</a></h3>
+<h3 id="_using_backslash"><a class="link" href="#_using_backslash">9.1. Using '\'(backslash)</a></h3>
 <div class="paragraph">
 <p>If you are using 2-way SQL mode, there is case that cannot parse a 2-way SQL when specify <code>'\'</code>(backslash) within static template parts.
 We know that following case cannot be parsed 2-way SQL. If you are not using 2-way SQL mode, this limitation can be ignore.</p>
 </div>
 <div class="sect3">
-<h4 id="_escape_clause_for_like"><a class="link" href="#_escape_clause_for_like">8.1.1. ESCAPE clause for LIKE</a></h4>
+<h4 id="_escape_clause_for_like"><a class="link" href="#_escape_clause_for_like">9.1.1. ESCAPE clause for LIKE</a></h4>
 <div class="paragraph">
 <p>If you specify the <code>ESCAPE '\'</code> directly as static template parts, the Thymeleaf cannot parse it.</p>
 </div>
@@ -1565,10 +1675,10 @@ For detail, please see <a href="#mybatis-likeEscapeClause">Section 7.2.1.2, &#82
 </div>
 </div>
 <div class="sect1">
-<h2 id="_appendix"><a class="link" href="#_appendix">9. Appendix</a></h2>
+<h2 id="_appendix"><a class="link" href="#_appendix">10. Appendix</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_configuration_properties"><a class="link" href="#_configuration_properties">9.1. Configuration properties</a></h3>
+<h3 id="_configuration_properties"><a class="link" href="#_configuration_properties">10.1. Configuration properties</a></h3>
 <div class="paragraph">
 <p>The mybatis-thymeleaf provides following properties for customizing configurations.</p>
 </div>
@@ -1593,7 +1703,7 @@ For detail, please see <a href="#mybatis-likeEscapeClause">Section 7.2.1.2, &#82
 <td class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><strong>General configuration</strong></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>use-2way</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>use2way</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether use the 2-way SQL feature</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>Boolean</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> (enable the 2-way SQL feature)</p></td>
@@ -1640,6 +1750,39 @@ For detail, please see <a href="#mybatis-likeEscapeClause">Section 7.2.1.2, &#82
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>"*.sql"</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><strong>Template file path provider configuration(for TemplateFilePathProvider)</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>template-file.path-provider.prefix</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The prefix for adding to template file path</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>""</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>template-file.path-provider.includes-package-path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether includes package path part</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> (includes package path)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>template-file.path-provider.separate-directory-per-mapper</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether separate directory per mapper</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> (separate directory per mapper)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>template-file.path-provider.includes-mapper-name-when-separate-directory</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether includes mapper name into file name when separate directory per mapper</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> (includes mapper name)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>template-file.path-provider.cache-enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether cache a resolved template file path</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> (cache a resolved template file path)</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><strong>Dialect configuration</strong></p></td>
 </tr>
 <tr>
@@ -1673,13 +1816,17 @@ For detail, please see <a href="#mybatis-likeEscapeClause">Section 7.2.1.2, &#82
 <div class="listingblock">
 <div class="title">src/main/resources/mybatis-thymeleaf.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">use-2way = true
+<pre class="CodeRay highlight"><code data-lang="properties">use2way = false
 customizer = com.example.MyTemplateEngineCustomizer
 template-file.cache-enabled = true
 template-file.cache-ttl = 3600000
 template-file.encoding = UTF-8
-template-file.base-dir = /templates/sqls
+template-file.base-dir = templates/
 template-file.patterns = *sql, *.sql.template
+template-file.path-provider.prefix = sqls/
+template-file.path-provider.includes-package-path = false
+template-file.path-provider.separate-directory-per-mapper = false
+template-file.path-provider.includes-mapper-name-when-separate-directory = false
 dialect.prefix = mybatis
 dialect.like-escape-char = ~
 dialect.like-escape-clause-format = escape '%s'
@@ -1700,13 +1847,17 @@ dialect.like-additional-escape-target-chars = ％, ＿</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">configuration.getLanguageRegistry().register(
   <span class="keyword">new</span> ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -&gt; {
-  c.setUse2way(<span class="predefined-constant">true</span>);
+  c.setUse2way(<span class="predefined-constant">false</span>);
   c.setCustomizer(CustomTemplateEngineCustomizer.class);
   c.getTemplateFile().setCacheEnabled(<span class="predefined-constant">false</span>);
   c.getTemplateFile().setCacheTtl(<span class="integer">3600000L</span>);
   c.getTemplateFile().setEncoding(StandardCharsets.UTF_8);
-  c.getTemplateFile().setBaseDir(<span class="string"><span class="delimiter">&quot;</span><span class="content">/templates/sqls/</span><span class="delimiter">&quot;</span></span>);
+  c.getTemplateFile().setBaseDir(<span class="string"><span class="delimiter">&quot;</span><span class="content">templates/</span><span class="delimiter">&quot;</span></span>);
   c.getTemplateFile().setPatterns(<span class="string"><span class="delimiter">&quot;</span><span class="content">*.sql</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">*.sql.template</span><span class="delimiter">&quot;</span></span>);
+  c.getTemplateFile().getPathProvider().setPrefix(<span class="string"><span class="delimiter">&quot;</span><span class="content">sqls/</span><span class="delimiter">&quot;</span></span>);
+  c.getTemplateFile().getPathProvider().setIncludesPackagePath(<span class="predefined-constant">false</span>);
+  c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(<span class="predefined-constant">false</span>);
+  c.getTemplateFile().getPathProvider().setIncludesMapperNameWhenSeparateDirectory(<span class="predefined-constant">false</span>);
   c.getDialect().setPrefix(<span class="string"><span class="delimiter">&quot;</span><span class="content">mybatis</span><span class="delimiter">&quot;</span></span>);
   c.getDialect().setLikeEscapeChar(<span class="string"><span class="delimiter">'</span><span class="content">~</span><span class="delimiter">'</span></span>);
   c.getDialect().setLikeEscapeClauseFormat(<span class="string"><span class="delimiter">&quot;</span><span class="content">escape '%s'</span><span class="delimiter">&quot;</span></span>);
@@ -1740,7 +1891,7 @@ We provide following factory methods for creating a <code>ThymeleafLanguageDrive
 </div>
 </div>
 <div class="sect2">
-<h3 id="_bulk_insert"><a class="link" href="#_bulk_insert">9.2. Bulk insert</a></h3>
+<h3 id="_bulk_insert"><a class="link" href="#_bulk_insert">10.2. Bulk insert</a></h3>
 <div class="paragraph">
 <p>This section describe about bulk insert for collection or array using SQL rather than JDBC feature.
 If you want to insert a collection or array by bulk, you can be realized it using the <code>th:each</code> and <code>mb:p</code> attribute tags as follow:</p>
@@ -1768,10 +1919,10 @@ If you want to insert a collection or array by bulk, you can be realized it usin
 <div class="title">Mapper methods</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Options</span>(useGeneratedKeys = <span class="predefined-constant">true</span>, keyProperty = <span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>)
-<span class="annotation">@Insert</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/sqls/PersonMapper_insertByBulk.sql</span><span class="delimiter">&quot;</span></span>)
+<span class="annotation">@Insert</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">sqls/PersonMapper_insertByBulk.sql</span><span class="delimiter">&quot;</span></span>)
 <span class="type">void</span> insertByBulk(<span class="predefined-type">List</span>&lt;Person&gt; persons);
 
-<span class="annotation">@Insert</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/sqls/PersonMapper_insertMailsByBulk.sql</span><span class="delimiter">&quot;</span></span>)
+<span class="annotation">@Insert</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">sqls/PersonMapper_insertMailsByBulk.sql</span><span class="delimiter">&quot;</span></span>)
 <span class="type">void</span> insertMailsByBulk(<span class="predefined-type">List</span>&lt;Person&gt; persons);</code></pre>
 </div>
 </div>
@@ -1831,14 +1982,14 @@ If you want to insert a collection or array by bulk, you can be realized it usin
 </div>
 </div>
 <div class="sect2">
-<h3 id="_multiline_string_literals"><a class="link" href="#_multiline_string_literals">9.3. Multiline String Literals</a></h3>
+<h3 id="_multiline_string_literals"><a class="link" href="#_multiline_string_literals">10.3. Multiline String Literals</a></h3>
 <div class="paragraph">
 <p>You can specify an SQL in annotation using "<a href="https://openjdk.java.net/jeps/326" target="_blank" rel="noopener">Raw String Literals</a>" feature that support by future JDK version.
 Also,"Multiline String Literals" provided other JVM languages (such as Kotlin and Groovy) can be used.
 There is a good compatibility with annotation driven mapper.</p>
 </div>
 <div class="sect3">
-<h4 id="_java_2"><a class="link" href="#_java_2">9.3.1. Java</a></h4>
+<h4 id="_java_2"><a class="link" href="#_java_2">10.3.1. Java</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1857,7 +2008,7 @@ There is a good compatibility with annotation driven mapper.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_kotlin"><a class="link" href="#_kotlin">9.3.2. Kotlin</a></h4>
+<h4 id="_kotlin"><a class="link" href="#_kotlin">10.3.2. Kotlin</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1877,7 +2028,7 @@ fun findById(id: Int): Name</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_groovy"><a class="link" href="#_groovy">9.3.3. Groovy</a></h4>
+<h4 id="_groovy"><a class="link" href="#_groovy">10.3.3. Groovy</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1898,7 +2049,7 @@ Todo findById(<span class="type">int</span> id);</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_related_resources"><a class="link" href="#_related_resources">9.4. Related resources</a></h3>
+<h3 id="_related_resources"><a class="link" href="#_related_resources">10.4. Related resources</a></h3>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 5. Related resource list</caption>
 <colgroup>
