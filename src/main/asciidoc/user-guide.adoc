@@ -1316,14 +1316,14 @@ There is a good compatibility with annotation driven mapper.
 
 ==== Java
 
-* link:https://openjdk.java.net/jeps/326[Raw String Literals^] (Not released yet)
+* link:https://openjdk.java.net/jeps/355[Text Blocks^] (Not released yet)
 
 [source,java]
 ----
-@Select(``
+@Select("""
   SELECT * FROM names
     WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
-``)
+""")
 Name findById(Integer id);
 ----
 
