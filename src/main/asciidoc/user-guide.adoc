@@ -113,7 +113,7 @@ The mybatis-thymeleaf supports using on following Java and artifacts version.
 
 [NOTE]
 ====
-About tested versions see the latest link:{travis-ci-url}[Travi CI^] build result.
+About tested versions see the latest link:{travis-ci-url}[Travis CI^] build result.
 ====
 
 === MyBatis
