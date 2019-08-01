@@ -3,7 +3,7 @@ language: java
 jdk:
   - openjdk12
   - openjdk11
-  - oraclejdk8
+  - openjdk8
 
 script:
   # build using mybatis latest released version
