@@ -383,10 +383,10 @@ class AnnotationDrivenMapperTest {
         persons.add(person);
       }
 
-      int maxMailId = Optional.ofNullable(mapper.getMaxMailId()).filter(x -> x != 0).orElse(-1);
-
       mapper.insertByBulk(persons);
       mapper.insertMailsByBulk(persons);
+
+      int maxMailId = Optional.ofNullable(mapper.getMaxMailId()).filter(x -> x != 0).orElse(-1) - 4;
 
       // Select
       List<Person> loadedPersons = mapper.selectPersons(persons.get(0).getId(), persons.get(1).getId());
@@ -478,4 +478,94 @@ class AnnotationDrivenMapperTest {
     }
   }
 
+  @Test
+  void testBulkInsertWithIndexedAndSelect() {
+
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
+      // Insert
+      List<Person> persons = new ArrayList<>();
+      {
+        Person person = new Person();
+        person.setName("MyBatis 1");
+        List<Mail> mails = new ArrayList<>();
+        person.setMails(mails);
+        {
+          Mail mail = new Mail();
+          mail.setAddress("mybatis1.main@test.com");
+          mails.add(mail);
+        }
+        {
+          Mail mail = new Mail();
+          mail.setAddress("mybatis1.sub@test.com");
+          mails.add(mail);
+        }
+        persons.add(person);
+      }
+      {
+        Person person = new Person();
+        person.setName("MyBatis 2");
+        List<Mail> mails = new ArrayList<>();
+        person.setMails(mails);
+        {
+          Mail mail = new Mail();
+          mail.setAddress("mybatis2.main@test.com");
+          mails.add(mail);
+        }
+        {
+          Mail mail = new Mail();
+          mail.setAddress("mybatis2.sub@test.com");
+          mails.add(mail);
+        }
+        persons.add(person);
+      }
+
+      mapper.insertByBulkWithIndexed(persons);
+      mapper.insertMailsByBulkWithIndexed(persons);
+
+      int maxMailId = Optional.ofNullable(mapper.getMaxMailId()).filter(x -> x != 0).orElse(-1) - 4;
+
+      // Select
+      List<Person> loadedPersons = mapper.selectPersons(persons.get(0).getId(), persons.get(1).getId());
+      Assertions.assertEquals(2, loadedPersons.size());
+      {
+        Person person = loadedPersons.get(0);
+        Assertions.assertEquals(persons.get(0).getId(), person.getId());
+        Assertions.assertEquals("MyBatis 1", person.getName());
+        List<Mail> mails = person.getMails();
+        Assertions.assertEquals(2, mails.size());
+        {
+          Mail mail = mails.get(0);
+          Assertions.assertEquals(maxMailId + 1, mail.getId());
+          Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis1.main@test.com", mail.getAddress());
+        }
+        {
+          Mail mail = mails.get(1);
+          Assertions.assertEquals(maxMailId + 2, mail.getId());
+          Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis1.sub@test.com", mail.getAddress());
+        }
+      }
+      {
+        Person person = loadedPersons.get(1);
+        Assertions.assertEquals(persons.get(1).getId(), person.getId());
+        Assertions.assertEquals("MyBatis 2", person.getName());
+        List<Mail> mails = person.getMails();
+        Assertions.assertEquals(2, mails.size());
+        {
+          Mail mail = mails.get(0);
+          Assertions.assertEquals(maxMailId + 3, mail.getId());
+          Assertions.assertEquals(persons.get(1).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis2.main@test.com", mail.getAddress());
+        }
+        {
+          Mail mail = mails.get(1);
+          Assertions.assertEquals(maxMailId + 4, mail.getId());
+          Assertions.assertEquals(persons.get(1).getId(), mail.getPersonId());
+          Assertions.assertEquals("mybatis2.sub@test.com", mail.getAddress());
+        }
+      }
+    }
+  }
 }
