@@ -65,6 +65,10 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
   @Override
   protected void doProcess(ITemplateContext context, IProcessableElementTag tag, AttributeName attributeName,
       String attributeValue, IElementTagStructureHandler structureHandler) {
+    if (attributeValue.contains("${")) {
+      attributeValue = getExpressionEvaluatedText(context, tag, attributeName, attributeValue);
+    }
+
     Pair parameterAndOptionPair = Pair.parse(attributeValue, ',');
     String parameterPath = parameterAndOptionPair.left;
     String options = parameterAndOptionPair.right;
@@ -109,6 +113,13 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
     IStandardExpression expression = EngineEventUtils.computeAttributeExpression(context, tag, attributeName,
         "${" + parameterValue + "}");
     return expression.execute(context, this.expressionExecutionContext);
+  }
+
+  private String getExpressionEvaluatedText(ITemplateContext context, IProcessableElementTag tag,
+      AttributeName attributeName, String parameterValue) {
+    IStandardExpression expression = EngineEventUtils.computeAttributeExpression(context, tag, attributeName,
+        "|" + parameterValue + "|");
+    return expression.execute(context, this.expressionExecutionContext).toString();
   }
 
   private boolean isCollectionOrArray(Object value) {

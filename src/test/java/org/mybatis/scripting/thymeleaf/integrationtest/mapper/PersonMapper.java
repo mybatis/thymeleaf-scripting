@@ -28,8 +28,15 @@ public interface PersonMapper {
   @Insert("sql/PersonMapper/insertByBulk.sql")
   void insertByBulk(List<Person> persons);
 
+  @Options(useGeneratedKeys = true, keyProperty = "id")
+  @Insert("sql/PersonMapper/insertByBulkWithIndexed.sql")
+  void insertByBulkWithIndexed(List<Person> persons);
+
   @Insert("sql/PersonMapper/insertMailsByBulk.sql")
   void insertMailsByBulk(List<Person> persons);
+
+  @Insert("sql/PersonMapper/insertMailsByBulkWithIndexed.sql")
+  void insertMailsByBulkWithIndexed(List<Person> persons);
 
   @Select("SELECT MAX(id) FROM person_mails")
   Integer getMaxMailId();

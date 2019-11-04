@@ -576,6 +576,27 @@ SELECT * FROM names
   /*[/]*/
   ORDER BY id
 ----
+
+Since 1.0.2, We support the indexed access using an iteration status object as follow:
+
+[source,sql]
+.Use indexed access using an iteration status object
+----
+SELECT * FROM names
+  WHERE 1 = 1
+  /*[# th:if="${not #lists.isEmpty(ids)}"]*/
+    AND id IN (
+    /*[# th:each="id : ${ids}"]*/
+      /*[# mb:p="ids[${idStat.index}]"]*/ 1 /*[/]*/ -- <1>
+      /*[(${idStat.last} ? '' : ',')]*/
+    /*[/]*/
+    )
+  /*[/]*/
+  ORDER BY id
+----
+
+<1> Access to a iterable object using indexed
+
 ====
 
 About more advanced usage of `th:each` , please see <<Bulk insert>>.
