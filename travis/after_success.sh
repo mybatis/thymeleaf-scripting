@@ -36,11 +36,11 @@ if [ $TRAVIS_REPO_SLUG == "mybatis/thymeleaf-scripting" ] && [ "$TRAVIS_PULL_REQ
   if [ $TRAVIS_JDK_VERSION == "openjdk8" ]; then
 
     # Deploy to sonatype
-    ./mvnw clean deploy -q --settings ./travis/settings.xml
+    ./mvnw clean deploy -Dlog.level.thymeleaf.config=info -q --settings ./travis/settings.xml
     echo -e "Successfully deployed SNAPSHOT artifacts to Sonatype under Travis job ${TRAVIS_JOB_NUMBER}"
 
     # Deploy to coveralls
-    ./mvnw clean test jacoco:report coveralls:report -q --settings ./travis/settings.xml
+    ./mvnw clean test jacoco:report coveralls:report -Dlog.level.thymeleaf.config=info -q --settings ./travis/settings.xml
     echo -e "Successfully ran coveralls under Travis job ${TRAVIS_JOB_NUMBER}"
 
     # Deploy to site
