@@ -33,6 +33,9 @@
   <logger name="org.thymeleaf">
     <level value="debug" />
   </logger>
+  <logger name="org.thymeleaf.TemplateEngine.CONFIG">
+    <level value="${log.level.thymeleaf.config:-debug}" />
+  </logger>
   <logger name="org.hsqldb">
     <level value="debug" />
   </logger>

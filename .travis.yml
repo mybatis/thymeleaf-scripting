@@ -9,11 +9,11 @@ jdk:
 
 script:
   # build using mybatis latest released version
-  - ./mvnw clean verify
+  - ./mvnw clean verify -Dlog.level.thymeleaf.config=info
   # test using mybatis 3.4.x line
-  - ./mvnw test -Dmybatis.version=3.4.6
+  - ./mvnw test -Dmybatis.version=3.4.6 -Dlog.level.thymeleaf.config=info
   # build using mybatis 3.5.x snapshot
-  - ./mvnw clean verify -Dmybatis.version=3.5.4-SNAPSHOT
+  - ./mvnw clean verify -Dmybatis.version=3.5.4-SNAPSHOT -Dlog.level.thymeleaf.config=info
 
 after_success:
   - chmod -R 777 ./travis/after_success.sh
