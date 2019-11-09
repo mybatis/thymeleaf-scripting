@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -199,12 +200,12 @@ public class SqlGenerator {
    *          a parameter object
    * @param customVariable
    *          a custom variables for passing to template engine
-   * @param customBindVariableStore
-   *          a store for saving a custom bind variable that generated with {@code mb:bind} or {@code mb:param}
+   * @param customBindVariableBinder
+   *          a binder for a custom bind variable that generated with {@code mb:bind} or {@code mb:param}
    * @return a processed SQL by template engine
    */
   public String generate(CharSequence sqlTemplate, Object parameter, Map<String, Object> customVariable,
-      Map<String, Object> customBindVariableStore) {
+      BiConsumer<String, Object> customBindVariableBinder) {
 
     Map<String, Object> processingCustomVariables = new HashMap<>(defaultCustomVariables);
     Optional.ofNullable(customVariable).ifPresent(processingCustomVariables::putAll);
@@ -213,8 +214,8 @@ public class SqlGenerator {
     String sql = templateEngine.process(sqlTemplate.toString(), context);
 
     MyBatisBindingContext bindingContext = MyBatisBindingContext.load(context);
-    if (bindingContext != null && customBindVariableStore != null) {
-      customBindVariableStore.putAll(bindingContext.getCustomBindVariables());
+    if (bindingContext != null && customBindVariableBinder != null) {
+      bindingContext.getCustomBindVariables().forEach(customBindVariableBinder);
     }
 
     return sql;
