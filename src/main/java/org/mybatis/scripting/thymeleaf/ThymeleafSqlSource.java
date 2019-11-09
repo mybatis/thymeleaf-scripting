@@ -18,7 +18,6 @@ package org.mybatis.scripting.thymeleaf;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -95,10 +94,8 @@ class ThymeleafSqlSource implements SqlSource {
     customVariables.put(TemporaryTakeoverKeys.CONFIGURATION, configuration);
     customVariables.put(TemporaryTakeoverKeys.DYNAMIC_CONTEXT, dynamicContext);
     customVariables.put(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE, processingParameterType);
-    Map<String, Object> customBindVariableStore = new HashMap<>();
-    String sql = sqlGenerator.generate(sqlTemplate, parameterObject, customVariables, customBindVariableStore);
+    String sql = sqlGenerator.generate(sqlTemplate, parameterObject, customVariables, dynamicContext::bind);
 
-    customBindVariableStore.forEach(dynamicContext::bind);
     SqlSource sqlSource = sqlSourceBuilder.parse(sql, processingParameterType, dynamicContext.getBindings());
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);

@@ -1113,7 +1113,7 @@ String sql = sqlGenerator.generate(
 
 ==== Receiving custom bind variables
 
-You can receiving custom bind variables that created during template processing via user define `Map` reference as follow:
+You can receiving custom bind variables that created during template processing via a `BiConsumer` function as follow:
 
 [NOTE]
 ====
@@ -1129,16 +1129,14 @@ Map<String, Object> conditionsMap = new HashMap<>();
 conditionsMap.put("name", "Yamada");
 
 // sql = "SELECT * FROM accounts WHERE name = #{patternName}"
-// customBindVariablesStore = {"patternName":"Yamada%"}
-Map<String, Object> customBindVariablesStore = new HashMap<>(); // <1>
+// conditionsMap = {"name":"Yamada", "patternName":"Yamada%"}
 String sql = sqlGenerator.generate(
     "/*[# mb:bind='patternName=|${#likes.escapeWildcard(name)}%|' /]*/" +
     "SELECT * FROM accounts WHERE name = /*[# mb:p='patternName']*/ 'Sato' /*[/]*/",
-    conditionsMap, null, customBindVariablesStore); // <2>
+    conditionsMap, null, conditionsMap::put); // <1>
 ----
 
-<1> Define a `Map` reference for receiving custom bind variables
-<2> Specify(Pass) a `Map` reference for receiving custom bind variables at 4th argument of `generate` method
+<1> Specify(Pass) a `BiConsumer` reference for receiving custom bind variables at 4th argument of `generate` method
 
 === Advanced Usage
 

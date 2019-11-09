@@ -248,18 +248,17 @@ class SqlGeneratorTest {
     // @formatter: on
     {
       Map<String, Object> param = Collections.singletonMap("name", "Be%");
-      Map<String, Object> store = new HashMap<>();
+      MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(param);
 
-      String sql = sqlGenerator.generate(sqlTemplate, param, null, store);
+      String sql = sqlGenerator.generate(sqlTemplate, param, null, mapSqlParameterSource::addValue);
 
-      Map<String, Object> record = jdbcOperations.queryForMap(sql, new MapSqlParameterSource(param).addValues(store));
+      Map<String, Object> record = jdbcOperations.queryForMap(sql, mapSqlParameterSource);
 
       Assertions.assertEquals(6, record.get("ID"));
       Assertions.assertEquals("Be%ty", record.get("FIRSTNAME"));
       Assertions.assertEquals("Ab_le", record.get("LASTNAME"));
 
-      Assertions.assertEquals(1, store.size());
-      Assertions.assertEquals("Be\\%%", store.get("patternName"));
+      Assertions.assertEquals("Be\\%%", mapSqlParameterSource.getValue("patternName"));
     }
   }
 
