@@ -76,6 +76,12 @@ class MyBatisDialectTest {
     }
   }
 
+  @Test
+  void testDefaultConstructor() {
+    MyBatisDialect dialect = new MyBatisDialect();
+    Assertions.assertEquals("mb", dialect.getPrefix());
+  }
+
   interface Mapper {
     @Select("SELECT * FROM names WHERE id = /*[# mybatis:p='id']*/ 1000 /*[/]*/")
     Name select(int id);

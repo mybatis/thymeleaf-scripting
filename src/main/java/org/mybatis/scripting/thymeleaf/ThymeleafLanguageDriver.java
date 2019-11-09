@@ -15,11 +15,6 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -28,13 +23,8 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
-import org.mybatis.scripting.thymeleaf.expression.Likes;
 import org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider;
 import org.thymeleaf.ITemplateEngine;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 /**
  * The {@code LanguageDriver} for integrating with Thymeleaf.
@@ -44,13 +34,13 @@ import org.thymeleaf.templateresolver.StringTemplateResolver;
  */
 public class ThymeleafLanguageDriver implements LanguageDriver {
 
-  private final ITemplateEngine templateEngine;
+  private final SqlGenerator sqlGenerator;
 
   /**
    * Constructor for creating instance with default {@code TemplateEngine}.
    */
   public ThymeleafLanguageDriver() {
-    this.templateEngine = createDefaultTemplateEngine(ThymeleafLanguageDriverConfig.newInstance());
+    this.sqlGenerator = configure(new SqlGenerator(ThymeleafLanguageDriverConfig.newInstance()));
   }
 
   /**
@@ -60,7 +50,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    *          A user defined {@code ITemplateEngine} instance
    */
   public ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig config) {
-    this.templateEngine = createDefaultTemplateEngine(config);
+    this.sqlGenerator = configure(new SqlGenerator(config));
     TemplateFilePathProvider.setLanguageDriverConfig(config);
   }
 
@@ -71,52 +61,12 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    *          A user defined {@code ITemplateEngine} instance
    */
   public ThymeleafLanguageDriver(ITemplateEngine templateEngine) {
-    this.templateEngine = templateEngine;
+    this.sqlGenerator = configure(new SqlGenerator(templateEngine));
   }
 
-  private ITemplateEngine createDefaultTemplateEngine(ThymeleafLanguageDriverConfig config) {
-    MyBatisDialect dialect = new MyBatisDialect(config.getDialect().getPrefix());
-    Likes likes = Likes.newBuilder().escapeChar(config.getDialect().getLikeEscapeChar())
-        .escapeClauseFormat(config.getDialect().getLikeEscapeClauseFormat())
-        .additionalEscapeTargetChars(config.getDialect().getLikeAdditionalEscapeTargetChars()).build();
-    dialect.setLikes(likes);
-
-    // Create an ClassLoaderTemplateResolver instance
-    ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();
-    TemplateMode mode = config.isUse2way() ? TemplateMode.CSS : TemplateMode.TEXT;
-    classLoaderTemplateResolver.setOrder(1);
-    classLoaderTemplateResolver.setTemplateMode(mode);
-    classLoaderTemplateResolver
-        .setResolvablePatterns(Arrays.stream(config.getTemplateFile().getPatterns()).collect(Collectors.toSet()));
-    classLoaderTemplateResolver.setCharacterEncoding(config.getTemplateFile().getEncoding().name());
-    classLoaderTemplateResolver.setCacheable(config.getTemplateFile().isCacheEnabled());
-    classLoaderTemplateResolver.setCacheTTLMs(config.getTemplateFile().getCacheTtl());
-    classLoaderTemplateResolver.setPrefix(config.getTemplateFile().getBaseDir());
-
-    // Create an StringTemplateResolver instance
-    StringTemplateResolver stringTemplateResolver = new StringTemplateResolver();
-    stringTemplateResolver.setOrder(2);
-    stringTemplateResolver.setTemplateMode(mode);
-
-    // Create an TemplateEngine instance
-    TemplateEngine targetTemplateEngine = new TemplateEngine();
-    targetTemplateEngine.addTemplateResolver(classLoaderTemplateResolver);
-    targetTemplateEngine.addTemplateResolver(stringTemplateResolver);
-    targetTemplateEngine.addDialect(dialect);
-    targetTemplateEngine.setEngineContextFactory(
-        new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
-
-    // Create an TemplateEngineCustomizer instance and apply
-    final TemplateEngineCustomizer customizer = Optional.ofNullable(config.getCustomizer()).map(v -> {
-      try {
-        return v.getConstructor().newInstance();
-      } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-        throw new IllegalStateException("Cannot create an instance for class: " + v, e);
-      }
-    }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.BuiltIn.DO_NOTHING);
-    customizer.accept(targetTemplateEngine);
-
-    return targetTemplateEngine;
+  private SqlGenerator configure(SqlGenerator sqlGenerator) {
+    sqlGenerator.setContextFactory(new ThymeleafSqlSource.ContextFactory());
+    return sqlGenerator;
   }
 
   /**
@@ -141,7 +91,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    */
   @Override
   public SqlSource createSqlSource(Configuration configuration, String script, Class<?> parameterType) {
-    return new ThymeleafSqlSource(configuration, templateEngine, script.trim(), parameterType);
+    return new ThymeleafSqlSource(configuration, sqlGenerator, script.trim(), parameterType);
   }
 
 }

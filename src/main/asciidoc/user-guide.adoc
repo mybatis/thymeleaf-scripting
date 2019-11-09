@@ -101,7 +101,7 @@ for integrating with template engine provide by Thymeleaf.
 * Can read an SQL template from a Thymeleaf template file on classpath
 * Can use a custom dialect(attribute tag and expression utility method) on your SQL template
 * Can fully customize a template engine configuration
-
+* Can generate the SQL from SQL template without the MyBatis core module (since 1.0.2)
 
 == Requirements
 
@@ -743,7 +743,7 @@ configuration.setVariables(variables);
 [source,sql]
 .SQL template
 ----
-SELECT * FROM /*[(${tableNameOfUser} ?: 'users')]*/ users -- <2>
+SELECT * FROM /*[# th:utext="${tableNameOfUser} ?: 'users'"]*/ users /*[/]*/ -- <2>
 ----
 
 <1> Define an any property as MyBatis's configuration properties
@@ -783,17 +783,16 @@ This configuration is optional. The non 2-way SQL can be use on the 2-way SQL mo
 use2way = false # <1>
 ----
 
-or
+<1> Set the `use2way` to `false`
 
 [source,java]
 .How to configure using config class
 ----
 configuration.getLanguageRegistry().register(new ThymeleafLanguageDriver(
-        ThymeleafLanguageDriverConfig.newInstance(c -> c.setUse2Way(false)))); // <2>
+        ThymeleafLanguageDriverConfig.newInstance(c -> c.setUse2Way(false)))); // <1>
 ----
 
-<1> Set the `use2way` to `false`
-<2> Set the `use2way` property to `false`
+<1> Set the `use2way` property of `ThymeleafLanguageDriverConfig` to `false`
 
 
 === Basic usage
@@ -990,6 +989,175 @@ using <<Configuration properties, Configuration properties>>.
   AND firstName LIKE #{patternFirstName} ESCAPE '\'
 ----
 
+== Using SQL Generator
+
+Since 1.0.2, we separate the SQL generating feature from the `ThymeleafLanguageDriver` and `ThymeleafSqlSource` class,
+we added the `SqlGenerator` and `SqlGeneratorConfig` for generating SQL from SQL template.
+These classes **does not depends on the MyBatis core module**(`mybatis-3.x.x.jar`).
+So that, it also can be used in combination with any data access libraries(e.g. Spring JDBC, JPA, R2DBC, etc...) that provide with named parameter.
+
+=== Configuration
+
+By default, the `SqlGenerator` applies settings for using together with the MyBatis core module(apply to `#{...}` as the bind variable format),
+but you can customize a default settings using configuration properties file or the `SqlGeneratorConfig`.
+The `SqlGeneratorConfig` allows the same configurations as the `ThymeleafLanguageDriverConfig` except the `TemplateFilePathProvider`(`template-file.path-provider.*`).
+
+==== Customize the bind variable format
+
+You can customize the bind variable format using configuration properties file or configuration class.
+In the following example, it changes the bind variable format to the Spring JDBC format(e.g. `:id`) from MyBatis core format(e.g. `#{id}`).
+
+[source,properties]
+.How to customize using configuration properties file
+----
+dialect.bind-variable-render = org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVariableRender # <1>
+----
+
+<1> Specify the `BindVariableRender` implementation class(built-in class) that render Spring JDBC bind variable format
+
+
+[source,java]
+.How to customize using config class
+----
+SqlGeneratorConfig config = SqlGeneratorConfig.newInstanceWithCustomizer(c ->
+    c.getDialect().setBindVariableRender(
+        BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType())); // <1>
+SqlGenerator sqlGenerator = new SqlGenerator(config); // <2>
+----
+
+<1> Specify the `BindVariableRender` implementation class(built-in class) that render Spring JDBC bind variable format via `BuiltIn` enum
+<2> Create a `SqlGenerator` instance with user defined configuration
+
+If you use the custom bind variable format other than built-in format,
+please create a implementation class of `BindVariableRender` and apply it to the configuration.
+
+[source,java]
+.How to create the BindVariableRender implementation class
+----
+public class R2dbcMySQLBindVariableRender implements BindVariableRender { // <1>
+  public String render(String name) {
+    return "?" + name;
+  }
+}
+----
+
+<1> Create a `BindVariableRender` implementation class
+
+
+==== Customize other configurations
+
+Please see also the following sections.
+
+* <<_customizing_configuration>>
+
+
+=== Basic Usage
+
+The `SqlGenerator` provide feature for generating a SQL from SQL template using the Thymeleaf as follow:
+
+[source,java]
+.Basic Usage:
+----
+SqlGenerator sqlGenerator = new SqlGenerator(); // <1>
+
+Conditions conditions = new Conditions();
+conditions.setId(10);
+
+// sql = "SELECT * FROM accounts WHERE id = #{id}"
+String sql = sqlGenerator.generate(
+    "SELECT * FROM accounts WHERE id = /*[# mb:p='id']*/ 1 /*[/]*/", conditions); // <2>
+----
+
+<1> Create a default instance of `SqlGenerator`
+<2> Generate an SQL from SQL template
+
+[NOTE]
+====
+The `SqlGenerator#generate` method is **thread-safe**. In other words, you can share an `SqlGenerator` instance at any components.
+====
+
+==== Specifying custom variables
+
+You can specify any custom variables separately from the parameter object as follow:
+
+[source,java]
+.How to use custom variables:
+----
+SqlGenerator sqlGenerator = new SqlGenerator();
+sqlGenerator.setDefaultCustomVariables(
+    Collections.singletonMap("accountsTableName", "users")); // <1>
+
+Account account = new Account();
+account.setName("Taro Yamada");
+
+Map<String, Object> customVariables = new HashMap<>(); // <2>
+customVariables.put("now", LocalDateTime.now());
+customVariables.put("loginId", loginId);
+
+// sql = "INSERT INTO users (name, created_at, created_by) VALUES(#{name}, #{now}, #{loginId})"
+String sql = sqlGenerator.generate(
+    "INSERT INTO /*[# th:utext=\"${accountsTableName} ?: 'accounts'\"]*/ accounts /*[/]*/ " + // <3>
+      "(name, created_at, created_by) VALUES(" +
+        "/*[# mb:p='name']*/ 'Hanako Yamada' /*[/]*/, " +
+        "/*[# mb:p='now']*/ current_timestamp() /*[/]*/, " + // <4>
+        "/*[# mb:p='loginId']*/ 'A00000001' /*[/]*/" + // <4>
+      ")", account, customVariables); // <5>
+----
+
+<1> Specify the default custom variable for sharing by every statements
+<2> Create custom variables per statement or transaction
+<3> Can be access to a custom variable at template processing time
+<4> Can be bind a custom variable
+<5> Specify(Pass) custom variables to sql generator at 3rd argument of `generate` method
+
+
+==== Receiving custom bind variables
+
+You can receiving custom bind variables that created during template processing via user define `Map` reference as follow:
+
+[NOTE]
+====
+The custom bind variables may create when use `mb:bind` or `mb:p` tag.
+====
+
+[source,java]
+.How to use custom bind variables store:
+----
+SqlGenerator sqlGenerator = new SqlGenerator();
+
+Map<String, Object> conditionsMap = new HashMap<>();
+conditionsMap.put("name", "Yamada");
+
+// sql = "SELECT * FROM accounts WHERE name = #{patternName}"
+// customBindVariablesStore = {"patternName":"Yamada%"}
+Map<String, Object> customBindVariablesStore = new HashMap<>(); // <1>
+String sql = sqlGenerator.generate(
+    "/*[# mb:bind='patternName=|${#likes.escapeWildcard(name)}%|' /]*/" +
+    "SELECT * FROM accounts WHERE name = /*[# mb:p='patternName']*/ 'Sato' /*[/]*/",
+    conditionsMap, null, customBindVariablesStore); // <2>
+----
+
+<1> Define a `Map` reference for receiving custom bind variables
+<2> Specify(Pass) a `Map` reference for receiving custom bind variables at 4th argument of `generate` method
+
+=== Advanced Usage
+
+==== Access JavaBeans property
+
+By default, the `SqlGenerator` use the JDK standard APIs(JavaBeans and Reflection API) for accessing a property of user defined Java object.
+If there is a conflict with property accessing in the data access library,
+you can change a default behavior by applying a custom `org.mybatis.scripting.thymeleaf.PropertyAccessor` implementation class.
+
+[source,java]
+.How to apply a custom PropertyAccessor
+----
+SqlGenerator sqlGenerator = new SqlGenerator();
+sqlGenerator.setPropertyAccessor(new MyPropertyAccessor()); // <1>
+----
+
+<1> Set a custom `PropertyAccessor` implementation class to the `SqlGenerator`
+
+
 == Support classes
 
 We provides useful classes for supporting development.
@@ -1076,7 +1244,7 @@ If you specify the `ESCAPE '\'` directly as static template parts, the Thymeleaf
 .Invalid usage
 ----
 /*[# mb:bind="patternFirstName=|${#likes.escapeWildcard(firstName)}%|" /]*/
-AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /**/ ESCAPE '\'
+AND firstName LIKE /*[('#{patternFirstName}')]*/ 'Taro%' /**/ ESCAPE '\' --<1>
 ----
 
 <1> Specify the `ESCAPE '\'` directly as static template parts
@@ -1145,7 +1313,8 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 |`String[]`
 |`"*.sql"`
 
-4+|*Template file path provider configuration(for TemplateFilePathProvider)*
+4+|*Template file path provider configuration for TemplateFilePathProvider* +
+(Available only at `ThymeleafLanguageDriverConfig`)
 
 |`template-file.path-provider.prefix`
 |The prefix for adding to template file path
@@ -1195,6 +1364,12 @@ The mybatis-thymeleaf provides following properties for customizing configuratio
 (Can specify multiple characters using comma(`","`) as separator character)
 |`Character[]`
 |`""` (no specify)
+
+|`dialect.bind-variable-render`
+|The FQCN of class that implements the `BindVariableRender`
+(interface for rendering a bind variable such as `#{id}`, `:id`, etc...)
+|`Class`
+|`null` (Uses render class for MyBatis)
 |===
 
 [source,properties]
@@ -1215,6 +1390,7 @@ dialect.prefix = mybatis
 dialect.like-escape-char = ~
 dialect.like-escape-clause-format = escape '%s'
 dialect.like-additional-escape-target-chars = ％, ＿
+dialect.bind-variable-render = org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVariableRender
 ----
 
 [TIP]
@@ -1235,11 +1411,14 @@ configuration.getLanguageRegistry().register(
   c.getTemplateFile().getPathProvider().setPrefix("sqls/");
   c.getTemplateFile().getPathProvider().setIncludesPackagePath(false);
   c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(false);
-  c.getTemplateFile().getPathProvider().setIncludesMapperNameWhenSeparateDirectory(false);
+  c.getTemplateFile().getPathProvider()
+      .setIncludesMapperNameWhenSeparateDirectory(false);
   c.getDialect().setPrefix("mybatis");
   c.getDialect().setLikeEscapeChar('~');
   c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
   c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
+  c.getDialect().setBindVariableRender(
+      BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType());
 })));
 ----
 
@@ -1250,6 +1429,36 @@ We provide following factory methods for creating a `ThymeleafLanguageDriver` in
 * `newInstance(String resourcePath)`
 * `newInstance(Properties customProperties)`
 * `newInstance(Consumer<ThymeleafLanguageDriverConfig> customizer)`
+
+These properties can be specified via factory method of `SqlGeneratorConfig` as follow:
+
+[source,java]
+----
+SqlGeneratorConfig config =
+  SqlGeneratorConfig.newInstanceWithCustomizer(c -> {
+  c.setUse2way(false);
+  c.setCustomizer(CustomTemplateEngineCustomizer.class);
+  c.getTemplateFile().setCacheEnabled(false);
+  c.getTemplateFile().setCacheTtl(3600000L);
+  c.getTemplateFile().setEncoding(StandardCharsets.UTF_8);
+  c.getTemplateFile().setBaseDir("templates/");
+  c.getTemplateFile().setPatterns("*.sql", "*.sql.template");
+  c.getDialect().setPrefix("mybatis");
+  c.getDialect().setLikeEscapeChar('~');
+  c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
+  c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
+  c.getDialect().setBindVariableRender(
+      BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType());
+});
+// ...
+----
+
+We provide following factory methods for creating a `SqlGeneratorConfig` instance.
+
+* `newInstance()`
+* `newInstanceWithResourcePath(String resourcePath)`
+* `newInstanceWithProperties(Properties customProperties)`
+* `newInstanceWithCustomizer(Consumer<SqlGeneratorConfig> customizer)`
 
 ====
 

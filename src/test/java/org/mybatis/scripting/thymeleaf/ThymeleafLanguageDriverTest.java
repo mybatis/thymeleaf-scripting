@@ -389,7 +389,7 @@ class ThymeleafLanguageDriverTest {
       // Since mybatis 3.5.1, exception is wrapped by InvocationTargetException
       Throwable cause = e.getCause() instanceof InvocationTargetException ? e.getCause().getCause() : e.getCause();
       Assertions.assertEquals(
-          "java.lang.ClassNotFoundException: Cannot find class: org.mybatis.scripting.thymeleaf.FooTemplateEngineCustomizer",
+          "java.lang.ClassNotFoundException: org.mybatis.scripting.thymeleaf.FooTemplateEngineCustomizer",
           cause.getMessage());
     }
   }
