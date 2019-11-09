@@ -830,7 +830,9 @@ By default, you can use it using `mb` dialect prefix (default prefix is initial 
 ^|Attribute Value Format
 
 |<<mybatis-param,p>>
-a|Render bind variable(`#{...}`) that can be parsed by MyBatis core module and register an iteration object to the MyBatis's bind variables.
+a|Render bind variable(default format: `#{...}`) that can be parsed by MyBatis core module and register an iteration object to the MyBatis's bind variables. +
+ +
+ The bind variable format decide by a implementation of `BindVariableRender`.
 a|`{variableName}(,{optionKey}={optionValue},...)` +
  +
  Valid format is same with link:{mybatis-doc-url}/sqlmap-xml.html#Parameters[MyBatis's inline parameter format^].
