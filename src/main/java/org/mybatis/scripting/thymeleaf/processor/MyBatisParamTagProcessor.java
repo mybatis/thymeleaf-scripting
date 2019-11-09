@@ -17,6 +17,7 @@ package org.mybatis.scripting.thymeleaf.processor;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.function.UnaryOperator;
 
 import org.mybatis.scripting.thymeleaf.MyBatisBindingContext;
 import org.thymeleaf.context.ITemplateContext;
@@ -31,9 +32,9 @@ import org.thymeleaf.standard.expression.StandardExpressionExecutionContext;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * The processor class for handling the {@code mybatis:p} tag. <br>
- * This processor render bind variable({@code #{…​}}) expression that can parsed MyBatis and register an iteration
- * object to the MyBatis’s bind variables.
+ * The processor class for handling the {@code mb:p} tag. <br>
+ * This processor render bind variable(default: {@code #{…​}}) expression that can parsed data access library and
+ * register an iteration object to the bind variables.
  *
  * @author Kazuki Shimizu
  * @version 1.0.0
@@ -44,6 +45,8 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
   private static final String ATTR_NAME = "p";
 
   private final StandardExpressionExecutionContext expressionExecutionContext;
+
+  private UnaryOperator<String> bindVariableRender = BindVariableRender.BuiltIn.MYBATIS;
 
   /**
    * Constructor that can be specified the template mode and dialect prefix.
@@ -57,6 +60,18 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
     super(templateMode, prefix, null, false, ATTR_NAME, true, PRECEDENCE, true);
     expressionExecutionContext = templateMode == TemplateMode.TEXT ? StandardExpressionExecutionContext.RESTRICTED
         : StandardExpressionExecutionContext.NORMAL;
+  }
+
+  /**
+   * Set a custom bind variable render function.<br>
+   * By default, render {@literal #{...}} format.
+   *
+   * @param bindVariableRender
+   *          a custom bind variable render function
+   * @since 1.0.2
+   */
+  public void setBindVariableRender(UnaryOperator<String> bindVariableRender) {
+    this.bindVariableRender = bindVariableRender;
   }
 
   /**
@@ -87,13 +102,13 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
         bindingContext.setCustomBindVariable(iterationObjectVariableName, iterationStatus.getCurrent());
       }
       if (nestedPropertyPath.isEmpty()) {
-        body = "#{" + iterationObjectVariableName + options + "}";
+        body = bindVariableRender.apply(iterationObjectVariableName + options);
       } else {
         Object value = getExpressionEvaluatedValue(context, tag, attributeName, parameterPath);
         if (isCollectionOrArray(value)) {
           body = generateCollectionBindVariables(value, iterationObjectVariableName + nestedPropertyPath, options);
         } else {
-          body = "#{" + iterationObjectVariableName + nestedPropertyPath + options + "}";
+          body = bindVariableRender.apply(iterationObjectVariableName + nestedPropertyPath + options);
         }
       }
     } else {
@@ -102,7 +117,7 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
       if (isCollectionOrArray(value)) {
         body = generateCollectionBindVariables(value, parameterPath, options);
       } else {
-        body = "#{" + attributeValue + "}";
+        body = bindVariableRender.apply(attributeValue);
       }
     }
     structureHandler.setBody(body, false);
@@ -136,7 +151,7 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
         if (i != 0) {
           sb.append(", ");
         }
-        sb.append("#{").append(parameterPath).append("[").append(i).append("]").append(options).append("}");
+        sb.append(bindVariableRender.apply(parameterPath + "[" + i + "]" + options));
       }
       return sb.toString();
     }

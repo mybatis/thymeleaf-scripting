@@ -18,9 +18,11 @@ package org.mybatis.scripting.thymeleaf;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.mybatis.scripting.thymeleaf.expression.Likes;
+import org.mybatis.scripting.thymeleaf.processor.BindVariableRender;
 import org.mybatis.scripting.thymeleaf.processor.MyBatisBindTagProcessor;
 import org.mybatis.scripting.thymeleaf.processor.MyBatisParamTagProcessor;
 import org.thymeleaf.context.IExpressionContext;
@@ -50,6 +52,8 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
 
   private Likes likes = Likes.newBuilder().build();
 
+  private BindVariableRender bindVariableRender;
+
   /**
    * Default constructor.
    */
@@ -78,14 +82,30 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
   }
 
   /**
+   * Set a bind variable render.
+   *
+   * @param bindVariableRender
+   *          a bind variable render
+   * @since 1.0.2
+   */
+  public void setBindVariableRender(BindVariableRender bindVariableRender) {
+    this.bindVariableRender = bindVariableRender;
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public Set<IProcessor> getProcessors(String dialectPrefix) {
     return new HashSet<>(Arrays.asList(new MyBatisBindTagProcessor(TemplateMode.TEXT, dialectPrefix),
         new MyBatisBindTagProcessor(TemplateMode.CSS, dialectPrefix),
-        new MyBatisParamTagProcessor(TemplateMode.TEXT, dialectPrefix),
-        new MyBatisParamTagProcessor(TemplateMode.CSS, dialectPrefix)));
+        configure(new MyBatisParamTagProcessor(TemplateMode.TEXT, dialectPrefix)),
+        configure(new MyBatisParamTagProcessor(TemplateMode.CSS, dialectPrefix))));
+  }
+
+  private MyBatisParamTagProcessor configure(MyBatisParamTagProcessor processor) {
+    Optional.ofNullable(bindVariableRender).ifPresent(processor::setBindVariableRender);
+    return processor;
   }
 
   /**

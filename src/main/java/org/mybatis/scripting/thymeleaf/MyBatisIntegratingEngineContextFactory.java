@@ -18,7 +18,6 @@ package org.mybatis.scripting.thymeleaf;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
-import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IEngineContext;
@@ -61,7 +60,7 @@ public class MyBatisIntegratingEngineContextFactory implements IEngineContextFac
             MyBatisBindingContext bindingContext = MyBatisBindingContext.load(engineContext);
             if (bindingContext.isFallbackParameterObject()) {
               value = engineContext.containsVariable(name) ? engineContext.getVariable(name)
-                  : engineContext.getVariable(DynamicContext.PARAMETER_OBJECT_KEY);
+                  : engineContext.getVariable(SqlGenerator.ContextKeys.PARAMETER_OBJECT);
             } else {
               value = engineContext.getVariable(name);
             }

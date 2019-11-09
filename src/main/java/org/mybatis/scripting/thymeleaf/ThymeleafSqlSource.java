@@ -18,12 +18,14 @@ package org.mybatis.scripting.thymeleaf;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.mapping.BoundSql;
@@ -31,7 +33,6 @@ import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
-import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.IContext;
 
 /**
@@ -44,8 +45,14 @@ import org.thymeleaf.context.IContext;
  */
 class ThymeleafSqlSource implements SqlSource {
 
+  private static class TemporaryTakeoverKeys {
+    private static final String CONFIGURATION = "__configuration__";
+    private static final String DYNAMIC_CONTEXT = "__dynamicContext__";
+    private static final String PROCESSING_PARAMETER_TYPE = "__processingParameterType__";
+  }
+
   private final Configuration configuration;
-  private final ITemplateEngine templateEngine;
+  private final SqlGenerator sqlGenerator;
   private final SqlSourceBuilder sqlSourceBuilder;
   private final String sqlTemplate;
   private final Class<?> parameterType;
@@ -55,17 +62,17 @@ class ThymeleafSqlSource implements SqlSource {
    *
    * @param configuration
    *          A configuration instance of MyBatis
-   * @param templateEngine
-   *          A template engine provide by Thymeleaf
+   * @param sqlGenerator
+   *          A sql generator using the Thymeleaf feature
    * @param sqlTemplate
    *          A template string of SQL (inline SQL or template file path)
    * @param parameterType
    *          A parameter type that specified at mapper method argument or xml element
    */
-  ThymeleafSqlSource(Configuration configuration, ITemplateEngine templateEngine, String sqlTemplate,
+  ThymeleafSqlSource(Configuration configuration, SqlGenerator sqlGenerator, String sqlTemplate,
       Class<?> parameterType) {
     this.configuration = configuration;
-    this.templateEngine = templateEngine;
+    this.sqlGenerator = sqlGenerator;
     this.sqlTemplate = sqlTemplate;
     this.parameterType = parameterType;
     this.sqlSourceBuilder = new SqlSourceBuilder(configuration);
@@ -83,30 +90,52 @@ class ThymeleafSqlSource implements SqlSource {
       processingParameterType = parameterType;
     }
 
-    MyBatisBindingContext bindingContext = new MyBatisBindingContext(
-        parameterObject != null && configuration.getTypeHandlerRegistry().hasTypeHandler(processingParameterType));
     DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);
-    dynamicContext.bind(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);
+    Map<String, Object> customVariables = dynamicContext.getBindings();
+    customVariables.put(TemporaryTakeoverKeys.CONFIGURATION, configuration);
+    customVariables.put(TemporaryTakeoverKeys.DYNAMIC_CONTEXT, dynamicContext);
+    customVariables.put(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE, processingParameterType);
+    Map<String, Object> customBindVariableStore = new HashMap<>();
+    String sql = sqlGenerator.generate(sqlTemplate, parameterObject, customVariables, customBindVariableStore);
 
-    IContext context;
-    if (parameterObject instanceof Map) {
-      @SuppressWarnings(value = "unchecked")
-      Map<String, Object> parameterMap = (Map<String, Object>) parameterObject;
-      context = new MapBasedContext(parameterMap, dynamicContext, configuration.getVariables());
-    } else {
-      MetaClass metaClass = MetaClass.forClass(processingParameterType, configuration.getReflectorFactory());
-      context = new MetaClassBasedContext(parameterObject, metaClass, processingParameterType, dynamicContext,
-          configuration.getVariables());
-    }
-
-    String sql = templateEngine.process(sqlTemplate, context);
-
-    bindingContext.getCustomBindVariables().forEach(dynamicContext::bind);
+    customBindVariableStore.forEach(dynamicContext::bind);
     SqlSource sqlSource = sqlSourceBuilder.parse(sql, processingParameterType, dynamicContext.getBindings());
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);
 
     return boundSql;
+  }
+
+  /**
+   * The factory class for Thymeleaf's context.
+   *
+   * @since 1.0.2
+   */
+  static class ContextFactory implements BiFunction<Object, Map<String, Object>, IContext> {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IContext apply(Object parameter, Map<String, Object> customVariable) {
+      Configuration configuration = (Configuration) customVariable.remove(TemporaryTakeoverKeys.CONFIGURATION);
+      DynamicContext dynamicContext = (DynamicContext) customVariable.remove(TemporaryTakeoverKeys.DYNAMIC_CONTEXT);
+      Class<?> processingParameterType = (Class<?>) customVariable
+          .remove(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE);
+      MyBatisBindingContext bindingContext = new MyBatisBindingContext(
+          parameter != null && configuration.getTypeHandlerRegistry().hasTypeHandler(processingParameterType));
+      dynamicContext.bind(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);
+      IContext context;
+      if (parameter instanceof Map) {
+        @SuppressWarnings(value = "unchecked")
+        Map<String, Object> map = (Map<String, Object>) parameter;
+        context = new MapBasedContext(map, dynamicContext, configuration.getVariables());
+      } else {
+        MetaClass metaClass = MetaClass.forClass(processingParameterType, configuration.getReflectorFactory());
+        context = new MetaClassBasedContext(parameter, metaClass, processingParameterType, dynamicContext,
+            configuration.getVariables());
+      }
+      return context;
+    }
   }
 
   private abstract static class AbstractContext implements IContext {
