@@ -1121,7 +1121,7 @@ The custom bind variables may create when use `mb:bind` or `mb:p` tag.
 ====
 
 [source,java]
-.How to use custom bind variables store:
+.How to use custom bind variables binder function:
 ----
 SqlGenerator sqlGenerator = new SqlGenerator();
 
