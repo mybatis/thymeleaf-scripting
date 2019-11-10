@@ -470,7 +470,7 @@ SELECT * FROM names
   WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/ -- <2>
 ----
 
-<1> A bind value is specified by `#{variable name}` format
+<1> A bind value is specified by 「`#{variable name}`」 format
 <2> Can render bind variable expression that can be parsed by MyBatis core module using custom attribute tag(`mb:p="variable name"`) provided by mybatis-thymeleaf
 
 [NOTE]
@@ -1164,7 +1164,7 @@ We provides useful classes for supporting development.
 
 === TemplateFilePathProvider
 
-The `TemplateFilePathProvider` is SQL provider class that return the SQL template file path(Available since 1.0.1).
+The `org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider` is SQL provider class that return the SQL template file path. This class is available since 1.0.1.
 This class use with SQL provider annotation(`@InsertProvider`, `@UpdateProvider`, `@DeleteProvider` and `@SelectProvider`) as follow:
 
 [NOTE]
@@ -1221,6 +1221,26 @@ If does not match all, it throw an exception that indicate not found a template 
 
 If you want to customize the template file path format,
 you can customize using the <<Configuration properties, configuration properties>> that start with `template-file.path-provider`.
+
+=== SpringNamedParameterBindVariableRender
+
+The `org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVariableRender` is the `BindVariableRender`
+implementation class for rendering bind variable to 「`:variable name`」 format(e.g. `:id`). This class is available since 1.0.2.
+
+[source,properties]
+.How to enable via configuration properties file (mybatis-thymeleaf.properties)
+----
+dialect.bind-variable-render = org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVariableRender
+----
+
+[source,java]
+.How to enable via configuration class (SqlGeneratorConfig)
+----
+SqlGeneratorConfig config = SqlGeneratorConfig.newInstanceWithCustomizer(c ->
+    c.getDialect().setBindVariableRender(
+        BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType()));
+SqlGenerator sqlGenerator = new SqlGenerator(config);
+----
 
 
 == Cautions for usage
