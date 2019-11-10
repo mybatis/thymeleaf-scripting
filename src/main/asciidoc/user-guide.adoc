@@ -1078,6 +1078,34 @@ String sql = sqlGenerator.generate(
 The `SqlGenerator#generate` method is **thread-safe**. In other words, you can share an `SqlGenerator` instance at any components.
 ====
 
+==== Receiving generated bind variables
+
+You can receiving bind variables that generated during template processing via a `BiConsumer` function as follow:
+
+[NOTE]
+====
+The bind variables may generate when use `mb:bind` or `mb:p` tag.
+====
+
+[source,java]
+.How to receive bind variables using binder function:
+----
+SqlGenerator sqlGenerator = new SqlGenerator();
+
+Map<String, Object> conditionsMap = new HashMap<>();
+conditionsMap.put("name", "Yamada");
+
+// sql = "SELECT * FROM accounts WHERE name = #{patternName}"
+// conditionsMap = {"name":"Yamada", "patternName":"Yamada%"}
+String sql = sqlGenerator.generate(
+    "/*[# mb:bind='patternName=|${#likes.escapeWildcard(name)}%|' /]*/" +
+    "SELECT * FROM accounts WHERE name = /*[# mb:p='patternName']*/ 'Sato' /*[/]*/",
+    conditionsMap, conditionsMap::put); // <1>
+----
+
+<1> Specify(Pass) a `BiConsumer` function for receiving bind variables at 3th argument of `generate` method
+
+
 ==== Specifying custom variables
 
 You can specify any custom variables separately from the parameter object as follow:
@@ -1110,35 +1138,7 @@ String sql = sqlGenerator.generate(
 <2> Create custom variables per statement or transaction
 <3> Can be access to a custom variable at template processing time
 <4> Can be bind a custom variable
-<5> Specify(Pass) custom variables to sql generator at 3rd argument of `generate` method
-
-
-==== Receiving custom bind variables
-
-You can receiving custom bind variables that created during template processing via a `BiConsumer` function as follow:
-
-[NOTE]
-====
-The custom bind variables may create when use `mb:bind` or `mb:p` tag.
-====
-
-[source,java]
-.How to use custom bind variables binder function:
-----
-SqlGenerator sqlGenerator = new SqlGenerator();
-
-Map<String, Object> conditionsMap = new HashMap<>();
-conditionsMap.put("name", "Yamada");
-
-// sql = "SELECT * FROM accounts WHERE name = #{patternName}"
-// conditionsMap = {"name":"Yamada", "patternName":"Yamada%"}
-String sql = sqlGenerator.generate(
-    "/*[# mb:bind='patternName=|${#likes.escapeWildcard(name)}%|' /]*/" +
-    "SELECT * FROM accounts WHERE name = /*[# mb:p='patternName']*/ 'Sato' /*[/]*/",
-    conditionsMap, null, conditionsMap::put); // <1>
-----
-
-<1> Specify(Pass) a `BiConsumer` reference for receiving custom bind variables at 4th argument of `generate` method
+<5> Specify(Pass) custom variables map to sql generator at 3rd argument of `generate` method
 
 === Advanced Usage
 

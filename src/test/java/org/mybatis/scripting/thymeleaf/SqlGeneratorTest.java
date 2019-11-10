@@ -250,7 +250,7 @@ class SqlGeneratorTest {
       Map<String, Object> param = Collections.singletonMap("name", "Be%");
       MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(param);
 
-      String sql = sqlGenerator.generate(sqlTemplate, param, null, mapSqlParameterSource::addValue);
+      String sql = sqlGenerator.generate(sqlTemplate, param, mapSqlParameterSource::addValue);
 
       Map<String, Object> record = jdbcOperations.queryForMap(sql, mapSqlParameterSource);
 

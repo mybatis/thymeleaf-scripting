@@ -94,7 +94,7 @@ class ThymeleafSqlSource implements SqlSource {
     customVariables.put(TemporaryTakeoverKeys.CONFIGURATION, configuration);
     customVariables.put(TemporaryTakeoverKeys.DYNAMIC_CONTEXT, dynamicContext);
     customVariables.put(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE, processingParameterType);
-    String sql = sqlGenerator.generate(sqlTemplate, parameterObject, customVariables, dynamicContext::bind);
+    String sql = sqlGenerator.generate(sqlTemplate, parameterObject, dynamicContext::bind, customVariables);
 
     SqlSource sqlSource = sqlSourceBuilder.parse(sql, processingParameterType, dynamicContext.getBindings());
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
