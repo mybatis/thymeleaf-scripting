@@ -39,6 +39,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.thymeleaf.TemplateEngine;
 
 class SqlGeneratorTest {
@@ -310,6 +311,35 @@ class SqlGeneratorTest {
     }
   }
 
+  @Test
+  void combination() {
+    SqlGenerator sqlGenerator = new SqlGenerator(config);
+    NamedParameterJdbcOperations jdbcOperations = new NamedParameterJdbcTemplate(dataSource);
+
+    // @formatter: off
+    String sqlTemplate = "SELECT * FROM names " + "/*[# th:if='${id != null}']*/ "
+        + "WHERE id = /*[# mb:p='id']*/ 1 /*[/]*/ " + "/*[/]*/" + "AND id = /*[# mb:p='userId']*/ 1 /*[/]*/ "
+        + "[# mb:bind='accountId=5' /]" + "AND id = /*[# mb:p='accountId']*/ 1 /*[/]*/ ";
+    // @formatter: on
+    {
+      Param param = new Param();
+      param.id = 5;
+
+      Map<String, Object> customVariables = new HashMap<>();
+      customVariables.put("userId", param.id);
+
+      String sql = sqlGenerator.generate(sqlTemplate, param, customVariables::put, customVariables);
+
+      Map<String, Object> record = jdbcOperations.queryForMap(sql, new CompositeSqlParameterSource(
+          new BeanPropertySqlParameterSource(param), new MapSqlParameterSource(customVariables)));
+
+      Assertions.assertEquals(3, record.size());
+      Assertions.assertEquals(5, record.get("ID"));
+      Assertions.assertEquals("Betty", record.get("FIRSTNAME"));
+      Assertions.assertEquals("Rubble", record.get("LASTNAME"));
+    }
+  }
+
   static class Param {
     private Integer id;
 
@@ -320,6 +350,44 @@ class SqlGeneratorTest {
     public void setId(Integer id) {
       this.id = id;
     }
+  }
+
+  public static class CompositeSqlParameterSource implements SqlParameterSource {
+
+    private final Map<String, SqlParameterSource> cache = new HashMap<>();
+    private final SqlParameterSource[] sources;
+
+    private CompositeSqlParameterSource(SqlParameterSource... sources) {
+      this.sources = sources;
+    }
+
+    @Override
+    public boolean hasValue(String paramName) {
+      return cache.computeIfAbsent(paramName,
+          x -> Stream.of(sources).filter(s -> s.hasValue(paramName)).findFirst().orElse(null)) != null;
+    }
+
+    @Override
+    public Object getValue(String paramName) throws IllegalArgumentException {
+      return hasValue(paramName) ? cache.get(paramName).getValue(paramName) : null;
+    }
+
+    @Override
+    public String getTypeName(String paramName) {
+      return hasValue(paramName) ? cache.get(paramName).getTypeName(paramName) : null;
+    }
+
+    @Override
+    public int getSqlType(String paramName) {
+      return hasValue(paramName) ? cache.get(paramName).getSqlType(paramName) : TYPE_UNKNOWN;
+    }
+
+    @Override
+    public String[] getParameterNames() {
+      return Stream.of(sources).map(SqlParameterSource::getParameterNames).flatMap(Stream::of).distinct()
+          .toArray(String[]::new);
+    }
+
   }
 
 }
