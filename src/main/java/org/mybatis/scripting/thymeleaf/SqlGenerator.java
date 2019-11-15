@@ -199,12 +199,12 @@ public class SqlGenerator {
    *          a template SQL
    * @param parameter
    *          a parameter object
-   * @param customVariable
+   * @param customVariables
    *          a custom variables for passing to template engine
    * @return a processed SQL by template engine
    */
-  public String generate(CharSequence sqlTemplate, Object parameter, Map<String, Object> customVariable) {
-    return generate(sqlTemplate, parameter, null, customVariable);
+  public String generate(CharSequence sqlTemplate, Object parameter, Map<String, Object> customVariables) {
+    return generate(sqlTemplate, parameter, null, customVariables);
   }
 
   /**
@@ -216,15 +216,15 @@ public class SqlGenerator {
    *          a parameter object
    * @param customBindVariableBinder
    *          a binder for a custom bind variable that generated with {@code mb:bind} or {@code mb:param}
-   * @param customVariable
+   * @param customVariables
    *          a custom variables for passing to template engine
    * @return a processed SQL by template engine
    */
   public String generate(CharSequence sqlTemplate, Object parameter,
-      BiConsumer<String, Object> customBindVariableBinder, Map<String, Object> customVariable) {
+      BiConsumer<String, Object> customBindVariableBinder, Map<String, Object> customVariables) {
 
     Map<String, Object> processingCustomVariables = new HashMap<>(defaultCustomVariables);
-    Optional.ofNullable(customVariable).ifPresent(processingCustomVariables::putAll);
+    Optional.ofNullable(customVariables).ifPresent(processingCustomVariables::putAll);
 
     IContext context = contextFactory.apply(parameter, processingCustomVariables);
     String sql = templateEngine.process(sqlTemplate.toString(), context);
