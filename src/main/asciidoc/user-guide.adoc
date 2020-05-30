@@ -1602,7 +1602,7 @@ fun findById(id: Int): Name
   SELECT * FROM names
     WHERE id = /*[# mb:p="id"]*/ 1 /*[/]*/
 ''')
-Todo findById(int id);
+Name findById(int id);
 ----
 
 === Related resources
