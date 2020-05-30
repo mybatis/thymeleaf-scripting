@@ -1560,7 +1560,7 @@ The `mb:p` register an element object that fetched from collection/array to the 
 
 === Multiline String Literals
 
-You can specify an SQL in annotation using "link:https://openjdk.java.net/jeps/355[Text Blocks^]" feature that support by future JDK version.
+You can specify an SQL in annotation using "link:https://openjdk.java.net/jeps/355[Text Blocks^]" feature that support since the JDK 13.
 Also,"Multiline String Literals" provided other JVM languages (such as Kotlin and Groovy) can be used.
 There is a good compatibility with annotation driven mapper.
 
