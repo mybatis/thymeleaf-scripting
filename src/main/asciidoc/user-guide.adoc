@@ -1050,7 +1050,7 @@ public class R2dbcMySQLBindVariableRender implements BindVariableRender { // <1>
 
 Please see also the following sections.
 
-* <<_customizing_configuration>>
+* <<Configuration properties>>
 
 
 === Basic Usage
