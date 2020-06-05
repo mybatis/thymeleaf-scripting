@@ -391,10 +391,10 @@
 <a class="jxr_linenumber" name="L383" href="#L383">383</a>         persons.add(person);
 <a class="jxr_linenumber" name="L384" href="#L384">384</a>       }
 <a class="jxr_linenumber" name="L385" href="#L385">385</a> 
-<a class="jxr_linenumber" name="L386" href="#L386">386</a>       <strong class="jxr_keyword">int</strong> maxMailId = Optional.ofNullable(mapper.getMaxMailId()).filter(x -&gt; x != 0).orElse(-1);
-<a class="jxr_linenumber" name="L387" href="#L387">387</a> 
-<a class="jxr_linenumber" name="L388" href="#L388">388</a>       mapper.insertByBulk(persons);
-<a class="jxr_linenumber" name="L389" href="#L389">389</a>       mapper.insertMailsByBulk(persons);
+<a class="jxr_linenumber" name="L386" href="#L386">386</a>       mapper.insertByBulk(persons);
+<a class="jxr_linenumber" name="L387" href="#L387">387</a>       mapper.insertMailsByBulk(persons);
+<a class="jxr_linenumber" name="L388" href="#L388">388</a> 
+<a class="jxr_linenumber" name="L389" href="#L389">389</a>       <strong class="jxr_keyword">int</strong> maxMailId = Optional.ofNullable(mapper.getMaxMailId()).filter(x -&gt; x != 0).orElse(-1) - 4;
 <a class="jxr_linenumber" name="L390" href="#L390">390</a> 
 <a class="jxr_linenumber" name="L391" href="#L391">391</a>       <em class="jxr_comment">// Select</em>
 <a class="jxr_linenumber" name="L392" href="#L392">392</a>       List&lt;Person&gt; loadedPersons = mapper.selectPersons(persons.get(0).getId(), persons.get(1).getId());
@@ -486,9 +486,99 @@
 <a class="jxr_linenumber" name="L478" href="#L478">478</a>     }
 <a class="jxr_linenumber" name="L479" href="#L479">479</a>   }
 <a class="jxr_linenumber" name="L480" href="#L480">480</a> 
-<a class="jxr_linenumber" name="L481" href="#L481">481</a> }
+<a class="jxr_linenumber" name="L481" href="#L481">481</a>   @Test
+<a class="jxr_linenumber" name="L482" href="#L482">482</a>   <strong class="jxr_keyword">void</strong> testBulkInsertWithIndexedAndSelect() {
+<a class="jxr_linenumber" name="L483" href="#L483">483</a> 
+<a class="jxr_linenumber" name="L484" href="#L484">484</a>     <strong class="jxr_keyword">try</strong> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+<a class="jxr_linenumber" name="L485" href="#L485">485</a>       <a name="PersonMapper" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/mapper/PersonMapper.html#PersonMapper">PersonMapper</a> mapper = sqlSession.getMapper(PersonMapper.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L486" href="#L486">486</a>       <em class="jxr_comment">// Insert</em>
+<a class="jxr_linenumber" name="L487" href="#L487">487</a>       List&lt;Person&gt; persons = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a class="jxr_linenumber" name="L488" href="#L488">488</a>       {
+<a class="jxr_linenumber" name="L489" href="#L489">489</a>         <a name="Person" href="../../../../../org/mybatis/scripti<a name="Person" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Person.html#Person">Person</a>meleaf/integrationtest/domain/Person.html#Person">Person</a> person = <strong class="jxr_keyword">new</strong> <a name="Person" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Person.html#Person">Person</a>();
+<a class="jxr_linenumber" name="L490" href="#L490">490</a>         person.setName(<span class="jxr_string">"MyBatis 1"</span>);
+<a class="jxr_linenumber" name="L491" href="#L491">491</a>         List&lt;Mail&gt; mails = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a class="jxr_linenumber" name="L492" href="#L492">492</a>         person.setMails(mails);
+<a class="jxr_linenumber" name="L493" href="#L493">493</a>         {
+<a class="jxr_linenumber" name="L494" href="#L494">494</a>           <a name="Mail" href="../../../../../org/mybatis/scrip<a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a>/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a> mail = <strong class="jxr_keyword">new</strong> <a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a>();
+<a class="jxr_linenumber" name="L495" href="#L495">495</a>           mail.setAddress(<span class="jxr_string">"mybatis1.main@test.com"</span>);
+<a class="jxr_linenumber" name="L496" href="#L496">496</a>           mails.add(mail);
+<a class="jxr_linenumber" name="L497" href="#L497">497</a>         }
+<a class="jxr_linenumber" name="L498" href="#L498">498</a>         {
+<a class="jxr_linenumber" name="L499" href="#L499">499</a>           <a name="Mail" href="../../../../../org/mybatis/scrip<a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a>/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a> mail = <strong class="jxr_keyword">new</strong> <a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a>();
+<a class="jxr_linenumber" name="L500" href="#L500">500</a>           mail.setAddress(<span class="jxr_string">"mybatis1.sub@test.com"</span>);
+<a class="jxr_linenumber" name="L501" href="#L501">501</a>           mails.add(mail);
+<a class="jxr_linenumber" name="L502" href="#L502">502</a>         }
+<a class="jxr_linenumber" name="L503" href="#L503">503</a>         persons.add(person);
+<a class="jxr_linenumber" name="L504" href="#L504">504</a>       }
+<a class="jxr_linenumber" name="L505" href="#L505">505</a>       {
+<a class="jxr_linenumber" name="L506" href="#L506">506</a>         <a name="Person" href="../../../../../org/mybatis/scripti<a name="Person" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Person.html#Person">Person</a>meleaf/integrationtest/domain/Person.html#Person">Person</a> person = <strong class="jxr_keyword">new</strong> <a name="Person" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Person.html#Person">Person</a>();
+<a class="jxr_linenumber" name="L507" href="#L507">507</a>         person.setName(<span class="jxr_string">"MyBatis 2"</span>);
+<a class="jxr_linenumber" name="L508" href="#L508">508</a>         List&lt;Mail&gt; mails = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a class="jxr_linenumber" name="L509" href="#L509">509</a>         person.setMails(mails);
+<a class="jxr_linenumber" name="L510" href="#L510">510</a>         {
+<a class="jxr_linenumber" name="L511" href="#L511">511</a>           <a name="Mail" href="../../../../../org/mybatis/scrip<a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a>/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a> mail = <strong class="jxr_keyword">new</strong> <a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a>();
+<a class="jxr_linenumber" name="L512" href="#L512">512</a>           mail.setAddress(<span class="jxr_string">"mybatis2.main@test.com"</span>);
+<a class="jxr_linenumber" name="L513" href="#L513">513</a>           mails.add(mail);
+<a class="jxr_linenumber" name="L514" href="#L514">514</a>         }
+<a class="jxr_linenumber" name="L515" href="#L515">515</a>         {
+<a class="jxr_linenumber" name="L516" href="#L516">516</a>           <a name="Mail" href="../../../../../org/mybatis/scrip<a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a>/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a> mail = <strong class="jxr_keyword">new</strong> <a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a>();
+<a class="jxr_linenumber" name="L517" href="#L517">517</a>           mail.setAddress(<span class="jxr_string">"mybatis2.sub@test.com"</span>);
+<a class="jxr_linenumber" name="L518" href="#L518">518</a>           mails.add(mail);
+<a class="jxr_linenumber" name="L519" href="#L519">519</a>         }
+<a class="jxr_linenumber" name="L520" href="#L520">520</a>         persons.add(person);
+<a class="jxr_linenumber" name="L521" href="#L521">521</a>       }
+<a class="jxr_linenumber" name="L522" href="#L522">522</a> 
+<a class="jxr_linenumber" name="L523" href="#L523">523</a>       mapper.insertByBulkWithIndexed(persons);
+<a class="jxr_linenumber" name="L524" href="#L524">524</a>       mapper.insertMailsByBulkWithIndexed(persons);
+<a class="jxr_linenumber" name="L525" href="#L525">525</a> 
+<a class="jxr_linenumber" name="L526" href="#L526">526</a>       <strong class="jxr_keyword">int</strong> maxMailId = Optional.ofNullable(mapper.getMaxMailId()).filter(x -&gt; x != 0).orElse(-1) - 4;
+<a class="jxr_linenumber" name="L527" href="#L527">527</a> 
+<a class="jxr_linenumber" name="L528" href="#L528">528</a>       <em class="jxr_comment">// Select</em>
+<a class="jxr_linenumber" name="L529" href="#L529">529</a>       List&lt;Person&gt; loadedPersons = mapper.selectPersons(persons.get(0).getId(), persons.get(1).getId());
+<a class="jxr_linenumber" name="L530" href="#L530">530</a>       Assertions.assertEquals(2, loadedPersons.size());
+<a class="jxr_linenumber" name="L531" href="#L531">531</a>       {
+<a class="jxr_linenumber" name="L532" href="#L532">532</a>         <a name="Person" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Person.html#Person">Person</a> person = loadedPersons.get(0);
+<a class="jxr_linenumber" name="L533" href="#L533">533</a>         Assertions.assertEquals(persons.get(0).getId(), person.getId());
+<a class="jxr_linenumber" name="L534" href="#L534">534</a>         Assertions.assertEquals(<span class="jxr_string">"MyBatis 1"</span>, person.getName());
+<a class="jxr_linenumber" name="L535" href="#L535">535</a>         List&lt;Mail&gt; mails = person.getMails();
+<a class="jxr_linenumber" name="L536" href="#L536">536</a>         Assertions.assertEquals(2, mails.size());
+<a class="jxr_linenumber" name="L537" href="#L537">537</a>         {
+<a class="jxr_linenumber" name="L538" href="#L538">538</a>           <a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a> mail = mails.get(0);
+<a class="jxr_linenumber" name="L539" href="#L539">539</a>           Assertions.assertEquals(maxMailId + 1, mail.getId());
+<a class="jxr_linenumber" name="L540" href="#L540">540</a>           Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
+<a class="jxr_linenumber" name="L541" href="#L541">541</a>           Assertions.assertEquals(<span class="jxr_string">"mybatis1.main@test.com"</span>, mail.getAddress());
+<a class="jxr_linenumber" name="L542" href="#L542">542</a>         }
+<a class="jxr_linenumber" name="L543" href="#L543">543</a>         {
+<a class="jxr_linenumber" name="L544" href="#L544">544</a>           <a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a> mail = mails.get(1);
+<a class="jxr_linenumber" name="L545" href="#L545">545</a>           Assertions.assertEquals(maxMailId + 2, mail.getId());
+<a class="jxr_linenumber" name="L546" href="#L546">546</a>           Assertions.assertEquals(persons.get(0).getId(), mail.getPersonId());
+<a class="jxr_linenumber" name="L547" href="#L547">547</a>           Assertions.assertEquals(<span class="jxr_string">"mybatis1.sub@test.com"</span>, mail.getAddress());
+<a class="jxr_linenumber" name="L548" href="#L548">548</a>         }
+<a class="jxr_linenumber" name="L549" href="#L549">549</a>       }
+<a class="jxr_linenumber" name="L550" href="#L550">550</a>       {
+<a class="jxr_linenumber" name="L551" href="#L551">551</a>         <a name="Person" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Person.html#Person">Person</a> person = loadedPersons.get(1);
+<a class="jxr_linenumber" name="L552" href="#L552">552</a>         Assertions.assertEquals(persons.get(1).getId(), person.getId());
+<a class="jxr_linenumber" name="L553" href="#L553">553</a>         Assertions.assertEquals(<span class="jxr_string">"MyBatis 2"</span>, person.getName());
+<a class="jxr_linenumber" name="L554" href="#L554">554</a>         List&lt;Mail&gt; mails = person.getMails();
+<a class="jxr_linenumber" name="L555" href="#L555">555</a>         Assertions.assertEquals(2, mails.size());
+<a class="jxr_linenumber" name="L556" href="#L556">556</a>         {
+<a class="jxr_linenumber" name="L557" href="#L557">557</a>           <a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a> mail = mails.get(0);
+<a class="jxr_linenumber" name="L558" href="#L558">558</a>           Assertions.assertEquals(maxMailId + 3, mail.getId());
+<a class="jxr_linenumber" name="L559" href="#L559">559</a>           Assertions.assertEquals(persons.get(1).getId(), mail.getPersonId());
+<a class="jxr_linenumber" name="L560" href="#L560">560</a>           Assertions.assertEquals(<span class="jxr_string">"mybatis2.main@test.com"</span>, mail.getAddress());
+<a class="jxr_linenumber" name="L561" href="#L561">561</a>         }
+<a class="jxr_linenumber" name="L562" href="#L562">562</a>         {
+<a class="jxr_linenumber" name="L563" href="#L563">563</a>           <a name="Mail" href="../../../../../org/mybatis/scripting/thymeleaf/integrationtest/domain/Mail.html#Mail">Mail</a> mail = mails.get(1);
+<a class="jxr_linenumber" name="L564" href="#L564">564</a>           Assertions.assertEquals(maxMailId + 4, mail.getId());
+<a class="jxr_linenumber" name="L565" href="#L565">565</a>           Assertions.assertEquals(persons.get(1).getId(), mail.getPersonId());
+<a class="jxr_linenumber" name="L566" href="#L566">566</a>           Assertions.assertEquals(<span class="jxr_string">"mybatis2.sub@test.com"</span>, mail.getAddress());
+<a class="jxr_linenumber" name="L567" href="#L567">567</a>         }
+<a class="jxr_linenumber" name="L568" href="#L568">568</a>       }
+<a class="jxr_linenumber" name="L569" href="#L569">569</a>     }
+<a class="jxr_linenumber" name="L570" href="#L570">570</a>   }
+<a class="jxr_linenumber" name="L571" href="#L571">571</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2018&#x2013;2019 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2018&#x2013;2020 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</div>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.7.1">
+<meta name="generator" content="Asciidoctor 1.5.8">
 <meta name="author" content="The MyBatis Team">
 <title>MyBatis Thymeleaf User&#8217;s Guide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
@@ -40,8 +40,8 @@
 <h1>MyBatis Thymeleaf User&#8217;s Guide</h1>
 <div class="details">
 <span id="author" class="author">The MyBatis Team</span><br>
-<span id="revnumber">version 1.0.1,</span>
-<span id="revdate">2019-07-15</span>
+<span id="revnumber">version 1.0.2,</span>
+<span id="revdate">2020-06-05</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -94,22 +94,30 @@
 <li><a href="#_expression_utility_method">7.2. Expression utility method</a></li>
 </ul>
 </li>
-<li><a href="#_support_classes">8. Support classes</a>
+<li><a href="#_using_sql_generator">8. Using SQL Generator</a>
 <ul class="sectlevel2">
-<li><a href="#_templatefilepathprovider">8.1. TemplateFilePathProvider</a></li>
+<li><a href="#_configuration_4">8.1. Configuration</a></li>
+<li><a href="#_basic_usage_2">8.2. Basic Usage</a></li>
+<li><a href="#_advanced_usage">8.3. Advanced Usage</a></li>
 </ul>
 </li>
-<li><a href="#_cautions_for_usage">9. Cautions for usage</a>
+<li><a href="#_support_classes">9. Support classes</a>
 <ul class="sectlevel2">
-<li><a href="#_using_backslash">9.1. Using '\'(backslash)</a></li>
+<li><a href="#_templatefilepathprovider">9.1. TemplateFilePathProvider</a></li>
+<li><a href="#_springnamedparameterbindvariablerender">9.2. SpringNamedParameterBindVariableRender</a></li>
 </ul>
 </li>
-<li><a href="#_appendix">10. Appendix</a>
+<li><a href="#_cautions_for_usage">10. Cautions for usage</a>
 <ul class="sectlevel2">
-<li><a href="#_configuration_properties">10.1. Configuration properties</a></li>
-<li><a href="#_bulk_insert">10.2. Bulk insert</a></li>
-<li><a href="#_multiline_string_literals">10.3. Multiline String Literals</a></li>
-<li><a href="#_related_resources">10.4. Related resources</a></li>
+<li><a href="#_using_backslash">10.1. Using '\'(backslash)</a></li>
+</ul>
+</li>
+<li><a href="#_appendix">11. Appendix</a>
+<ul class="sectlevel2">
+<li><a href="#_configuration_properties">11.1. Configuration properties</a></li>
+<li><a href="#_bulk_insert">11.2. Bulk insert</a></li>
+<li><a href="#_multiline_string_literals">11.3. Multiline String Literals</a></li>
+<li><a href="#_related_resources">11.4. Related resources</a></li>
 </ul>
 </li>
 </ul>
@@ -227,6 +235,9 @@ for integrating with template engine provide by Thymeleaf.</p>
 <li>
 <p>Can fully customize a template engine configuration</p>
 </li>
+<li>
+<p>Can generate the SQL from SQL template without the MyBatis core module (since 1.0.2)</p>
+</li>
 </ul>
 </div>
 </div>
@@ -255,7 +266,7 @@ for integrating with template engine provide by Thymeleaf.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>About tested versions see the latest <a href="https://travis-ci.org/mybatis/thymeleaf-scripting" target="_blank" rel="noopener">Travi CI</a> build result.</p>
+<p>About tested versions see the latest <a href="https://travis-ci.org/mybatis/thymeleaf-scripting" target="_blank" rel="noopener">Travis CI</a> build result.</p>
 </div>
 </td>
 </tr>
@@ -352,12 +363,12 @@ for integrating with template engine provide by Thymeleaf.</p>
   <span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.mybatis<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>mybatis<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>3.5.2<span class="tag">&lt;/version&gt;</span> <span class="comment">&lt;!-- Adjust to your application --&gt;</span>
+    <span class="tag">&lt;version&gt;</span>3.5.5<span class="tag">&lt;/version&gt;</span> <span class="comment">&lt;!-- Adjust to your application --&gt;</span>
   <span class="tag">&lt;/dependency&gt;</span>
   <span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.mybatis.scripting<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>mybatis-thymeleaf<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>1.0.1<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;version&gt;</span>1.0.2<span class="tag">&lt;/version&gt;</span>
   <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;/dependencies&gt;</span></code></pre>
 </div>
@@ -388,8 +399,8 @@ for using the "Sonatype OSS Snapshots Repository" as follow:</p>
 <div class="title">build.gradle (dependencies)</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis:mybatis:3.5.2</span><span class="delimiter">&quot;</span></span>) <span class="comment">// Adjust version to your application</span>
-  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting:mybatis-thymeleaf:1.0.1</span><span class="delimiter">&quot;</span></span>)
+  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis:mybatis:3.5.5</span><span class="delimiter">&quot;</span></span>) <span class="comment">// Adjust version to your application</span>
+  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting:mybatis-thymeleaf:1.0.2</span><span class="delimiter">&quot;</span></span>)
 }</code></pre>
 </div>
 </div>
@@ -456,7 +467,7 @@ configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class);</code>
 <td class="content">
 <div class="paragraph">
 <p>You can specify a readable SQL on annotation using "Multiline String Literals" provided by some JVM language.
-About "Multiline String Literals", please see the <a href="#_multiline_string_literals">Section 10.3, &#8220;Multiline String Literals&#8221;</a>.</p>
+About "Multiline String Literals", please see the <a href="#_multiline_string_literals">Section 11.3, &#8220;Multiline String Literals&#8221;</a>.</p>
 </div>
 </td>
 </tr>
@@ -622,7 +633,7 @@ SqlSessionFactory sqlSessionFactory = <span class="keyword">new</span> SqlSessio
 <div class="paragraph">
 <p>The mybatis-thymeleaf provide the special properties file for customizing default configuration.
 By default behavior, the mybatis-thymeleaf load the <code>mybatis-thymeleaf.properties</code> stored just under classpath.
-About supported properties, please see the <a href="#_configuration_properties">Section 10.1, &#8220;Configuration properties&#8221;</a>.</p>
+About supported properties, please see the <a href="#_configuration_properties">Section 11.1, &#8220;Configuration properties&#8221;</a>.</p>
 </div>
 <div class="sect4">
 <h5 id="_using_an_any_properties_file"><a class="link" href="#_using_an_any_properties_file">Using an any properties file</a></h5>
@@ -742,7 +753,7 @@ configuration.setDefaultScriptingLanguage(ThymeleafLanguageDriver.class); <i cla
 </td>
 <td class="content">
 <div class="paragraph">
-<p>About cautions for usage 2-way SQL, please see the <a href="#_cautions_for_usage">Section 9, &#8220;Cautions for usage&#8221;</a>.</p>
+<p>About cautions for usage 2-way SQL, please see the <a href="#_cautions_for_usage">Section 10, &#8220;Cautions for usage&#8221;</a>.</p>
 </div>
 </td>
 </tr>
@@ -773,7 +784,7 @@ that can be parsed by MyBatis core module as follow:</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>A bind value is specified by <code>#{variable name}</code> format</td>
+<td>A bind value is specified by 「<code>#{variable name}</code>」 format</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -947,12 +958,39 @@ You can access an iteration status object (<code>IterationStatusVar</code>) that
   <span class="keyword">ORDER</span> <span class="keyword">BY</span> id</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Since 1.0.2, We support the indexed access using an iteration status object as follow:</p>
+</div>
+<div class="listingblock">
+<div class="title">Use indexed access using an iteration status object</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> names
+  <span class="keyword">WHERE</span> <span class="integer">1</span> = <span class="integer">1</span>
+  <span class="comment">/*[# th:if=&quot;${not #lists.isEmpty(ids)}&quot;]*/</span>
+    <span class="keyword">AND</span> id <span class="keyword">IN</span> (
+    <span class="comment">/*[# th:each=&quot;id : ${ids}&quot;]*/</span>
+      <span class="comment">/*[# mb:p=&quot;ids[${idStat.index}]&quot;]*/</span> <span class="integer">1</span> <span class="comment">/*[/]*/</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="comment">/*[(${idStat.last} ? '' : ',')]*/</span>
+    <span class="comment">/*[/]*/</span>
+    )
+  <span class="comment">/*[/]*/</span>
+  <span class="keyword">ORDER</span> <span class="keyword">BY</span> id</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Access to a iterable object using indexed</td>
+</tr>
+</table>
+</div>
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>About more advanced usage of <code>th:each</code> , please see <a href="#_bulk_insert">Section 10.2, &#8220;Bulk insert&#8221;</a>.</p>
+<p>About more advanced usage of <code>th:each</code> , please see <a href="#_bulk_insert">Section 11.2, &#8220;Bulk insert&#8221;</a>.</p>
 </div>
 </div>
 </div>
@@ -1135,7 +1173,7 @@ configuration.setVariables(variables);</code></pre>
 <div class="listingblock">
 <div class="title">SQL template</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> <span class="comment">/*[(${tableNameOfUser} ?: 'users')]*/</span> users <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> <span class="comment">/*[# th:utext=&quot;${tableNameOfUser} ?: 'users'&quot;]*/</span> users <span class="comment">/*[/]*/</span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1200,25 +1238,26 @@ Therefore you should be configure explicitly to use the non 2-way SQL mode using
 <pre class="CodeRay highlight"><code data-lang="properties">use2way = false <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>or</p>
-</div>
-<div class="listingblock">
-<div class="title">How to configure using config class</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">configuration.getLanguageRegistry().register(<span class="keyword">new</span> ThymeleafLanguageDriver(
-        ThymeleafLanguageDriverConfig.newInstance(c -&gt; c.setUse2Way(<span class="predefined-constant">false</span>)))); <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
-</div>
-</div>
 <div class="colist arabic">
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Set the <code>use2way</code> to <code>false</code></td>
 </tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">How to configure using config class</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">configuration.getLanguageRegistry().register(<span class="keyword">new</span> ThymeleafLanguageDriver(
+        ThymeleafLanguageDriverConfig.newInstance(c -&gt; c.setUse2Way(<span class="predefined-constant">false</span>)))); <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
 <tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Set the <code>use2way</code> property to <code>false</code></td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the <code>use2way</code> property of <code>ThymeleafLanguageDriverConfig</code> to <code>false</code></td>
 </tr>
 </table>
 </div>
@@ -1275,7 +1314,9 @@ By default, you can use it using <code>mb</code> dialect prefix (default prefix 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#mybatis-param">p</a></p></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>Render bind variable(<code>#{&#8230;&#8203;}</code>) that can be parsed by MyBatis core module and register an iteration object to the MyBatis&#8217;s bind variables.</p>
+<p>Render bind variable(default format: <code>#{&#8230;&#8203;}</code>) that can be parsed by MyBatis core module and register an iteration object to the MyBatis&#8217;s bind variables.<br>
+<br>
+ The bind variable format decide by a implementation of <code>BindVariableRender</code>.</p>
 </div></div></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p><code>{variableName}(,{optionKey}={optionValue},&#8230;&#8203;)</code><br>
@@ -1520,15 +1561,280 @@ using <a href="#_configuration_properties">Configuration properties</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_support_classes"><a class="link" href="#_support_classes">8. Support classes</a></h2>
+<h2 id="_using_sql_generator"><a class="link" href="#_using_sql_generator">8. Using SQL Generator</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Since 1.0.2, we separate the SQL generating feature from the <code>ThymeleafLanguageDriver</code> and <code>ThymeleafSqlSource</code> class,
+we added the <code>SqlGenerator</code> and <code>SqlGeneratorConfig</code> for generating SQL from SQL template.
+These classes <strong>does not depends on the MyBatis core module</strong>(<code>mybatis-3.x.x.jar</code>).
+So that, it also can be used in combination with any data access libraries(e.g. Spring JDBC, JPA, R2DBC, etc&#8230;&#8203;) that provide with named parameter.</p>
+</div>
+<div class="sect2">
+<h3 id="_configuration_4"><a class="link" href="#_configuration_4">8.1. Configuration</a></h3>
+<div class="paragraph">
+<p>By default, the <code>SqlGenerator</code> applies settings for using together with the MyBatis core module(apply to <code>#{&#8230;&#8203;}</code> as the bind variable format),
+but you can customize a default settings using configuration properties file or the <code>SqlGeneratorConfig</code>.
+The <code>SqlGeneratorConfig</code> allows the same configurations as the <code>ThymeleafLanguageDriverConfig</code> except the <code>TemplateFilePathProvider</code>(<code>template-file.path-provider.*</code>).</p>
+</div>
+<div class="sect3">
+<h4 id="_customize_the_bind_variable_format"><a class="link" href="#_customize_the_bind_variable_format">8.1.1. Customize the bind variable format</a></h4>
+<div class="paragraph">
+<p>You can customize the bind variable format using configuration properties file or configuration class.
+In the following example, it changes the bind variable format to the Spring JDBC format(e.g. <code>:id</code>) from MyBatis core format(e.g. <code>#{id}</code>).</p>
+</div>
+<div class="listingblock">
+<div class="title">How to customize using configuration properties file</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">dialect.bind-variable-render = org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVariableRender <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Specify the <code>BindVariableRender</code> implementation class(built-in class) that render Spring JDBC bind variable format</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">How to customize using config class</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">SqlGeneratorConfig config = SqlGeneratorConfig.newInstanceWithCustomizer(c -&gt;
+    c.getDialect().setBindVariableRender(
+        BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType())); <i class="conum" data-value="1"></i><b>(1)</b>
+SqlGenerator sqlGenerator = <span class="keyword">new</span> SqlGenerator(config); <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Specify the <code>BindVariableRender</code> implementation class(built-in class) that render Spring JDBC bind variable format via <code>BuiltIn</code> enum</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Create a <code>SqlGenerator</code> instance with user defined configuration</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use the custom bind variable format other than built-in format,
+please create a implementation class of <code>BindVariableRender</code> and apply it to the configuration.</p>
+</div>
+<div class="listingblock">
+<div class="title">How to create the BindVariableRender implementation class</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">R2dbcMySQLBindVariableRender</span> <span class="directive">implements</span> BindVariableRender { <i class="conum" data-value="1"></i><b>(1)</b>
+  <span class="directive">public</span> <span class="predefined-type">String</span> render(<span class="predefined-type">String</span> name) {
+    <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">?</span><span class="delimiter">&quot;</span></span> + name;
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a <code>BindVariableRender</code> implementation class</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_customize_other_configurations"><a class="link" href="#_customize_other_configurations">8.1.2. Customize other configurations</a></h4>
+<div class="paragraph">
+<p>Please see also the following sections.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#_configuration_properties">Section 11.1, &#8220;Configuration properties&#8221;</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_basic_usage_2"><a class="link" href="#_basic_usage_2">8.2. Basic Usage</a></h3>
+<div class="paragraph">
+<p>The <code>SqlGenerator</code> provide feature for generating a SQL from SQL template using the Thymeleaf as follow:</p>
+</div>
+<div class="listingblock">
+<div class="title">Basic Usage:</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">SqlGenerator sqlGenerator = <span class="keyword">new</span> SqlGenerator(); <i class="conum" data-value="1"></i><b>(1)</b>
+
+Conditions conditions = <span class="keyword">new</span> Conditions();
+conditions.setId(<span class="integer">10</span>);
+
+<span class="comment">// sql = &quot;SELECT * FROM accounts WHERE id = #{id}&quot;</span>
+<span class="predefined-type">String</span> sql = sqlGenerator.generate(
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">SELECT * FROM accounts WHERE id = /*[# mb:p='id']*/ 1 /*[/]*/</span><span class="delimiter">&quot;</span></span>, conditions); <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a default instance of <code>SqlGenerator</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Generate an SQL from SQL template</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>SqlGenerator#generate</code> method is <strong>thread-safe</strong>. In other words, you can share an <code>SqlGenerator</code> instance at any components.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_receiving_generated_bind_variables"><a class="link" href="#_receiving_generated_bind_variables">8.2.1. Receiving generated bind variables</a></h4>
+<div class="paragraph">
+<p>You can receiving bind variables that generated during template processing via a <code>BiConsumer</code> function as follow:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The bind variables may generate when use <code>mb:bind</code> or <code>mb:p</code> tag.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">How to receive bind variables using binder function:</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">SqlGenerator sqlGenerator = <span class="keyword">new</span> SqlGenerator();
+
+<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; conditionsMap = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;();
+conditionsMap.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Yamada</span><span class="delimiter">&quot;</span></span>);
+
+<span class="comment">// sql = &quot;SELECT * FROM accounts WHERE name = #{patternName}&quot;</span>
+<span class="comment">// conditionsMap = {&quot;name&quot;:&quot;Yamada&quot;, &quot;patternName&quot;:&quot;Yamada%&quot;}</span>
+<span class="predefined-type">String</span> sql = sqlGenerator.generate(
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">/*[# mb:bind='patternName=|${#likes.escapeWildcard(name)}%|' /]*/</span><span class="delimiter">&quot;</span></span> +
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">SELECT * FROM accounts WHERE name = /*[# mb:p='patternName']*/ 'Sato' /*[/]*/</span><span class="delimiter">&quot;</span></span>,
+    conditionsMap, conditionsMap::put); <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Specify(Pass) a <code>BiConsumer</code> function for receiving bind variables at 3th argument of <code>generate</code> method</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_specifying_custom_variables"><a class="link" href="#_specifying_custom_variables">8.2.2. Specifying custom variables</a></h4>
+<div class="paragraph">
+<p>You can specify any custom variables separately from the parameter object as follow:</p>
+</div>
+<div class="listingblock">
+<div class="title">How to use custom variables:</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">SqlGenerator sqlGenerator = <span class="keyword">new</span> SqlGenerator();
+sqlGenerator.setDefaultCustomVariables(
+    <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">accountsTableName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="1"></i><b>(1)</b>
+
+Account account = <span class="keyword">new</span> Account();
+account.setName(<span class="string"><span class="delimiter">&quot;</span><span class="content">Taro Yamada</span><span class="delimiter">&quot;</span></span>);
+
+<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; customVariables = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;(); <i class="conum" data-value="2"></i><b>(2)</b>
+customVariables.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">now</span><span class="delimiter">&quot;</span></span>, LocalDateTime.now());
+customVariables.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">loginId</span><span class="delimiter">&quot;</span></span>, loginId);
+
+<span class="comment">// sql = &quot;INSERT INTO users (name, created_at, created_by) VALUES(#{name}, #{now}, #{loginId})&quot;</span>
+<span class="predefined-type">String</span> sql = sqlGenerator.generate(
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">INSERT INTO /*[# th:utext=</span><span class="char">\&quot;</span><span class="content">${accountsTableName} ?: 'accounts'</span><span class="char">\&quot;</span><span class="content">]*/ accounts /*[/]*/ </span><span class="delimiter">&quot;</span></span> + <i class="conum" data-value="3"></i><b>(3)</b>
+      <span class="string"><span class="delimiter">&quot;</span><span class="content">(name, created_at, created_by) VALUES(</span><span class="delimiter">&quot;</span></span> +
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">/*[# mb:p='name']*/ 'Hanako Yamada' /*[/]*/, </span><span class="delimiter">&quot;</span></span> +
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">/*[# mb:p='now']*/ current_timestamp() /*[/]*/, </span><span class="delimiter">&quot;</span></span> + <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">/*[# mb:p='loginId']*/ 'A00000001' /*[/]*/</span><span class="delimiter">&quot;</span></span> + <i class="conum" data-value="4"></i><b>(4)</b>
+      <span class="string"><span class="delimiter">&quot;</span><span class="content">)</span><span class="delimiter">&quot;</span></span>, account, customVariables); <i class="conum" data-value="5"></i><b>(5)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Specify the default custom variable for sharing by every statements</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Create custom variables per statement or transaction</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Can be access to a custom variable at template processing time</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Can be bind a custom variable</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Specify(Pass) custom variables map to sql generator at 3rd argument of <code>generate</code> method</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_advanced_usage"><a class="link" href="#_advanced_usage">8.3. Advanced Usage</a></h3>
+<div class="sect3">
+<h4 id="_access_javabeans_property"><a class="link" href="#_access_javabeans_property">8.3.1. Access JavaBeans property</a></h4>
+<div class="paragraph">
+<p>By default, the <code>SqlGenerator</code> use the JDK standard APIs(JavaBeans and Reflection API) for accessing a property of user defined Java object.
+If there is a conflict with property accessing in the data access library,
+you can change a default behavior by applying a custom <code>org.mybatis.scripting.thymeleaf.PropertyAccessor</code> implementation class.</p>
+</div>
+<div class="listingblock">
+<div class="title">How to apply a custom PropertyAccessor</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">SqlGenerator sqlGenerator = <span class="keyword">new</span> SqlGenerator();
+sqlGenerator.setPropertyAccessor(<span class="keyword">new</span> MyPropertyAccessor()); <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set a custom <code>PropertyAccessor</code> implementation class to the <code>SqlGenerator</code></td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_support_classes"><a class="link" href="#_support_classes">9. Support classes</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We provides useful classes for supporting development.</p>
 </div>
 <div class="sect2">
-<h3 id="_templatefilepathprovider"><a class="link" href="#_templatefilepathprovider">8.1. TemplateFilePathProvider</a></h3>
+<h3 id="_templatefilepathprovider"><a class="link" href="#_templatefilepathprovider">9.1. TemplateFilePathProvider</a></h3>
 <div class="paragraph">
-<p>The <code>TemplateFilePathProvider</code> is SQL provider class that return the SQL template file path(Available since 1.0.1).
+<p>The <code>org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider</code> is SQL provider class that return the SQL template file path. This class is available since 1.0.1.
 This class use with SQL provider annotation(<code>@InsertProvider</code>, <code>@UpdateProvider</code>, <code>@DeleteProvider</code> and <code>@SelectProvider</code>) as follow:</p>
 </div>
 <div class="admonitionblock note">
@@ -1608,10 +1914,32 @@ If does not match all, it throw an exception that indicate not found a template 
 you can customize using the <a href="#_configuration_properties">configuration properties</a> that start with <code>template-file.path-provider</code>.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_springnamedparameterbindvariablerender"><a class="link" href="#_springnamedparameterbindvariablerender">9.2. SpringNamedParameterBindVariableRender</a></h3>
+<div class="paragraph">
+<p>The <code>org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVariableRender</code> is the <code>BindVariableRender</code>
+implementation class for rendering bind variable to 「<code>:variable name</code>」 format(e.g. <code>:id</code>). This class is available since 1.0.2.</p>
+</div>
+<div class="listingblock">
+<div class="title">How to enable via configuration properties file (mybatis-thymeleaf.properties)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">dialect.bind-variable-render = org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVariableRender</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">How to enable via configuration class (SqlGeneratorConfig)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">SqlGeneratorConfig config = SqlGeneratorConfig.newInstanceWithCustomizer(c -&gt;
+    c.getDialect().setBindVariableRender(
+        BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType()));
+SqlGenerator sqlGenerator = <span class="keyword">new</span> SqlGenerator(config);</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_cautions_for_usage"><a class="link" href="#_cautions_for_usage">9. Cautions for usage</a></h2>
+<h2 id="_cautions_for_usage"><a class="link" href="#_cautions_for_usage">10. Cautions for usage</a></h2>
 <div class="sectionbody">
 <div class="admonitionblock caution">
 <table>
@@ -1629,13 +1957,13 @@ Therefore there are some cautions for usage.</p>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_using_backslash"><a class="link" href="#_using_backslash">9.1. Using '\'(backslash)</a></h3>
+<h3 id="_using_backslash"><a class="link" href="#_using_backslash">10.1. Using '\'(backslash)</a></h3>
 <div class="paragraph">
 <p>If you are using 2-way SQL mode, there is case that cannot parse a 2-way SQL when specify <code>'\'</code>(backslash) within static template parts.
 We know that following case cannot be parsed 2-way SQL. If you are not using 2-way SQL mode, this limitation can be ignore.</p>
 </div>
 <div class="sect3">
-<h4 id="_escape_clause_for_like"><a class="link" href="#_escape_clause_for_like">9.1.1. ESCAPE clause for LIKE</a></h4>
+<h4 id="_escape_clause_for_like"><a class="link" href="#_escape_clause_for_like">10.1.1. ESCAPE clause for LIKE</a></h4>
 <div class="paragraph">
 <p>If you specify the <code>ESCAPE '\'</code> directly as static template parts, the Thymeleaf cannot parse it.</p>
 </div>
@@ -1643,7 +1971,7 @@ We know that following case cannot be parsed 2-way SQL. If you are not using 2-w
 <div class="title">Invalid usage</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="sql"><span class="comment">/*[# mb:bind=&quot;patternFirstName=|${#likes.escapeWildcard(firstName)}%|&quot; /]*/</span>
-<span class="keyword">AND</span> firstName <span class="keyword">LIKE</span> <span class="comment">/*[('#{patternFirstName}')]*/</span> <span class="string"><span class="delimiter">'</span><span class="content">Taro%</span><span class="delimiter">'</span></span> <span class="comment">/**/</span> ESCAPE <span class="string"><span class="delimiter">'</span><span class="char">\'</span></span></code></pre>
+<span class="keyword">AND</span> firstName <span class="keyword">LIKE</span> <span class="comment">/*[('#{patternFirstName}')]*/</span> <span class="string"><span class="delimiter">'</span><span class="content">Taro%</span><span class="delimiter">'</span></span> <span class="comment">/**/</span> ESCAPE <span class="string"><span class="delimiter">'</span><span class="char">\'</span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1675,10 +2003,10 @@ For detail, please see <a href="#mybatis-likeEscapeClause">Section 7.2.1.2, &#82
 </div>
 </div>
 <div class="sect1">
-<h2 id="_appendix"><a class="link" href="#_appendix">10. Appendix</a></h2>
+<h2 id="_appendix"><a class="link" href="#_appendix">11. Appendix</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_configuration_properties"><a class="link" href="#_configuration_properties">10.1. Configuration properties</a></h3>
+<h3 id="_configuration_properties"><a class="link" href="#_configuration_properties">11.1. Configuration properties</a></h3>
 <div class="paragraph">
 <p>The mybatis-thymeleaf provides following properties for customizing configurations.</p>
 </div>
@@ -1750,7 +2078,8 @@ For detail, please see <a href="#mybatis-likeEscapeClause">Section 7.2.1.2, &#82
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>"*.sql"</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><strong>Template file path provider configuration(for TemplateFilePathProvider)</strong></p></td>
+<td class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><strong>Template file path provider configuration for TemplateFilePathProvider</strong><br>
+(Available only at <code>ThymeleafLanguageDriverConfig</code>)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>template-file.path-provider.prefix</code></p></td>
@@ -1811,6 +2140,13 @@ For detail, please see <a href="#mybatis-likeEscapeClause">Section 7.2.1.2, &#82
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>Character[]</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>""</code> (no specify)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dialect.bind-variable-render</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The FQCN of class that implements the <code>BindVariableRender</code>
+(interface for rendering a bind variable such as <code>#{id}</code>, <code>:id</code>, etc&#8230;&#8203;)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>Class</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>null</code> (Uses render class for MyBatis)</p></td>
+</tr>
 </tbody>
 </table>
 <div class="listingblock">
@@ -1830,7 +2166,8 @@ template-file.path-provider.includes-mapper-name-when-separate-directory = false
 dialect.prefix = mybatis
 dialect.like-escape-char = ~
 dialect.like-escape-clause-format = escape '%s'
-dialect.like-additional-escape-target-chars = ％, ＿</code></pre>
+dialect.like-additional-escape-target-chars = ％, ＿
+dialect.bind-variable-render = org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVariableRender</code></pre>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -1857,11 +2194,14 @@ dialect.like-additional-escape-target-chars = ％, ＿</code></pre>
   c.getTemplateFile().getPathProvider().setPrefix(<span class="string"><span class="delimiter">&quot;</span><span class="content">sqls/</span><span class="delimiter">&quot;</span></span>);
   c.getTemplateFile().getPathProvider().setIncludesPackagePath(<span class="predefined-constant">false</span>);
   c.getTemplateFile().getPathProvider().setSeparateDirectoryPerMapper(<span class="predefined-constant">false</span>);
-  c.getTemplateFile().getPathProvider().setIncludesMapperNameWhenSeparateDirectory(<span class="predefined-constant">false</span>);
+  c.getTemplateFile().getPathProvider()
+      .setIncludesMapperNameWhenSeparateDirectory(<span class="predefined-constant">false</span>);
   c.getDialect().setPrefix(<span class="string"><span class="delimiter">&quot;</span><span class="content">mybatis</span><span class="delimiter">&quot;</span></span>);
   c.getDialect().setLikeEscapeChar(<span class="string"><span class="delimiter">'</span><span class="content">~</span><span class="delimiter">'</span></span>);
   c.getDialect().setLikeEscapeClauseFormat(<span class="string"><span class="delimiter">&quot;</span><span class="content">escape '%s'</span><span class="delimiter">&quot;</span></span>);
   c.getDialect().setLikeAdditionalEscapeTargetChars(<span class="string"><span class="delimiter">'</span><span class="content">％</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">＿</span><span class="delimiter">'</span></span>);
+  c.getDialect().setBindVariableRender(
+      BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType());
 })));</code></pre>
 </div>
 </div>
@@ -1885,13 +2225,56 @@ We provide following factory methods for creating a <code>ThymeleafLanguageDrive
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>These properties can be specified via factory method of <code>SqlGeneratorConfig</code> as follow:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">SqlGeneratorConfig config =
+  SqlGeneratorConfig.newInstanceWithCustomizer(c -&gt; {
+  c.setUse2way(<span class="predefined-constant">false</span>);
+  c.setCustomizer(CustomTemplateEngineCustomizer.class);
+  c.getTemplateFile().setCacheEnabled(<span class="predefined-constant">false</span>);
+  c.getTemplateFile().setCacheTtl(<span class="integer">3600000L</span>);
+  c.getTemplateFile().setEncoding(StandardCharsets.UTF_8);
+  c.getTemplateFile().setBaseDir(<span class="string"><span class="delimiter">&quot;</span><span class="content">templates/</span><span class="delimiter">&quot;</span></span>);
+  c.getTemplateFile().setPatterns(<span class="string"><span class="delimiter">&quot;</span><span class="content">*.sql</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">*.sql.template</span><span class="delimiter">&quot;</span></span>);
+  c.getDialect().setPrefix(<span class="string"><span class="delimiter">&quot;</span><span class="content">mybatis</span><span class="delimiter">&quot;</span></span>);
+  c.getDialect().setLikeEscapeChar(<span class="string"><span class="delimiter">'</span><span class="content">~</span><span class="delimiter">'</span></span>);
+  c.getDialect().setLikeEscapeClauseFormat(<span class="string"><span class="delimiter">&quot;</span><span class="content">escape '%s'</span><span class="delimiter">&quot;</span></span>);
+  c.getDialect().setLikeAdditionalEscapeTargetChars(<span class="string"><span class="delimiter">'</span><span class="content">％</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">＿</span><span class="delimiter">'</span></span>);
+  c.getDialect().setBindVariableRender(
+      BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType());
+});
+<span class="comment">// ...</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We provide following factory methods for creating a <code>SqlGeneratorConfig</code> instance.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>newInstance()</code></p>
+</li>
+<li>
+<p><code>newInstanceWithResourcePath(String resourcePath)</code></p>
+</li>
+<li>
+<p><code>newInstanceWithProperties(Properties customProperties)</code></p>
+</li>
+<li>
+<p><code>newInstanceWithCustomizer(Consumer&lt;SqlGeneratorConfig&gt; customizer)</code></p>
+</li>
+</ul>
+</div>
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_bulk_insert"><a class="link" href="#_bulk_insert">10.2. Bulk insert</a></h3>
+<h3 id="_bulk_insert"><a class="link" href="#_bulk_insert">11.2. Bulk insert</a></h3>
 <div class="paragraph">
 <p>This section describe about bulk insert for collection or array using SQL rather than JDBC feature.
 If you want to insert a collection or array by bulk, you can be realized it using the <code>th:each</code> and <code>mb:p</code> attribute tags as follow:</p>
@@ -1982,33 +2365,33 @@ If you want to insert a collection or array by bulk, you can be realized it usin
 </div>
 </div>
 <div class="sect2">
-<h3 id="_multiline_string_literals"><a class="link" href="#_multiline_string_literals">10.3. Multiline String Literals</a></h3>
+<h3 id="_multiline_string_literals"><a class="link" href="#_multiline_string_literals">11.3. Multiline String Literals</a></h3>
 <div class="paragraph">
-<p>You can specify an SQL in annotation using "<a href="https://openjdk.java.net/jeps/326" target="_blank" rel="noopener">Raw String Literals</a>" feature that support by future JDK version.
+<p>You can specify an SQL in annotation using "<a href="https://openjdk.java.net/jeps/355" target="_blank" rel="noopener">Text Blocks</a>" feature that support since the JDK 13.
 Also,"Multiline String Literals" provided other JVM languages (such as Kotlin and Groovy) can be used.
 There is a good compatibility with annotation driven mapper.</p>
 </div>
 <div class="sect3">
-<h4 id="_java_2"><a class="link" href="#_java_2">10.3.1. Java</a></h4>
+<h4 id="_java_2"><a class="link" href="#_java_2">11.3.1. Java</a></h4>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://openjdk.java.net/jeps/326" target="_blank" rel="noopener">Raw String Literals</a> (Not released yet)</p>
+<p><a href="https://openjdk.java.net/jeps/355" target="_blank" rel="noopener">Text Blocks</a></p>
 </li>
 </ul>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Select</span>(<span class="error">`</span><span class="error">`</span>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span><span class="string"><span class="delimiter">&quot;</span><span class="content">
   SELECT * FROM names
-    WHERE id = <span class="comment">/*[# mb:p=&quot;id&quot;]*/</span> <span class="integer">1</span> <span class="comment">/*[/]*/</span>
-<span class="error">`</span><span class="error">`</span>)
+    WHERE id = /*[# mb:p=</span><span class="delimiter">&quot;</span></span>id<span class="string"><span class="delimiter">&quot;</span><span class="content">]*/ 1 /*[/]*/
+</span><span class="delimiter">&quot;</span></span><span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>)
 <span class="predefined-type">Name</span> findById(<span class="predefined-type">Integer</span> id);</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_kotlin"><a class="link" href="#_kotlin">10.3.2. Kotlin</a></h4>
+<h4 id="_kotlin"><a class="link" href="#_kotlin">11.3.2. Kotlin</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -2028,7 +2411,7 @@ fun findById(id: Int): Name</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_groovy"><a class="link" href="#_groovy">10.3.3. Groovy</a></h4>
+<h4 id="_groovy"><a class="link" href="#_groovy">11.3.3. Groovy</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -2043,13 +2426,13 @@ fun findById(id: Int): Name</code></pre>
   SELECT * FROM names
     WHERE id = /*[# mb:p=&quot;id&quot;]*/ 1 /*[/]*/
 </span><span class="delimiter">'''</span></span>)
-Todo findById(<span class="type">int</span> id);</code></pre>
+<span class="predefined-type">Name</span> findById(<span class="type">int</span> id);</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_related_resources"><a class="link" href="#_related_resources">10.4. Related resources</a></h3>
+<h3 id="_related_resources"><a class="link" href="#_related_resources">11.4. Related resources</a></h3>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 5. Related resource list</caption>
 <colgroup>
@@ -2104,7 +2487,7 @@ Todo findById(<span class="type">int</span> id);</code></pre>
 -->
 <div>
     <div class="text-center">
-        <p>Copyright &copy;2018-2019 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</p>
+        <p>Copyright &copy;2018-2020 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</p>
     </div>
 </div>
 </body>

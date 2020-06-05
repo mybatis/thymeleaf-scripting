@@ -397,7 +397,7 @@
 <a class="jxr_linenumber" name="L389" href="#L389">389</a>       <em class="jxr_comment">// Since mybatis 3.5.1, exception is wrapped by InvocationTargetException</em>
 <a class="jxr_linenumber" name="L390" href="#L390">390</a>       Throwable cause = e.getCause() instanceof InvocationTargetException ? e.getCause().getCause() : e.getCause();
 <a class="jxr_linenumber" name="L391" href="#L391">391</a>       Assertions.assertEquals(
-<a class="jxr_linenumber" name="L392" href="#L392">392</a>           <span class="jxr_string">"java.lang.ClassNotFoundException: Cannot find class: org.mybatis.scripting.thymeleaf.FooTemplateEngineCustomizer"</span>,
+<a class="jxr_linenumber" name="L392" href="#L392">392</a>           <span class="jxr_string">"java.lang.ClassNotFoundException: org.mybatis.scripting.thymeleaf.FooTemplateEngineCustomizer"</span>,
 <a class="jxr_linenumber" name="L393" href="#L393">393</a>           cause.getMessage());
 <a class="jxr_linenumber" name="L394" href="#L394">394</a>     }
 <a class="jxr_linenumber" name="L395" href="#L395">395</a>   }
@@ -445,6 +445,6 @@
 <a class="jxr_linenumber" name="L437" href="#L437">437</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2018&#x2013;2019 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2018&#x2013;2020 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</div>
 </body>
 </html>
