@@ -28,7 +28,7 @@
 
   <groupId>org.mybatis.scripting</groupId>
   <artifactId>mybatis-thymeleaf</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>MyBatis Thymeleaf</name>
@@ -48,7 +48,7 @@
     <url>https://github.com/mybatis/thymeleaf-scripting</url>
     <connection>scm:git:ssh://github.com/mybatis/thymeleaf-scripting.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</developerConnection>
-    <tag>mybatis-thymeleaf-1.0.2</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issue Management</system>
