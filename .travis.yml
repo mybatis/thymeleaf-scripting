@@ -16,7 +16,7 @@ script:
   # test using mybatis 3.4.x line
   - ./mvnw test -Dmybatis.version=3.4.6 -Dlog.level.thymeleaf.config=info
   # build using mybatis 3.5.x snapshot
-  - ./mvnw clean verify -Dmybatis.version=3.5.5-SNAPSHOT -Dlog.level.thymeleaf.config=info
+  - ./mvnw clean verify -Dmybatis.version=$(./travis/get_latest_version.sh 3.5) -Dlog.level.thymeleaf.config=info
 
 after_success:
   - chmod -R 777 ./travis/after_success.sh
