@@ -1208,6 +1208,37 @@ public interface NameMapper extends BaseMapper {
 }
 ----
 
+[TIP]
+====
+Since the MyBatis 3.5.6, you can omit the `type` attribute at each annotations
+when specify the default provider class as global configuration as follow:
+
+.Mapper interface
+[source, java]
+----
+public interface NameMapper extends BaseMapper {
+  @SelectProvider
+  List<Name> findByCondition(NameCondition condition);
+}
+----
+
+.Java based configuration
+[source, java]
+----
+Configuration configuration = new Configuration();
+configuration.setDefaultSqlProviderType(TemplateFilePathProvider.class);
+----
+
+.XML based configuration
+[source, xml]
+----
+<settings>
+  <setting name="defaultSqlProviderType" value="org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider"/>
+</settings>
+----
+
+====
+
 By default implementation, a template file path resolve following format and priority order.
 If does not match all, it throw an exception that indicate not found a template file.
 
