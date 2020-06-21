@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018-2019 the original author or authors.
+ *    Copyright 2018-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,11 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -26,11 +31,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.InvalidNameParam;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.util.List;
-import java.util.Properties;
 
 class ThymeleafSqlSourceTest {
 

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018-2019 the original author or authors.
+ *    Copyright 2018-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class Likes {
   /**
    * Escape for LIKE condition value. <br>
    * By default configuration, this method escape the {@code "%"} and {@code "_"} using {@code "\"}.
-   * 
+   *
    * @param value
    *          A target condition value
    * @return A escaped value
@@ -69,7 +69,7 @@ public class Likes {
   /**
    * Return a escape clause string of LIKE. <br>
    * By default configuration, this method return {@code "ESCAPE '\'"}.
-   * 
+   *
    * @return A escape clause string of LIKE
    */
   public String escapeClause() {
@@ -78,7 +78,7 @@ public class Likes {
 
   /**
    * Creates a new builder instance for {@link Likes}.
-   * 
+   *
    * @return a new builder instance
    */
   public static Builder newBuilder() {
@@ -99,7 +99,7 @@ public class Likes {
     /**
      * Set an escape character for wildcard of LIKE. <br>
      * The default value is {@code '\'} (backslash)
-     * 
+     *
      * @param escapeChar
      *          A escape character
      * @return A self instance
@@ -139,7 +139,7 @@ public class Likes {
 
     /**
      * Return a {@link Likes} instance .
-     * 
+     *
      * @return A {@link Likes} instance corresponding with specified option
      */
     public Likes build() {

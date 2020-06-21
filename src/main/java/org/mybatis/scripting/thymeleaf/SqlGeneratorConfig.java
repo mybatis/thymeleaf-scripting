@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018-2019 the original author or authors.
+ *    Copyright 2018-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ public class SqlGeneratorConfig {
    * <p>
    * Default is {@code true}.
    * </p>
-   * 
+   *
    * @return If use the 2-way SQL feature, return {@code true}
    */
   public boolean isUse2way() {
@@ -116,7 +116,7 @@ public class SqlGeneratorConfig {
    * <p>
    * Default is {@code null}.
    * </p>
-   * 
+   *
    * @return the interface for customizing a default TemplateEngine
    */
   public Class<? extends TemplateEngineCustomizer> getCustomizer() {
@@ -334,7 +334,7 @@ public class SqlGeneratorConfig {
      * <p>
      * Default is {@code "mb"}.
      * </p>
-     * 
+     *
      * @return the prefix name of dialect
      */
     public String getPrefix() {
@@ -356,7 +356,7 @@ public class SqlGeneratorConfig {
      * <p>
      * Default is {@code '\'}.
      * </p>
-     * 
+     *
      * @return the escape character for wildcard
      */
     public Character getLikeEscapeChar() {
@@ -378,7 +378,7 @@ public class SqlGeneratorConfig {
      * <p>
      * Can specify format that can be allowed by String#format method. Default is {@code "ESCAPE '%s'"}.
      * </p>
-     * 
+     *
      * @return the format of escape clause for LIKE condition
      */
     public String getLikeEscapeClauseFormat() {
@@ -400,7 +400,7 @@ public class SqlGeneratorConfig {
      * <p>
      * Can specify multiple characters using comma(",") as separator character. Default is empty(none).
      * </p>
-     * 
+     *
      * @return additional escape target characters(custom wildcard characters)
      */
     public Character[] getLikeAdditionalEscapeTargetChars() {
@@ -422,7 +422,7 @@ public class SqlGeneratorConfig {
      * <p>
      * Default is {@link BindVariableRender.BuiltIn#MYBATIS}
      * </p>
-     * 
+     *
      * @return a bind variable render
      */
     public Class<? extends BindVariableRender> getBindVariableRender() {

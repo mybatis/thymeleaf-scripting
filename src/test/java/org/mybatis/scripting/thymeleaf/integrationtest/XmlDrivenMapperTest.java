@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018 the original author or authors.
+ *    Copyright 2018-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,6 +14,11 @@
  *    limitations under the License.
  */
 package org.mybatis.scripting.thymeleaf.integrationtest;
+
+import java.io.Reader;
+import java.sql.Connection;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -32,11 +37,6 @@ import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver;
 import org.mybatis.scripting.thymeleaf.integrationtest.domain.Name;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.NameParam;
 import org.mybatis.scripting.thymeleaf.integrationtest.mapper.XmlNameMapper;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.util.Arrays;
-import java.util.List;
 
 class XmlDrivenMapperTest {
   private static SqlSessionFactory sqlSessionFactory;

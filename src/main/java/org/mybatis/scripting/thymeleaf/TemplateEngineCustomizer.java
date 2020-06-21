@@ -1,5 +1,5 @@
 /**
- *    Copyright 2018-2019 the original author or authors.
+ *    Copyright 2018-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  * specify the 'customizer' property of mybatis-thymeleaf.properties. <br>
  * <br>
  * e.g.) Implementation class:
- * 
+ *
  * <pre>
  * package com.example;
- * 
+ *
  * // ...
  * public class MyTemplateEngineCustomizer implements TemplateEngineCustomizer {
  *   public void customize(TemplateEngine defaultTemplateEngine) {
@@ -41,7 +41,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  *
  * <br>
  * e.g.) Configuration file (mybatis-thymeleaf.properties):
- * 
+ *
  * <pre>
  * customizer = com.example.MyTemplateEngineCustomizer
  * </pre>
@@ -54,7 +54,7 @@ public interface TemplateEngineCustomizer extends Consumer<TemplateEngine> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see #customize(TemplateEngine)
    */
   @Override
