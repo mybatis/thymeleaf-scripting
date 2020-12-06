@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 #    Copyright 2018-2020 the original author or authors.
 #
@@ -15,14 +14,26 @@
 #    limitations under the License.
 #
 
+name: Java CI
 
-targetMinorVersion=$1
-majorVersion=${targetMinorVersion%.*}
-minorVersion=${targetMinorVersion#*.}
-while read -r line; do
-  maintenanceVersion=${line#*<a*>${targetMinorVersion}.} && maintenanceVersion=${maintenanceVersion%%-*}
-  maintenanceVersions="${maintenanceVersions}${maintenanceVersion}"$'\n'
-done<<END
-  $(curl -s "https://oss.sonatype.org/content/repositories/snapshots/org/mybatis/mybatis/" | grep "SNAPSHOT" | grep -E ">${majorVersion}\.${minorVersion}\.[0-9]*")
-END
-echo "${targetMinorVersion}.$(echo "${maintenanceVersions}" | sort -n | tail -n 1)-SNAPSHOT"
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [8, 11, 15, 16-ea]
+      fail-fast: false
+      max-parallel: 4
+    name: Test JDK ${{ matrix.java }}, ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Test with Maven
+        run: ./mvnw test -B -D"license.skip=true"
