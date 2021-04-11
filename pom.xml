@@ -77,9 +77,6 @@
     <!-- Dependencies plugin settings -->
     <module.name>org.mybatis.scripting.thymeleaf</module.name>
     <clirr.comparisonVersion>1.0.0</clirr.comparisonVersion>
-
-    <!-- Remove after parent 32 (support for jdk 13) -->
-    <jacoco.version>0.8.5</jacoco.version>
   </properties>
 
   <dependencies>
