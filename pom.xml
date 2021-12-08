@@ -69,7 +69,7 @@
   <properties>
     <!-- Dependencies artifact version -->
     <mybatis.version>3.5.7</mybatis.version>
-    <thymeleaf.version>3.0.13.RELEASE</thymeleaf.version>
+    <thymeleaf.version>3.0.14.RELEASE</thymeleaf.version>
 
     <!-- Dependencies plugin version -->
     <asciidoctor-maven-plugin.version>2.2.1</asciidoctor-maven-plugin.version>
