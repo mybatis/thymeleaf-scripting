@@ -1,6 +1,6 @@
 # MyBatis Thymeleaf 3 Support
 
-[![Build Status](https://travis-ci.org/mybatis/thymeleaf-scripting.svg?branch=master)](https://travis-ci.org/mybatis/thymeleaf-scripting)
+[![Java CI](https://github.com/mybatis/thymeleaf-scripting/actions/workflows/ci.yaml/badge.svg)](https://github.com/mybatis/thymeleaf-scripting/actions/workflows/ci.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/mybatis/thymeleaf-scripting/badge.svg?branch=master)](https://coveralls.io/github/mybatis/thymeleaf-scripting?branch=master)
 [![Maven central](https://maven-badges.herokuapp.com/maven-central/org.mybatis.scripting/mybatis-thymeleaf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.mybatis.scripting/mybatis-thymeleaf)
 [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.mybatis.scripting/mybatis-thymeleaf.svg)](https://oss.sonatype.org/content/repositories/snapshots/org/mybatis/scripting/mybatis-thymeleaf/)
