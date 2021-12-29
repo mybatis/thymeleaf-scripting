@@ -1307,6 +1307,60 @@ the mybatis-thymeleaf provide the expression utility method for adding the `ESCA
 For detail, please see <<escapeClause>>.
 ====
 
+=== Using #likes.escapeClause()
+
+You should use the `#likes.escapeClause()` when specify escape character for LIKE phrase,
+but you notice there is possible that will be removed characters after `/\*[(${#likes.escapeClause()})]*/` (link:https://github.com/mybatis/thymeleaf-scripting/issues/66[see gh-66]]).
+
+[source,sql]
+.Invalid usage
+----
+SELECT * FROM area WHERE NAME LIKE 'Tara%' /*[(${#likes.escapeClause()})]*/ ORDER BY ID --<1>
+----
+
+<1> Specify any sql phrase after `/\*[(${#likes.escapeClause()})]*/` without line break
+
+The above sql template will translate to follow(removed `ORDER BY ID`):
+
+[source,sql]
+.Translated SQL
+----
+SELECT * FROM area WHERE NAME LIKE 'Tara%' escape '\'
+----
+
+==== Workarounds
+
+This behavior can be avoided to apply following workarounds.
+
+===== Adding line break character
+
+Add line break character after `/\*[(${#likes.escapeClause()})]*/`.
+
+[source,sql]
+.Valid usage
+----
+SELECT * FROM area
+WHERE NAME LIKE 'Tara%' /*[(${#likes.escapeClause()})]*/
+ORDER BY ID
+----
+
+===== Adding /**/
+
+Add `/\**/` after `/*[(${#likes.escapeClause()})]*/`.
+
+[source,sql]
+.Valid usage
+----
+SELECT * FROM area WHERE NAME LIKE 'Tara%' /*[(${#likes.escapeClause()})]*//**/ ORDER BY ID
+----
+
+The above sql template will translate to follow:
+
+[source,sql]
+.Translated SQL
+----
+SELECT * FROM area WHERE NAME LIKE 'Tara%' ESCAPE '\'/**/ ORDER BY ID
+----
 
 == Appendix
 
