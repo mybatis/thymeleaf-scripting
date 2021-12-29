@@ -18,7 +18,7 @@
 
 // Define variable for urls
 :mybatis-doc-url: http://www.mybatis.org/mybatis-3
-:travis-ci-url: https://travis-ci.org/mybatis/thymeleaf-scripting
+:ci-url: https://github.com/mybatis/thymeleaf-scripting/actions/workflows/ci.yaml
 :thymeleaf-doc-url: https://www.thymeleaf.org/doc/tutorials/3.0
 :github-organization-url: https://github.com/mybatis
 :github-url: {github-organization-url}/thymeleaf-scripting
@@ -113,7 +113,7 @@ The mybatis-thymeleaf supports using on following Java and artifacts version.
 
 [NOTE]
 ====
-About tested versions see the latest link:{travis-ci-url}[Travis CI^] build result.
+About tested versions see the latest link:{ci-url}[CI^] build result.
 ====
 
 === MyBatis
