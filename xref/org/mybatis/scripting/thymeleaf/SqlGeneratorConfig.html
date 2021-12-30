@@ -6,21 +6,21 @@
 </head>
 <body>
 <div id="overview"><a href="../../../../../apidocs/org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html">View Javadoc</a></div><pre>
-<a class="jxr_linenumber" name="L1" href="#L1">1</a>   <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L2" href="#L2">2</a>   <em class="jxr_javadoccomment"> *    Copyright 2018-2019 the original author or authors.</em>
-<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <em class="jxr_javadoccomment"> *</em>
-<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_javadoccomment"> *    Licensed under the Apache License, Version 2.0 (the "License");</em>
-<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_javadoccomment"> *    you may not use this file except in compliance with the License.</em>
-<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_javadoccomment"> *    You may obtain a copy of the License at</em>
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_javadoccomment"> *</em>
-<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_javadoccomment"> *       <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
-<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_javadoccomment"> *</em>
-<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_javadoccomment"> *    Unless required by applicable law or agreed to in writing, software</em>
-<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_javadoccomment"> *    distributed under the License is distributed on an "AS IS" BASIS,</em>
-<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_javadoccomment"> *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
-<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_javadoccomment"> *    See the License for the specific language governing permissions and</em>
-<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <em class="jxr_javadoccomment"> *    limitations under the License.</em>
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_javadoccomment"> */</em>
+<a class="jxr_linenumber" name="L1" href="#L1">1</a>   <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="L2" href="#L2">2</a>   <em class="jxr_comment"> *    Copyright 2018-2021 the original author or authors.</em>
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> *    Licensed under the Apache License, Version 2.0 (the "License");</em>
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment"> *    you may not use this file except in compliance with the License.</em>
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> *    You may obtain a copy of the License at</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> *       <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> *    Unless required by applicable law or agreed to in writing, software</em>
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> *    distributed under the License is distributed on an "AS IS" BASIS,</em>
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_comment"> *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_comment"> *    See the License for the specific language governing permissions and</em>
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <em class="jxr_comment"> *    limitations under the License.</em>
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_comment"> */</em>
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">package</strong> org.mybatis.scripting.thymeleaf;
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> java.io.BufferedReader;
@@ -102,7 +102,7 @@
 <a class="jxr_linenumber" name="L94" href="#L94">94</a>  <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
 <a class="jxr_linenumber" name="L95" href="#L95">95</a>  <em class="jxr_javadoccomment">   * Default is {@code true}.</em>
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>  <em class="jxr_javadoccomment">   * &lt;/p&gt;</em>
-<a class="jxr_linenumber" name="L97" href="#L97">97</a>  <em class="jxr_javadoccomment">   * </em>
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>  <em class="jxr_javadoccomment">   *</em>
 <a class="jxr_linenumber" name="L98" href="#L98">98</a>  <em class="jxr_javadoccomment">   * @return If use the 2-way SQL feature, return {@code true}</em>
 <a class="jxr_linenumber" name="L99" href="#L99">99</a>  <em class="jxr_javadoccomment">   */</em>
 <a class="jxr_linenumber" name="L100" href="#L100">100</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isUse2way() {
@@ -124,7 +124,7 @@
 <a class="jxr_linenumber" name="L116" href="#L116">116</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
 <a class="jxr_linenumber" name="L117" href="#L117">117</a> <em class="jxr_javadoccomment">   * Default is {@code null}.</em>
 <a class="jxr_linenumber" name="L118" href="#L118">118</a> <em class="jxr_javadoccomment">   * &lt;/p&gt;</em>
-<a class="jxr_linenumber" name="L119" href="#L119">119</a> <em class="jxr_javadoccomment">   * </em>
+<a class="jxr_linenumber" name="L119" href="#L119">119</a> <em class="jxr_javadoccomment">   *</em>
 <a class="jxr_linenumber" name="L120" href="#L120">120</a> <em class="jxr_javadoccomment">   * @return the interface for customizing a default TemplateEngine</em>
 <a class="jxr_linenumber" name="L121" href="#L121">121</a> <em class="jxr_javadoccomment">   */</em>
 <a class="jxr_linenumber" name="L122" href="#L122">122</a>   <strong class="jxr_keyword">public</strong> Class&lt;? <strong class="jxr_keyword">extends</strong> TemplateEngineCustomizer&gt; getCustomizer() {
@@ -342,7 +342,7 @@
 <a class="jxr_linenumber" name="L334" href="#L334">334</a> <em class="jxr_javadoccomment">     * &lt;p&gt;</em>
 <a class="jxr_linenumber" name="L335" href="#L335">335</a> <em class="jxr_javadoccomment">     * Default is {@code "mb"}.</em>
 <a class="jxr_linenumber" name="L336" href="#L336">336</a> <em class="jxr_javadoccomment">     * &lt;/p&gt;</em>
-<a class="jxr_linenumber" name="L337" href="#L337">337</a> <em class="jxr_javadoccomment">     * </em>
+<a class="jxr_linenumber" name="L337" href="#L337">337</a> <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L338" href="#L338">338</a> <em class="jxr_javadoccomment">     * @return the prefix name of dialect</em>
 <a class="jxr_linenumber" name="L339" href="#L339">339</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L340" href="#L340">340</a>     <strong class="jxr_keyword">public</strong> String getPrefix() {
@@ -364,7 +364,7 @@
 <a class="jxr_linenumber" name="L356" href="#L356">356</a> <em class="jxr_javadoccomment">     * &lt;p&gt;</em>
 <a class="jxr_linenumber" name="L357" href="#L357">357</a> <em class="jxr_javadoccomment">     * Default is {@code '\'}.</em>
 <a class="jxr_linenumber" name="L358" href="#L358">358</a> <em class="jxr_javadoccomment">     * &lt;/p&gt;</em>
-<a class="jxr_linenumber" name="L359" href="#L359">359</a> <em class="jxr_javadoccomment">     * </em>
+<a class="jxr_linenumber" name="L359" href="#L359">359</a> <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L360" href="#L360">360</a> <em class="jxr_javadoccomment">     * @return the escape character for wildcard</em>
 <a class="jxr_linenumber" name="L361" href="#L361">361</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L362" href="#L362">362</a>     <strong class="jxr_keyword">public</strong> Character getLikeEscapeChar() {
@@ -386,7 +386,7 @@
 <a class="jxr_linenumber" name="L378" href="#L378">378</a> <em class="jxr_javadoccomment">     * &lt;p&gt;</em>
 <a class="jxr_linenumber" name="L379" href="#L379">379</a> <em class="jxr_javadoccomment">     * Can specify format that can be allowed by String#format method. Default is {@code "ESCAPE '%s'"}.</em>
 <a class="jxr_linenumber" name="L380" href="#L380">380</a> <em class="jxr_javadoccomment">     * &lt;/p&gt;</em>
-<a class="jxr_linenumber" name="L381" href="#L381">381</a> <em class="jxr_javadoccomment">     * </em>
+<a class="jxr_linenumber" name="L381" href="#L381">381</a> <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L382" href="#L382">382</a> <em class="jxr_javadoccomment">     * @return the format of escape clause for LIKE condition</em>
 <a class="jxr_linenumber" name="L383" href="#L383">383</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L384" href="#L384">384</a>     <strong class="jxr_keyword">public</strong> String getLikeEscapeClauseFormat() {
@@ -408,7 +408,7 @@
 <a class="jxr_linenumber" name="L400" href="#L400">400</a> <em class="jxr_javadoccomment">     * &lt;p&gt;</em>
 <a class="jxr_linenumber" name="L401" href="#L401">401</a> <em class="jxr_javadoccomment">     * Can specify multiple characters using comma(",") as separator character. Default is empty(none).</em>
 <a class="jxr_linenumber" name="L402" href="#L402">402</a> <em class="jxr_javadoccomment">     * &lt;/p&gt;</em>
-<a class="jxr_linenumber" name="L403" href="#L403">403</a> <em class="jxr_javadoccomment">     * </em>
+<a class="jxr_linenumber" name="L403" href="#L403">403</a> <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L404" href="#L404">404</a> <em class="jxr_javadoccomment">     * @return additional escape target characters(custom wildcard characters)</em>
 <a class="jxr_linenumber" name="L405" href="#L405">405</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L406" href="#L406">406</a>     <strong class="jxr_keyword">public</strong> Character[] getLikeAdditionalEscapeTargetChars() {
@@ -430,7 +430,7 @@
 <a class="jxr_linenumber" name="L422" href="#L422">422</a> <em class="jxr_javadoccomment">     * &lt;p&gt;</em>
 <a class="jxr_linenumber" name="L423" href="#L423">423</a> <em class="jxr_javadoccomment">     * Default is {@link BindVariableRender.BuiltIn#MYBATIS}</em>
 <a class="jxr_linenumber" name="L424" href="#L424">424</a> <em class="jxr_javadoccomment">     * &lt;/p&gt;</em>
-<a class="jxr_linenumber" name="L425" href="#L425">425</a> <em class="jxr_javadoccomment">     * </em>
+<a class="jxr_linenumber" name="L425" href="#L425">425</a> <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L426" href="#L426">426</a> <em class="jxr_javadoccomment">     * @return a bind variable render</em>
 <a class="jxr_linenumber" name="L427" href="#L427">427</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L428" href="#L428">428</a>     <strong class="jxr_keyword">public</strong> Class&lt;? <strong class="jxr_keyword">extends</strong> BindVariableRender&gt; getBindVariableRender() {
@@ -526,7 +526,7 @@
 <a class="jxr_linenumber" name="L518" href="#L518">518</a> <em class="jxr_javadoccomment">   * @return a configuration instance</em>
 <a class="jxr_linenumber" name="L519" href="#L519">519</a> <em class="jxr_javadoccomment">   */</em>
 <a class="jxr_linenumber" name="L520" href="#L520">520</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> newInstance() {
-<a class="jxr_linenumber" name="L521" href="#L521">521</a>     <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/<a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>atorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> config = <strong class="jxr_keyword">new</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>();
+<a class="jxr_linenumber" name="L521" href="#L521">521</a>     <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> config = <strong class="jxr_keyword">new</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>();
 <a class="jxr_linenumber" name="L522" href="#L522">522</a>     applyDefaultProperties(config);
 <a class="jxr_linenumber" name="L523" href="#L523">523</a>     <strong class="jxr_keyword">return</strong> config;
 <a class="jxr_linenumber" name="L524" href="#L524">524</a>   }
@@ -542,7 +542,7 @@
 <a class="jxr_linenumber" name="L534" href="#L534">534</a> <em class="jxr_javadoccomment">   * @see #newInstance()</em>
 <a class="jxr_linenumber" name="L535" href="#L535">535</a> <em class="jxr_javadoccomment">   */</em>
 <a class="jxr_linenumber" name="L536" href="#L536">536</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> newInstanceWithResourcePath(String resourcePath) {
-<a class="jxr_linenumber" name="L537" href="#L537">537</a>     <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/<a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>atorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> config = <strong class="jxr_keyword">new</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>();
+<a class="jxr_linenumber" name="L537" href="#L537">537</a>     <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> config = <strong class="jxr_keyword">new</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>();
 <a class="jxr_linenumber" name="L538" href="#L538">538</a>     applyResourcePath(config, resourcePath);
 <a class="jxr_linenumber" name="L539" href="#L539">539</a>     <strong class="jxr_keyword">return</strong> config;
 <a class="jxr_linenumber" name="L540" href="#L540">540</a>   }
@@ -556,7 +556,7 @@
 <a class="jxr_linenumber" name="L548" href="#L548">548</a> <em class="jxr_javadoccomment">   * @see #newInstance()</em>
 <a class="jxr_linenumber" name="L549" href="#L549">549</a> <em class="jxr_javadoccomment">   */</em>
 <a class="jxr_linenumber" name="L550" href="#L550">550</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> newInstanceWithProperties(Properties customProperties) {
-<a class="jxr_linenumber" name="L551" href="#L551">551</a>     <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/<a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>atorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> config = <strong class="jxr_keyword">new</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>();
+<a class="jxr_linenumber" name="L551" href="#L551">551</a>     <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> config = <strong class="jxr_keyword">new</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>();
 <a class="jxr_linenumber" name="L552" href="#L552">552</a>     applyProperties(config, customProperties);
 <a class="jxr_linenumber" name="L553" href="#L553">553</a>     <strong class="jxr_keyword">return</strong> config;
 <a class="jxr_linenumber" name="L554" href="#L554">554</a>   }
@@ -570,7 +570,7 @@
 <a class="jxr_linenumber" name="L562" href="#L562">562</a> <em class="jxr_javadoccomment">   * @see #newInstance()</em>
 <a class="jxr_linenumber" name="L563" href="#L563">563</a> <em class="jxr_javadoccomment">   */</em>
 <a class="jxr_linenumber" name="L564" href="#L564">564</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> newInstanceWithCustomizer(Consumer&lt;SqlGeneratorConfig&gt; customizer) {
-<a class="jxr_linenumber" name="L565" href="#L565">565</a>     <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/<a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>atorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> config = <strong class="jxr_keyword">new</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>();
+<a class="jxr_linenumber" name="L565" href="#L565">565</a>     <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a> config = <strong class="jxr_keyword">new</strong> <a name="SqlGeneratorConfig" href="../../../../org/mybatis/scripting/thymeleaf/SqlGeneratorConfig.html#SqlGeneratorConfig">SqlGeneratorConfig</a>();
 <a class="jxr_linenumber" name="L566" href="#L566">566</a>     customizer.accept(config);
 <a class="jxr_linenumber" name="L567" href="#L567">567</a>     applyDefaultProperties(config);
 <a class="jxr_linenumber" name="L568" href="#L568">568</a>     <strong class="jxr_keyword">return</strong> config;
@@ -692,6 +692,6 @@
 <a class="jxr_linenumber" name="L684" href="#L684">684</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2018&#x2013;2020 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2018&#x2013;2021 <a href="https://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</div>
 </body>
 </html>

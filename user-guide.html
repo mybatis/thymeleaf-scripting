@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.8">
+<meta name="generator" content="Asciidoctor 2.0.15">
 <meta name="author" content="The MyBatis Team">
 <title>MyBatis Thymeleaf User&#8217;s Guide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
@@ -40,8 +40,8 @@
 <h1>MyBatis Thymeleaf User&#8217;s Guide</h1>
 <div class="details">
 <span id="author" class="author">The MyBatis Team</span><br>
-<span id="revnumber">version 1.0.2,</span>
-<span id="revdate">2020-06-05</span>
+<span id="revnumber">version 1.0.3,</span>
+<span id="revdate">2021-12-30</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -110,6 +110,7 @@
 <li><a href="#_cautions_for_usage">10. Cautions for usage</a>
 <ul class="sectlevel2">
 <li><a href="#_using_backslash">10.1. Using '\'(backslash)</a></li>
+<li><a href="#_using_likes_escapeclause">10.2. Using #likes.escapeClause()</a></li>
 </ul>
 </li>
 <li><a href="#_appendix">11. Appendix</a>
@@ -266,7 +267,7 @@ for integrating with template engine provide by Thymeleaf.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>About tested versions see the latest <a href="https://travis-ci.org/mybatis/thymeleaf-scripting" target="_blank" rel="noopener">Travis CI</a> build result.</p>
+<p>About tested versions see the latest <a href="https://github.com/mybatis/thymeleaf-scripting/actions/workflows/ci.yaml" target="_blank" rel="noopener">CI</a> build result.</p>
 </div>
 </td>
 </tr>
@@ -363,12 +364,12 @@ for integrating with template engine provide by Thymeleaf.</p>
   <span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.mybatis<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>mybatis<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>3.5.5<span class="tag">&lt;/version&gt;</span> <span class="comment">&lt;!-- Adjust to your application --&gt;</span>
+    <span class="tag">&lt;version&gt;</span>3.5.9<span class="tag">&lt;/version&gt;</span> <span class="comment">&lt;!-- Adjust to your application --&gt;</span>
   <span class="tag">&lt;/dependency&gt;</span>
   <span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.mybatis.scripting<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>mybatis-thymeleaf<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>1.0.2<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;version&gt;</span>1.0.3<span class="tag">&lt;/version&gt;</span>
   <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;/dependencies&gt;</span></code></pre>
 </div>
@@ -399,8 +400,8 @@ for using the "Sonatype OSS Snapshots Repository" as follow:</p>
 <div class="title">build.gradle (dependencies)</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis:mybatis:3.5.5</span><span class="delimiter">&quot;</span></span>) <span class="comment">// Adjust version to your application</span>
-  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting:mybatis-thymeleaf:1.0.2</span><span class="delimiter">&quot;</span></span>)
+  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis:mybatis:3.5.9</span><span class="delimiter">&quot;</span></span>) <span class="comment">// Adjust version to your application</span>
+  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting:mybatis-thymeleaf:1.0.3</span><span class="delimiter">&quot;</span></span>)
 }</code></pre>
 </div>
 </div>
@@ -1886,6 +1887,45 @@ This class use with SQL provider annotation(<code>@InsertProvider</code>, <code>
 }</code></pre>
 </div>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Since the MyBatis 3.5.6, you can omit the <code>type</code> attribute at each annotations
+when specify the default provider class as global configuration as follow:</p>
+</div>
+<div class="listingblock">
+<div class="title">Mapper interface</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">interface</span> <span class="class">NameMapper</span> <span class="directive">extends</span> BaseMapper {
+  <span class="annotation">@SelectProvider</span>
+  <span class="predefined-type">List</span>&lt;<span class="predefined-type">Name</span>&gt; findByCondition(NameCondition condition);
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Java based configuration</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">Configuration</span> configuration = <span class="keyword">new</span> <span class="predefined-type">Configuration</span>();
+configuration.setDefaultSqlProviderType(TemplateFilePathProvider.class);</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">XML based configuration</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;settings&gt;</span>
+  <span class="tag">&lt;setting</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">defaultSqlProviderType</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">value</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+<span class="tag">&lt;/settings&gt;</span></code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>By default implementation, a template file path resolve following format and priority order.
 If does not match all, it throw an exception that indicate not found a template file.</p>
@@ -1971,7 +2011,8 @@ We know that following case cannot be parsed 2-way SQL. If you are not using 2-w
 <div class="title">Invalid usage</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="sql"><span class="comment">/*[# mb:bind=&quot;patternFirstName=|${#likes.escapeWildcard(firstName)}%|&quot; /]*/</span>
-<span class="keyword">AND</span> firstName <span class="keyword">LIKE</span> <span class="comment">/*[('#{patternFirstName}')]*/</span> <span class="string"><span class="delimiter">'</span><span class="content">Taro%</span><span class="delimiter">'</span></span> <span class="comment">/**/</span> ESCAPE <span class="string"><span class="delimiter">'</span><span class="char">\'</span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<span class="keyword">AND</span> firstName <span class="keyword">LIKE</span> <span class="comment">/*[('#{patternFirstName}')]*/</span> <span class="string"><span class="delimiter">'</span><span class="content">Taro%</span><span class="delimiter">'</span></span> <span class="comment">/**/</span> ESCAPE <span class="string"><span class="delimiter">'</span><span class="char">\'</span><span class="content"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span></span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1997,6 +2038,77 @@ For detail, please see <a href="#mybatis-likeEscapeClause">Section 7.2.1.2, &#82
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_using_likes_escapeclause"><a class="link" href="#_using_likes_escapeclause">10.2. Using #likes.escapeClause()</a></h3>
+<div class="paragraph">
+<p>You should use the <code>#likes.escapeClause()</code> when specify escape character for LIKE phrase,
+but you notice there is possible that will be removed characters after <code>/*[(${#likes.escapeClause()})]*/</code> (<a href="https://github.com/mybatis/thymeleaf-scripting/issues/66">see gh-66</a>]).</p>
+</div>
+<div class="listingblock">
+<div class="title">Invalid usage</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> area <span class="keyword">WHERE</span> NAME <span class="keyword">LIKE</span> <span class="string"><span class="delimiter">'</span><span class="content">Tara%</span><span class="delimiter">'</span></span> <span class="comment">/*[(${#likes.escapeClause()})]*/</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> ID <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Specify any sql phrase after <code>/*[(${#likes.escapeClause()})]*/</code> without line break</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The above sql template will translate to follow(removed <code>ORDER BY ID</code>):</p>
+</div>
+<div class="listingblock">
+<div class="title">Translated SQL</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> area <span class="keyword">WHERE</span> NAME <span class="keyword">LIKE</span> <span class="string"><span class="delimiter">'</span><span class="content">Tara%</span><span class="delimiter">'</span></span> escape <span class="string"><span class="delimiter">'</span><span class="char">\'</span></span></code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_workarounds"><a class="link" href="#_workarounds">10.2.1. Workarounds</a></h4>
+<div class="paragraph">
+<p>This behavior can be avoided to apply following workarounds.</p>
+</div>
+<div class="sect4">
+<h5 id="_adding_line_break_character"><a class="link" href="#_adding_line_break_character">Adding line break character</a></h5>
+<div class="paragraph">
+<p>Add line break character after <code>/*[(${#likes.escapeClause()})]*/</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Valid usage</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> area
+<span class="keyword">WHERE</span> NAME <span class="keyword">LIKE</span> <span class="string"><span class="delimiter">'</span><span class="content">Tara%</span><span class="delimiter">'</span></span> <span class="comment">/*[(${#likes.escapeClause()})]*/</span>
+<span class="keyword">ORDER</span> <span class="keyword">BY</span> ID</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_adding"><a class="link" href="#_adding">Adding /**/</a></h5>
+<div class="paragraph">
+<p>Add <code>/**/</code> after <code>/*[(${#likes.escapeClause()})]*/</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Valid usage</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> area <span class="keyword">WHERE</span> NAME <span class="keyword">LIKE</span> <span class="string"><span class="delimiter">'</span><span class="content">Tara%</span><span class="delimiter">'</span></span> <span class="comment">/*[(${#likes.escapeClause()})]*/</span><span class="comment">/**/</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> ID</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above sql template will translate to follow:</p>
+</div>
+<div class="listingblock">
+<div class="title">Translated SQL</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">SELECT</span> * <span class="keyword">FROM</span> area <span class="keyword">WHERE</span> NAME <span class="keyword">LIKE</span> <span class="string"><span class="delimiter">'</span><span class="content">Tara%</span><span class="delimiter">'</span></span> ESCAPE <span class="string"><span class="delimiter">'</span><span class="char">\'</span><span class="content">/**/ ORDER BY ID</span></span></code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -2487,7 +2599,7 @@ fun findById(id: Int): Name</code></pre>
 -->
 <div>
     <div class="text-center">
-        <p>Copyright &copy;2018-2020 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</p>
+        <p>Copyright &copy;2018-2021 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</p>
     </div>
 </div>
 </body>
