@@ -72,7 +72,7 @@
     <thymeleaf.version>3.0.14.RELEASE</thymeleaf.version>
 
     <!-- Dependencies plugin version -->
-    <asciidoctor-maven-plugin.version>2.2.1</asciidoctor-maven-plugin.version>
+    <asciidoctor-maven-plugin.version>2.2.2</asciidoctor-maven-plugin.version>
 
     <!-- Dependencies plugin settings -->
     <module.name>org.mybatis.scripting.thymeleaf</module.name>
