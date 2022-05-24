@@ -68,7 +68,7 @@
 
   <properties>
     <!-- Dependencies artifact version -->
-    <mybatis.version>3.5.9</mybatis.version>
+    <mybatis.version>3.5.10</mybatis.version>
     <thymeleaf.version>3.0.15.RELEASE</thymeleaf.version>
 
     <!-- Dependencies plugin version -->
