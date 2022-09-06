@@ -1,11 +1,11 @@
 /*
- *    Copyright 2018-2021 the original author or authors.
+ *    Copyright 2018-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,6 +40,7 @@ import org.thymeleaf.util.StringUtils;
  * Configuration class for {@link SqlGenerator}.
  *
  * @author Kazuki Shimizu
+ *
  * @since 1.0.2
  */
 public class SqlGeneratorConfig {
@@ -530,7 +531,9 @@ public class SqlGeneratorConfig {
    *
    * @param resourcePath
    *          A property file resource path
+   *
    * @return a configuration instance
+   *
    * @see #newInstance()
    */
   public static SqlGeneratorConfig newInstanceWithResourcePath(String resourcePath) {
@@ -544,7 +547,9 @@ public class SqlGeneratorConfig {
    *
    * @param customProperties
    *          custom configuration properties
+   *
    * @return a configuration instance
+   *
    * @see #newInstance()
    */
   public static SqlGeneratorConfig newInstanceWithProperties(Properties customProperties) {
@@ -558,7 +563,9 @@ public class SqlGeneratorConfig {
    *
    * @param customizer
    *          baseline customizer
+   *
    * @return a configuration instance
+   *
    * @see #newInstance()
    */
   public static SqlGeneratorConfig newInstanceWithCustomizer(Consumer<SqlGeneratorConfig> customizer) {
@@ -613,6 +620,7 @@ public class SqlGeneratorConfig {
    *          a target type
    * @param <T>
    *          a target type
+   *
    * @return new instance of target type
    */
   static <T> T newInstanceForType(Class<T> type) {
