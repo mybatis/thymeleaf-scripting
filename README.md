@@ -58,7 +58,7 @@ SELECT * FROM names
 
 ## Documentation
 
-* [Published User's Guide](http://www.mybatis.org/thymeleaf-scripting/user-guide.html)
+* [Published User's Guide](https://www.mybatis.org/thymeleaf-scripting/user-guide.html)
 
 
 * [Snapshot User's Guide](src/main/asciidoc/user-guide.adoc)
