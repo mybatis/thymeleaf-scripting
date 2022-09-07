@@ -1,11 +1,11 @@
 /*
- *    Copyright 2018-2021 the original author or authors.
+ *    Copyright 2018-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,6 +45,7 @@ import org.mybatis.scripting.thymeleaf.support.spring.SpringNamedParameterBindVa
  * </pre>
  *
  * @author Kazuki Shimizu
+ *
  * @version 1.0.2
  */
 @FunctionalInterface
@@ -65,6 +66,7 @@ public interface BindVariableRender extends UnaryOperator<String> {
    *
    * @param name
    *          a bind variable name
+   *
    * @return a bind variable
    */
   String render(String name);

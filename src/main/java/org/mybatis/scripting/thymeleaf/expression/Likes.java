@@ -1,11 +1,11 @@
 /*
- *    Copyright 2018-2021 the original author or authors.
+ *    Copyright 2018-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
  * This object can be access using {@code #likes}) as expression utility object.
  *
  * @author Kazuki Shimizu
+ *
  * @version 1.0.0
  */
 public class Likes {
@@ -50,6 +51,7 @@ public class Likes {
    *
    * @param value
    *          A target condition value
+   *
    * @return A escaped value
    */
   public String escapeWildcard(String value) {
@@ -102,6 +104,7 @@ public class Likes {
      *
      * @param escapeChar
      *          A escape character
+     *
      * @return A self instance
      */
     public Builder escapeChar(Character escapeChar) {
@@ -115,6 +118,7 @@ public class Likes {
      *
      * @param additionalEscapeTargetChars
      *          escape target characters(custom wildcard characters)
+     *
      * @return A self instance
      */
     public Builder additionalEscapeTargetChars(Character... additionalEscapeTargetChars) {
@@ -129,6 +133,7 @@ public class Likes {
      *
      * @param escapeClauseFormat
      *          a format of escape clause
+     *
      * @return A self instance
      */
     public Builder escapeClauseFormat(String escapeClauseFormat) {

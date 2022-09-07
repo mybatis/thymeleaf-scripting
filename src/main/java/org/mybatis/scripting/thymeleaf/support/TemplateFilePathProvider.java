@@ -1,11 +1,11 @@
 /*
- *    Copyright 2018-2021 the original author or authors.
+ *    Copyright 2018-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -66,6 +66,7 @@ import org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriverConfig.TemplateFil
  * </pre>
  *
  * @author Kazuki Shimizu
+ *
  * @version 1.0.1
  */
 public class TemplateFilePathProvider {
@@ -112,9 +113,7 @@ public class TemplateFilePathProvider {
   }
 
   /**
-   * Provide an SQL scripting string(template file path).
-   *
-   * <br>
+   * Provide an SQL scripting string(template file path). <br>
    * By default implementation, a template file path resolve following format and priority order. If does not match all,
    * it throw an exception that indicate not found a template file.
    * <ul>
@@ -129,6 +128,7 @@ public class TemplateFilePathProvider {
    *
    * @param context
    *          a context of SQL provider
+   *
    * @return an SQL scripting string(template file path)
    */
   public static String provideSql(ProviderContext context) {
@@ -229,6 +229,7 @@ public class TemplateFilePathProvider {
      *          a mapper method that specified provider
      * @param databaseId
      *          a database id that provided from {@link org.apache.ibatis.mapping.DatabaseIdProvider}
+     *
      * @return a template file path
      */
     String generatePath(Class<?> type, Method method, String databaseId);

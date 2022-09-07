@@ -1,11 +1,11 @@
 /*
- *    Copyright 2018-2021 the original author or authors.
+ *    Copyright 2018-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,6 +37,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * register an iteration object to the bind variables.
  *
  * @author Kazuki Shimizu
+ *
  * @version 1.0.0
  */
 public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
@@ -68,6 +69,7 @@ public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
    *
    * @param bindVariableRender
    *          a custom bind variable render function
+   *
    * @since 1.0.2
    */
   public void setBindVariableRender(UnaryOperator<String> bindVariableRender) {
