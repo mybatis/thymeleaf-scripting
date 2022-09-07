@@ -6,7 +6,7 @@
 [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.mybatis.scripting/mybatis-thymeleaf.svg)](https://oss.sonatype.org/content/repositories/snapshots/org/mybatis/scripting/mybatis-thymeleaf/)
 [![License](https://img.shields.io/:license-apache-brightgreen.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-![thymeleaf-scripting](http://mybatis.github.io/images/mybatis-logo.png)
+![thymeleaf-scripting](https://mybatis.org/images/mybatis-logo.png)
 
 MyBatis Thymeleaf 3 Scripting Support.
 
