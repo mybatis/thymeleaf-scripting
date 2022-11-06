@@ -76,9 +76,9 @@ public class SqlGeneratorConfig {
   private boolean use2way = true;
 
   /**
-   * The interface for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
+   * The instance for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
    */
-  private Class<? extends TemplateEngineCustomizer> customizer;
+  private TemplateEngineCustomizer customizer;
 
   /**
    * Template file configuration.
@@ -117,11 +117,14 @@ public class SqlGeneratorConfig {
    * <p>
    * Default is {@code null}.
    * </p>
+   * This method exists for the backward compatibility.<br>
+   * Use {@link #getCustomizerInstance()} instead
    *
    * @return the interface for customizing a default TemplateEngine
    */
+  @Deprecated
   public Class<? extends TemplateEngineCustomizer> getCustomizer() {
-    return customizer;
+    return customizer == null ? null : customizer.getClass();
   }
 
   /**
@@ -130,7 +133,16 @@ public class SqlGeneratorConfig {
    * @param customizer
    *          the interface for customizing a default TemplateEngine
    */
+  @Deprecated
   public void setCustomizer(Class<? extends TemplateEngineCustomizer> customizer) {
+    this.customizer = newInstanceForType(customizer);
+  }
+
+  public TemplateEngineCustomizer getCustomizerInstance() {
+    return customizer;
+  }
+
+  public void setCustomizerInstance(TemplateEngineCustomizer customizer) {
     this.customizer = customizer;
   }
 
@@ -328,7 +340,7 @@ public class SqlGeneratorConfig {
     /**
      * The bind variable render.
      */
-    private Class<? extends BindVariableRender> bindVariableRender;
+    private BindVariableRender bindVariableRender;
 
     /**
      * Get the prefix name of dialect provided by this project.
@@ -423,17 +435,35 @@ public class SqlGeneratorConfig {
      * <p>
      * Default is {@link BindVariableRender.BuiltIn#MYBATIS}
      * </p>
+     * This method exists for the backward compatibility. <br>
+     * Use {@link #getBindVariableRenderInstance()} instead
      *
      * @return a bind variable render
      */
+    @Deprecated
     public Class<? extends BindVariableRender> getBindVariableRender() {
+      return bindVariableRender == null ? null : bindVariableRender.getClass();
+    }
+
+    /**
+     * This method exists for the backward compatibility.<br>
+     * Use {@link #setBindVariableRenderInstance(BindVariableRender)} instead
+     *
+     * @param bindVariableRender
+     *          bindVariableRender class
+     */
+    @Deprecated
+    public void setBindVariableRender(Class<? extends BindVariableRender> bindVariableRender) {
+      this.bindVariableRender = newInstanceForType(bindVariableRender);
+    }
+
+    public BindVariableRender getBindVariableRenderInstance() {
       return bindVariableRender;
     }
 
-    public void setBindVariableRender(Class<? extends BindVariableRender> bindVariableRender) {
+    public void setBindVariableRenderInstance(BindVariableRender bindVariableRender) {
       this.bindVariableRender = bindVariableRender;
     }
-
   }
 
   /**

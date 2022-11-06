@@ -1038,12 +1038,12 @@ dialect.bind-variable-render = org.mybatis.scripting.thymeleaf.support.spring.Sp
 .How to customize using config class
 ----
 SqlGeneratorConfig config = SqlGeneratorConfig.newInstanceWithCustomizer(c ->
-    c.getDialect().setBindVariableRender(
-        BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType())); // <1>
+    c.getDialect().setBindVariableRenderInstance(
+        BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER)); // <1>
 SqlGenerator sqlGenerator = new SqlGenerator(config); // <2>
 ----
 
-<1> Specify the `BindVariableRender` implementation class(built-in class) that render Spring JDBC bind variable format via `BuiltIn` enum
+<1> Specify the `BindVariableRender` implementation (built-in class) that renders Spring JDBC bind variable format via `BuiltIn` enum
 <2> Create a `SqlGenerator` instance with user defined configuration
 
 If you use the custom bind variable format other than built-in format,
@@ -1284,8 +1284,8 @@ dialect.bind-variable-render = org.mybatis.scripting.thymeleaf.support.spring.Sp
 .How to enable via configuration class (SqlGeneratorConfig)
 ----
 SqlGeneratorConfig config = SqlGeneratorConfig.newInstanceWithCustomizer(c ->
-    c.getDialect().setBindVariableRender(
-        BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType()));
+    c.getDialect().setBindVariableRenderInstance(
+        BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER));
 SqlGenerator sqlGenerator = new SqlGenerator(config);
 ----
 
@@ -1523,7 +1523,7 @@ These properties can be specified via factory method of `ThymeleafLanguageDriver
 configuration.getLanguageRegistry().register(
   new ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig.newInstance(c -> {
   c.setUse2way(false);
-  c.setCustomizer(CustomTemplateEngineCustomizer.class);
+  c.setCustomizerInstance(new CustomTemplateEngineCustomizer());
   c.getTemplateFile().setCacheEnabled(false);
   c.getTemplateFile().setCacheTtl(3600000L);
   c.getTemplateFile().setEncoding(StandardCharsets.UTF_8);
@@ -1538,8 +1538,8 @@ configuration.getLanguageRegistry().register(
   c.getDialect().setLikeEscapeChar('~');
   c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
   c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
-  c.getDialect().setBindVariableRender(
-      BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType());
+  c.getDialect().setBindVariableRenderInstance(
+      BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER);
 })));
 ----
 
@@ -1558,7 +1558,7 @@ These properties can be specified via factory method of `SqlGeneratorConfig` as 
 SqlGeneratorConfig config =
   SqlGeneratorConfig.newInstanceWithCustomizer(c -> {
   c.setUse2way(false);
-  c.setCustomizer(CustomTemplateEngineCustomizer.class);
+  c.setCustomizerInstance(new CustomTemplateEngineCustomizer());
   c.getTemplateFile().setCacheEnabled(false);
   c.getTemplateFile().setCacheTtl(3600000L);
   c.getTemplateFile().setEncoding(StandardCharsets.UTF_8);
@@ -1568,8 +1568,8 @@ SqlGeneratorConfig config =
   c.getDialect().setLikeEscapeChar('~');
   c.getDialect().setLikeEscapeClauseFormat("escape '%s'");
   c.getDialect().setLikeAdditionalEscapeTargetChars('％', '＿');
-  c.getDialect().setBindVariableRender(
-      BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType());
+  c.getDialect().setBindVariableRenderInstance(
+      BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER);
 });
 // ...
 ----

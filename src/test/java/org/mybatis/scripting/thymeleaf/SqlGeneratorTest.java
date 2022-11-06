@@ -65,7 +65,7 @@ class SqlGeneratorTest {
       }
     }
     config = SqlGeneratorConfig.newInstanceWithCustomizer(
-        c -> c.getDialect().setBindVariableRender(BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType()));
+        c -> c.getDialect().setBindVariableRenderInstance(BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER));
   }
 
   @Test
@@ -95,7 +95,7 @@ class SqlGeneratorTest {
   @Test
   void processWithConfig() {
     SqlGeneratorConfig config = SqlGeneratorConfig.newInstanceWithCustomizer(
-        c -> c.getDialect().setBindVariableRender(BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER.getType()));
+        c -> c.getDialect().setBindVariableRenderInstance(BindVariableRender.BuiltIn.SPRING_NAMED_PARAMETER));
     SqlGenerator sqlGenerator = new SqlGenerator(config);
     NamedParameterJdbcOperations jdbcOperations = new NamedParameterJdbcTemplate(dataSource);
 
