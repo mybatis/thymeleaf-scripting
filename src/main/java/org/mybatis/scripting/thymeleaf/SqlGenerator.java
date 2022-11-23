@@ -125,8 +125,7 @@ public class SqlGenerator {
 
   private ITemplateEngine createDefaultTemplateEngine(SqlGeneratorConfig config) {
     MyBatisDialect dialect = new MyBatisDialect(config.getDialect().getPrefix());
-    Optional.ofNullable(config.getDialect().getBindVariableRender()).map(SqlGeneratorConfig::newInstanceForType)
-        .ifPresent(dialect::setBindVariableRender);
+    Optional.ofNullable(config.getDialect().getBindVariableRenderInstance()).ifPresent(dialect::setBindVariableRender);
     Likes likes = Likes.newBuilder().escapeChar(config.getDialect().getLikeEscapeChar())
         .escapeClauseFormat(config.getDialect().getLikeEscapeClauseFormat())
         .additionalEscapeTargetChars(config.getDialect().getLikeAdditionalEscapeTargetChars()).build();
@@ -158,8 +157,7 @@ public class SqlGenerator {
         new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));
 
     // Create an TemplateEngineCustomizer instance and apply
-    Optional.ofNullable(config.getCustomizer()).map(SqlGeneratorConfig::newInstanceForType)
-        .ifPresent(x -> x.accept(targetTemplateEngine));
+    Optional.ofNullable(config.getCustomizerInstance()).ifPresent(x -> x.accept(targetTemplateEngine));
 
     return targetTemplateEngine;
   }

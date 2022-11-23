@@ -236,7 +236,7 @@ class ThymeleafLanguageDriverTest {
     System.setProperty("mybatis-thymeleaf.config.file", "mybatis-thymeleaf-empty.properties");
     ThymeleafLanguageDriverConfig thymeleafLanguageDriverConfig = ThymeleafLanguageDriverConfig.newInstance(c -> {
       c.setUse2way(false);
-      c.setCustomizer(CustomTemplateEngineCustomizer.class);
+      c.setCustomizerInstance(new CustomTemplateEngineCustomizer());
       c.getTemplateFile().setCacheEnabled(false);
       c.getTemplateFile().setCacheTtl(30000L);
       c.getTemplateFile().setEncoding(StandardCharsets.ISO_8859_1);
@@ -406,7 +406,8 @@ class ThymeleafLanguageDriverTest {
       Assertions.assertEquals(
           "Failed to load language driver for org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver", e.getMessage());
       // Since mybatis 3.5.1, exception is wrapped by InvocationTargetException
-      Throwable cause = e.getCause() instanceof InvocationTargetException ? e.getCause().getCause() : e.getCause();
+      Throwable cause = e.getCause() instanceof InvocationTargetException
+          ? e.getCause().getCause().getCause().getCause() : e.getCause();
       Assertions.assertEquals(
           "Cannot create an instance for class: class org.mybatis.scripting.thymeleaf.NoDefaultConstructorTemplateEngineCustomizer",
           cause.getMessage());
