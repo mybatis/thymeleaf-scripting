@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ThymeleafLanguageDriver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf</a> &gt; <span class="el_source">ThymeleafLanguageDriver.java</span></div><h1>ThymeleafLanguageDriver.java</h1><pre class="source lang-java linenums">/**
- *    Copyright 2018-2019 the original author or authors.
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ThymeleafLanguageDriver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf</a> &gt; <span class="el_source">ThymeleafLanguageDriver.java</span></div><h1>ThymeleafLanguageDriver.java</h1><pre class="source lang-java linenums">/*
+ *    Copyright 2018-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
@@ -15,11 +15,6 @@
  */
 package org.mybatis.scripting.thymeleaf;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -28,29 +23,26 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
-import org.mybatis.scripting.thymeleaf.expression.Likes;
+import org.mybatis.scripting.thymeleaf.support.TemplateFilePathProvider;
 import org.thymeleaf.ITemplateEngine;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 /**
  * The {@code LanguageDriver} for integrating with Thymeleaf.
  *
  * @author Kazuki Shimizu
+ *
  * @version 1.0.0
  */
 public class ThymeleafLanguageDriver implements LanguageDriver {
 
-  private final ITemplateEngine templateEngine;
+  private final SqlGenerator sqlGenerator;
 
   /**
    * Constructor for creating instance with default {@code TemplateEngine}.
    */
-<span class="fc" id="L51">  public ThymeleafLanguageDriver() {</span>
-<span class="fc" id="L52">    this.templateEngine = createDefaultTemplateEngine(ThymeleafLanguageDriverConfig.newInstance());</span>
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L43">  public ThymeleafLanguageDriver() {</span>
+<span class="fc" id="L44">    this.sqlGenerator = configure(new SqlGenerator(ThymeleafLanguageDriverConfig.newInstance()));</span>
+<span class="fc" id="L45">  }</span>
 
   /**
    * Constructor for creating instance with user specified {@code Properties}.
@@ -58,9 +50,10 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    * @param config
    *          A user defined {@code ITemplateEngine} instance
    */
-<span class="fc" id="L61">  public ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig config) {</span>
-<span class="fc" id="L62">    this.templateEngine = createDefaultTemplateEngine(config);</span>
-<span class="fc" id="L63">  }</span>
+<span class="fc" id="L53">  public ThymeleafLanguageDriver(ThymeleafLanguageDriverConfig config) {</span>
+<span class="fc" id="L54">    this.sqlGenerator = configure(new SqlGenerator(config));</span>
+<span class="fc" id="L55">    TemplateFilePathProvider.setLanguageDriverConfig(config);</span>
+<span class="fc" id="L56">  }</span>
 
   /**
    * Constructor for creating instance with user defined {@code ITemplateEngine}.
@@ -68,53 +61,13 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    * @param templateEngine
    *          A user defined {@code ITemplateEngine} instance
    */
-<span class="fc" id="L71">  public ThymeleafLanguageDriver(ITemplateEngine templateEngine) {</span>
-<span class="fc" id="L72">    this.templateEngine = templateEngine;</span>
-<span class="fc" id="L73">  }</span>
+<span class="fc" id="L64">  public ThymeleafLanguageDriver(ITemplateEngine templateEngine) {</span>
+<span class="fc" id="L65">    this.sqlGenerator = configure(new SqlGenerator(templateEngine));</span>
+<span class="fc" id="L66">  }</span>
 
-  private ITemplateEngine createDefaultTemplateEngine(ThymeleafLanguageDriverConfig config) {
-<span class="fc" id="L76">    MyBatisDialect dialect = new MyBatisDialect(config.getDialect().getPrefix());</span>
-<span class="fc" id="L77">    Likes likes = Likes.newBuilder().escapeChar(config.getDialect().getLikeEscapeChar())</span>
-<span class="fc" id="L78">        .escapeClauseFormat(config.getDialect().getLikeEscapeClauseFormat())</span>
-<span class="fc" id="L79">        .additionalEscapeTargetChars(config.getDialect().getLikeAdditionalEscapeTargetChars()).build();</span>
-<span class="fc" id="L80">    dialect.setLikes(likes);</span>
-
-    // Create an ClassLoaderTemplateResolver instance
-<span class="fc" id="L83">    ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();</span>
-<span class="fc bfc" id="L84" title="All 2 branches covered.">    TemplateMode mode = config.isUse2way() ? TemplateMode.CSS : TemplateMode.TEXT;</span>
-<span class="fc" id="L85">    classLoaderTemplateResolver.setOrder(1);</span>
-<span class="fc" id="L86">    classLoaderTemplateResolver.setTemplateMode(mode);</span>
-<span class="fc" id="L87">    classLoaderTemplateResolver</span>
-<span class="fc" id="L88">        .setResolvablePatterns(Arrays.stream(config.getTemplateFile().getPatterns()).collect(Collectors.toSet()));</span>
-<span class="fc" id="L89">    classLoaderTemplateResolver.setCharacterEncoding(config.getTemplateFile().getEncoding().name());</span>
-<span class="fc" id="L90">    classLoaderTemplateResolver.setCacheable(config.getTemplateFile().isCacheEnabled());</span>
-<span class="fc" id="L91">    classLoaderTemplateResolver.setCacheTTLMs(config.getTemplateFile().getCacheTtl());</span>
-<span class="fc" id="L92">    classLoaderTemplateResolver.setPrefix(config.getTemplateFile().getBaseDir());</span>
-
-    // Create an StringTemplateResolver instance
-<span class="fc" id="L95">    StringTemplateResolver stringTemplateResolver = new StringTemplateResolver();</span>
-<span class="fc" id="L96">    stringTemplateResolver.setOrder(2);</span>
-<span class="fc" id="L97">    stringTemplateResolver.setTemplateMode(mode);</span>
-
-    // Create an TemplateEngine instance
-<span class="fc" id="L100">    TemplateEngine targetTemplateEngine = new TemplateEngine();</span>
-<span class="fc" id="L101">    targetTemplateEngine.addTemplateResolver(classLoaderTemplateResolver);</span>
-<span class="fc" id="L102">    targetTemplateEngine.addTemplateResolver(stringTemplateResolver);</span>
-<span class="fc" id="L103">    targetTemplateEngine.addDialect(dialect);</span>
-<span class="fc" id="L104">    targetTemplateEngine.setEngineContextFactory(</span>
-<span class="fc" id="L105">        new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));</span>
-
-    // Create an TemplateEngineCustomizer instance and apply
-<span class="fc" id="L108">    final TemplateEngineCustomizer customizer = Optional.ofNullable(config.getCustomizer()).map(v -&gt; {</span>
-      try {
-<span class="fc" id="L110">        return v.getConstructor().newInstance();</span>
-<span class="fc" id="L111">      } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {</span>
-<span class="fc" id="L112">        throw new IllegalStateException(&quot;Cannot create an instance for class: &quot; + v, e);</span>
-      }
-<span class="fc" id="L114">    }).map(TemplateEngineCustomizer.class::cast).orElse(TemplateEngineCustomizer.BuiltIn.DO_NOTHING);</span>
-<span class="fc" id="L115">    customizer.accept(targetTemplateEngine);</span>
-
-<span class="fc" id="L117">    return targetTemplateEngine;</span>
+  private SqlGenerator configure(SqlGenerator sqlGenerator) {
+<span class="fc" id="L69">    sqlGenerator.setContextFactory(new ThymeleafSqlSource.ContextFactory());</span>
+<span class="fc" id="L70">    return sqlGenerator;</span>
   }
 
   /**
@@ -123,7 +76,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
   @Override
   public ParameterHandler createParameterHandler(MappedStatement mappedStatement, Object parameterObject,
       BoundSql boundSql) {
-<span class="fc" id="L126">    return new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);</span>
+<span class="fc" id="L79">    return new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);</span>
   }
 
   /**
@@ -131,7 +84,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    */
   @Override
   public SqlSource createSqlSource(Configuration configuration, XNode script, Class&lt;?&gt; parameterType) {
-<span class="fc" id="L134">    return createSqlSource(configuration, script.getNode().getTextContent(), parameterType);</span>
+<span class="fc" id="L87">    return createSqlSource(configuration, script.getNode().getTextContent(), parameterType);</span>
   }
 
   /**
@@ -139,8 +92,8 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    */
   @Override
   public SqlSource createSqlSource(Configuration configuration, String script, Class&lt;?&gt; parameterType) {
-<span class="fc" id="L142">    return new ThymeleafSqlSource(configuration, templateEngine, script.trim(), parameterType);</span>
+<span class="fc" id="L95">    return new ThymeleafSqlSource(configuration, sqlGenerator, script.trim(), parameterType);</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

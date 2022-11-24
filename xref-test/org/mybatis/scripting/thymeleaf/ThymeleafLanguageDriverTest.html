@@ -7,13 +7,13 @@
 <body>
 <div id="overview"><a href="../../../../../testapidocs/org/mybatis/scripting/thymeleaf/ThymeleafLanguageDriverTest.html">View Javadoc</a></div><pre>
 <a class="jxr_linenumber" name="L1" href="#L1">1</a>   <em class="jxr_comment">/*</em>
-<a class="jxr_linenumber" name="L2" href="#L2">2</a>   <em class="jxr_comment"> *    Copyright 2018-2021 the original author or authors.</em>
+<a class="jxr_linenumber" name="L2" href="#L2">2</a>   <em class="jxr_comment"> *    Copyright 2018-2022 the original author or authors.</em>
 <a class="jxr_linenumber" name="L3" href="#L3">3</a>   <em class="jxr_comment"> *</em>
 <a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> *    Licensed under the Apache License, Version 2.0 (the "License");</em>
 <a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment"> *    you may not use this file except in compliance with the License.</em>
 <a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> *    You may obtain a copy of the License at</em>
 <a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> *</em>
-<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> *       <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> *       <a href="https://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">https://www.apache.org/licenses/LICENSE-2.0</a></em>
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> *</em>
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> *    Unless required by applicable law or agreed to in writing, software</em>
 <a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> *    distributed under the License is distributed on an "AS IS" BASIS,</em>
@@ -244,7 +244,7 @@
 <a class="jxr_linenumber" name="L236" href="#L236">236</a>     System.setProperty(<span class="jxr_string">"mybatis-thymeleaf.config.file"</span>, <span class="jxr_string">"mybatis-thymeleaf-empty.properties"</span>);
 <a class="jxr_linenumber" name="L237" href="#L237">237</a>     ThymeleafLanguageDriverConfig thymeleafLanguageDriverConfig = ThymeleafLanguageDriverConfig.newInstance(c -&gt; {
 <a class="jxr_linenumber" name="L238" href="#L238">238</a>       c.setUse2way(false);
-<a class="jxr_linenumber" name="L239" href="#L239">239</a>       c.setCustomizer(CustomTemplateEngineCustomizer.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L239" href="#L239">239</a>       c.setCustomizerInstance(<strong class="jxr_keyword">new</strong> <a name="CustomTemplateEngineCustomizer" href="../../../../org/mybatis/scripting/thymeleaf/CustomTemplateEngineCustomizer.html#CustomTemplateEngineCustomizer">CustomTemplateEngineCustomizer</a>());
 <a class="jxr_linenumber" name="L240" href="#L240">240</a>       c.getTemplateFile().setCacheEnabled(false);
 <a class="jxr_linenumber" name="L241" href="#L241">241</a>       c.getTemplateFile().setCacheTtl(30000L);
 <a class="jxr_linenumber" name="L242" href="#L242">242</a>       c.getTemplateFile().setEncoding(StandardCharsets.ISO_8859_1);
@@ -414,37 +414,38 @@
 <a class="jxr_linenumber" name="L406" href="#L406">406</a>       Assertions.assertEquals(
 <a class="jxr_linenumber" name="L407" href="#L407">407</a>           <span class="jxr_string">"Failed to load language driver for org.mybatis.scripting.thymeleaf.ThymeleafLanguageDriver"</span>, e.getMessage());
 <a class="jxr_linenumber" name="L408" href="#L408">408</a>       <em class="jxr_comment">// Since mybatis 3.5.1, exception is wrapped by InvocationTargetException</em>
-<a class="jxr_linenumber" name="L409" href="#L409">409</a>       Throwable cause = e.getCause() instanceof InvocationTargetException ? e.getCause().getCause() : e.getCause();
-<a class="jxr_linenumber" name="L410" href="#L410">410</a>       Assertions.assertEquals(
-<a class="jxr_linenumber" name="L411" href="#L411">411</a>           <span class="jxr_string">"Cannot create an instance for class: class org.mybatis.scripting.thymeleaf.NoDefaultConstructorTemplateEngineCustomizer"</span>,
-<a class="jxr_linenumber" name="L412" href="#L412">412</a>           cause.getMessage());
-<a class="jxr_linenumber" name="L413" href="#L413">413</a>     }
-<a class="jxr_linenumber" name="L414" href="#L414">414</a>   }
-<a class="jxr_linenumber" name="L415" href="#L415">415</a> 
-<a class="jxr_linenumber" name="L416" href="#L416">416</a>   @Test
-<a class="jxr_linenumber" name="L417" href="#L417">417</a>   <strong class="jxr_keyword">void</strong> testCanResolveStringTemplateByUserDefineTemplateEngine() {
-<a class="jxr_linenumber" name="L418" href="#L418">418</a>     <strong class="jxr_keyword">try</strong> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-<a class="jxr_linenumber" name="L419" href="#L419">419</a>       <a name="NameMapper" href="../../../../org/mybatis/scripting/thymeleaf/integrationtest/mapper/NameMapper.html#NameMapper">NameMapper</a> mapper = sqlSession.getMapper(NameMapper.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L420" href="#L420">420</a>       List&lt;Name&gt; names = mapper.getAllNames();
-<a class="jxr_linenumber" name="L421" href="#L421">421</a>       Assertions.assertEquals(7, names.size());
-<a class="jxr_linenumber" name="L422" href="#L422">422</a>     }
-<a class="jxr_linenumber" name="L423" href="#L423">423</a>   }
-<a class="jxr_linenumber" name="L424" href="#L424">424</a> 
-<a class="jxr_linenumber" name="L425" href="#L425">425</a>   @Test
-<a class="jxr_linenumber" name="L426" href="#L426">426</a>   <strong class="jxr_keyword">void</strong> testCanNotResolveTemplateFileByUserDefineTemplateEngine() {
-<a class="jxr_linenumber" name="L427" href="#L427">427</a>     <strong class="jxr_keyword">try</strong> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-<a class="jxr_linenumber" name="L428" href="#L428">428</a>       <a name="NameMapper" href="../../../../org/mybatis/scripting/thymeleaf/integrationtest/mapper/NameMapper.html#NameMapper">NameMapper</a> mapper = sqlSession.getMapper(NameMapper.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L429" href="#L429">429</a>       mapper.findUsingTemplateFile(<strong class="jxr_keyword">new</strong> <a name="NameParam" href="../../../../org/mybatis/scripting/thymeleaf/integrationtest/mapper/NameParam.html#NameParam">NameParam</a>(3));
-<a class="jxr_linenumber" name="L430" href="#L430">430</a>       Assertions.fail();
-<a class="jxr_linenumber" name="L431" href="#L431">431</a>     } <strong class="jxr_keyword">catch</strong> (PersistenceException e) {
-<a class="jxr_linenumber" name="L432" href="#L432">432</a>       Assertions.assertEquals(<span class="jxr_string">"unexpected token: SQL in statement [sql/NameMapper/findById.sql]"</span>,
-<a class="jxr_linenumber" name="L433" href="#L433">433</a>           e.getCause().getMessage());
-<a class="jxr_linenumber" name="L434" href="#L434">434</a>     }
-<a class="jxr_linenumber" name="L435" href="#L435">435</a>   }
-<a class="jxr_linenumber" name="L436" href="#L436">436</a> 
-<a class="jxr_linenumber" name="L437" href="#L437">437</a> }
+<a class="jxr_linenumber" name="L409" href="#L409">409</a>       Throwable cause = e.getCause() instanceof InvocationTargetException
+<a class="jxr_linenumber" name="L410" href="#L410">410</a>           ? e.getCause().getCause().getCause().getCause() : e.getCause();
+<a class="jxr_linenumber" name="L411" href="#L411">411</a>       Assertions.assertEquals(
+<a class="jxr_linenumber" name="L412" href="#L412">412</a>           <span class="jxr_string">"Cannot create an instance for class: class org.mybatis.scripting.thymeleaf.NoDefaultConstructorTemplateEngineCustomizer"</span>,
+<a class="jxr_linenumber" name="L413" href="#L413">413</a>           cause.getMessage());
+<a class="jxr_linenumber" name="L414" href="#L414">414</a>     }
+<a class="jxr_linenumber" name="L415" href="#L415">415</a>   }
+<a class="jxr_linenumber" name="L416" href="#L416">416</a> 
+<a class="jxr_linenumber" name="L417" href="#L417">417</a>   @Test
+<a class="jxr_linenumber" name="L418" href="#L418">418</a>   <strong class="jxr_keyword">void</strong> testCanResolveStringTemplateByUserDefineTemplateEngine() {
+<a class="jxr_linenumber" name="L419" href="#L419">419</a>     <strong class="jxr_keyword">try</strong> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+<a class="jxr_linenumber" name="L420" href="#L420">420</a>       <a name="NameMapper" href="../../../../org/mybatis/scripting/thymeleaf/integrationtest/mapper/NameMapper.html#NameMapper">NameMapper</a> mapper = sqlSession.getMapper(NameMapper.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L421" href="#L421">421</a>       List&lt;Name&gt; names = mapper.getAllNames();
+<a class="jxr_linenumber" name="L422" href="#L422">422</a>       Assertions.assertEquals(7, names.size());
+<a class="jxr_linenumber" name="L423" href="#L423">423</a>     }
+<a class="jxr_linenumber" name="L424" href="#L424">424</a>   }
+<a class="jxr_linenumber" name="L425" href="#L425">425</a> 
+<a class="jxr_linenumber" name="L426" href="#L426">426</a>   @Test
+<a class="jxr_linenumber" name="L427" href="#L427">427</a>   <strong class="jxr_keyword">void</strong> testCanNotResolveTemplateFileByUserDefineTemplateEngine() {
+<a class="jxr_linenumber" name="L428" href="#L428">428</a>     <strong class="jxr_keyword">try</strong> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+<a class="jxr_linenumber" name="L429" href="#L429">429</a>       <a name="NameMapper" href="../../../../org/mybatis/scripting/thymeleaf/integrationtest/mapper/NameMapper.html#NameMapper">NameMapper</a> mapper = sqlSession.getMapper(NameMapper.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L430" href="#L430">430</a>       mapper.findUsingTemplateFile(<strong class="jxr_keyword">new</strong> <a name="NameParam" href="../../../../org/mybatis/scripting/thymeleaf/integrationtest/mapper/NameParam.html#NameParam">NameParam</a>(3));
+<a class="jxr_linenumber" name="L431" href="#L431">431</a>       Assertions.fail();
+<a class="jxr_linenumber" name="L432" href="#L432">432</a>     } <strong class="jxr_keyword">catch</strong> (PersistenceException e) {
+<a class="jxr_linenumber" name="L433" href="#L433">433</a>       Assertions.assertEquals(<span class="jxr_string">"unexpected token: SQL in statement [sql/NameMapper/findById.sql]"</span>,
+<a class="jxr_linenumber" name="L434" href="#L434">434</a>           e.getCause().getMessage());
+<a class="jxr_linenumber" name="L435" href="#L435">435</a>     }
+<a class="jxr_linenumber" name="L436" href="#L436">436</a>   }
+<a class="jxr_linenumber" name="L437" href="#L437">437</a> 
+<a class="jxr_linenumber" name="L438" href="#L438">438</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2018&#x2013;2021 <a href="https://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2018&#x2013;2022 <a href="https://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</div>
 </body>
 </html>
