@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2025 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 package org.mybatis.scripting.thymeleaf;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -27,9 +29,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import org.apache.ibatis.builder.ParameterMappingTokenHandler;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlSource;
+import org.apache.ibatis.parsing.GenericTokenParser;
 import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
@@ -54,7 +59,6 @@ class ThymeleafSqlSource implements SqlSource {
 
   private final Configuration configuration;
   private final SqlGenerator sqlGenerator;
-  private final SqlSourceBuilder sqlSourceBuilder;
   private final String sqlTemplate;
   private final Class<?> parameterType;
 
@@ -76,7 +80,6 @@ class ThymeleafSqlSource implements SqlSource {
     this.sqlGenerator = sqlGenerator;
     this.sqlTemplate = sqlTemplate;
     this.parameterType = parameterType;
-    this.sqlSourceBuilder = new SqlSourceBuilder(configuration);
   }
 
   /**
@@ -101,11 +104,21 @@ class ThymeleafSqlSource implements SqlSource {
     customVariables.put(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE, processingParameterType);
     String sql = sqlGenerator.generate(sqlTemplate, parameterObject, bindings::put, customVariables);
 
-    SqlSource sqlSource = sqlSourceBuilder.parse(sql, processingParameterType, bindings);
+    SqlSource sqlSource = parse(configuration, sql, parameterObject, bindings);
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     bindings.forEach(boundSql::setAdditionalParameter);
 
     return boundSql;
+  }
+
+  private static SqlSource parse(Configuration configuration, String originalSql, Object parameterObject,
+      Map<String, Object> additionalParameters) {
+    Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+    List<ParameterMapping> parameterMappings = new ArrayList<>();
+    ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler(parameterMappings, configuration,
+        parameterObject, parameterType, additionalParameters, true);
+    GenericTokenParser parser = new GenericTokenParser("#{", "}", handler);
+    return SqlSourceBuilder.buildSqlSource(configuration, parser.parse(originalSql), parameterMappings);
   }
 
   /**
@@ -120,7 +133,7 @@ class ThymeleafSqlSource implements SqlSource {
     @Override
     public IContext apply(Object parameter, Map<String, Object> customVariable) {
       Configuration configuration = (Configuration) customVariable.remove(TemporaryTakeoverKeys.CONFIGURATION);
-      Map<String, Object> bindings =  (Map<String, Object>) customVariable.remove(TemporaryTakeoverKeys.DYNAMIC_CONTEXT);
+      Map<String, Object> bindings = (Map<String, Object>) customVariable.remove(TemporaryTakeoverKeys.DYNAMIC_CONTEXT);
       Class<?> processingParameterType = (Class<?>) customVariable
           .remove(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE);
       MyBatisBindingContext bindingContext = new MyBatisBindingContext(
