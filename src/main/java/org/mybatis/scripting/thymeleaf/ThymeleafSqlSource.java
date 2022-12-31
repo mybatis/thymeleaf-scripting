@@ -18,6 +18,7 @@ package org.mybatis.scripting.thymeleaf;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -90,16 +91,19 @@ class ThymeleafSqlSource implements SqlSource {
       processingParameterType = parameterType;
     }
 
-    DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);
-    Map<String, Object> customVariables = dynamicContext.getBindings();
-    customVariables.put(TemporaryTakeoverKeys.CONFIGURATION, configuration);
-    customVariables.put(TemporaryTakeoverKeys.DYNAMIC_CONTEXT, dynamicContext);
-    customVariables.put(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE, processingParameterType);
-    String sql = sqlGenerator.generate(sqlTemplate, parameterObject, dynamicContext::bind, customVariables);
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put(DynamicContext.PARAMETER_OBJECT_KEY, parameterObject);
+    bindings.put(DynamicContext.DATABASE_ID_KEY, configuration.getDatabaseId());
 
-    SqlSource sqlSource = sqlSourceBuilder.parse(sql, processingParameterType, dynamicContext.getBindings());
+    Map<String, Object> customVariables = bindings;
+    customVariables.put(TemporaryTakeoverKeys.CONFIGURATION, configuration);
+    customVariables.put(TemporaryTakeoverKeys.DYNAMIC_CONTEXT, bindings);
+    customVariables.put(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE, processingParameterType);
+    String sql = sqlGenerator.generate(sqlTemplate, parameterObject, bindings::put, customVariables);
+
+    SqlSource sqlSource = sqlSourceBuilder.parse(sql, processingParameterType, bindings);
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-    dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);
+    bindings.forEach(boundSql::setAdditionalParameter);
 
     return boundSql;
   }
@@ -116,20 +120,20 @@ class ThymeleafSqlSource implements SqlSource {
     @Override
     public IContext apply(Object parameter, Map<String, Object> customVariable) {
       Configuration configuration = (Configuration) customVariable.remove(TemporaryTakeoverKeys.CONFIGURATION);
-      DynamicContext dynamicContext = (DynamicContext) customVariable.remove(TemporaryTakeoverKeys.DYNAMIC_CONTEXT);
+      Map<String, Object> bindings =  (Map<String, Object>) customVariable.remove(TemporaryTakeoverKeys.DYNAMIC_CONTEXT);
       Class<?> processingParameterType = (Class<?>) customVariable
           .remove(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE);
       MyBatisBindingContext bindingContext = new MyBatisBindingContext(
           parameter != null && configuration.getTypeHandlerRegistry().hasTypeHandler(processingParameterType));
-      dynamicContext.bind(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);
+      bindings.put(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);
       IContext context;
       if (parameter instanceof Map) {
         @SuppressWarnings(value = "unchecked")
         Map<String, Object> map = (Map<String, Object>) parameter;
-        context = new MapBasedContext(map, dynamicContext, configuration.getVariables());
+        context = new MapBasedContext(map, bindings, configuration.getVariables());
       } else {
         MetaClass metaClass = MetaClass.forClass(processingParameterType, configuration.getReflectorFactory());
-        context = new MetaClassBasedContext(parameter, metaClass, processingParameterType, dynamicContext,
+        context = new MetaClassBasedContext(parameter, metaClass, processingParameterType, bindings,
             configuration.getVariables());
       }
       return context;
@@ -138,15 +142,15 @@ class ThymeleafSqlSource implements SqlSource {
 
   private abstract static class AbstractContext implements IContext {
 
-    private final DynamicContext dynamicContext;
+    private final Map<String, Object> dynamicContext;
     private final Properties configurationProperties;
     private final Set<String> variableNames;
 
-    private AbstractContext(DynamicContext dynamicContext, Properties configurationProperties) {
+    private AbstractContext(Map<String, Object> dynamicContext, Properties configurationProperties) {
       this.dynamicContext = dynamicContext;
       this.configurationProperties = configurationProperties;
       this.variableNames = new HashSet<>();
-      addVariableNames(dynamicContext.getBindings().keySet());
+      addVariableNames(dynamicContext.keySet());
       Optional.ofNullable(configurationProperties).ifPresent(v -> addVariableNames(v.stringPropertyNames()));
     }
 
@@ -183,8 +187,8 @@ class ThymeleafSqlSource implements SqlSource {
      */
     @Override
     public Object getVariable(String name) {
-      if (dynamicContext.getBindings().containsKey(name)) {
-        return dynamicContext.getBindings().get(name);
+      if (dynamicContext.containsKey(name)) {
+        return dynamicContext.get(name);
       }
       if (configurationProperties != null && configurationProperties.containsKey(name)) {
         return configurationProperties.getProperty(name);
@@ -200,7 +204,7 @@ class ThymeleafSqlSource implements SqlSource {
 
     private final Map<String, Object> variables;
 
-    private MapBasedContext(Map<String, Object> parameterMap, DynamicContext dynamicContext,
+    private MapBasedContext(Map<String, Object> parameterMap, Map<String, Object> dynamicContext,
         Properties configurationProperties) {
       super(dynamicContext, configurationProperties);
       this.variables = parameterMap;
@@ -224,7 +228,7 @@ class ThymeleafSqlSource implements SqlSource {
     private final Class<?> parameterType;
 
     private MetaClassBasedContext(Object parameterObject, MetaClass parameterMetaClass, Class<?> parameterType,
-        DynamicContext dynamicContext, Properties configurationProperties) {
+        Map<String, Object> dynamicContext, Properties configurationProperties) {
       super(dynamicContext, configurationProperties);
       this.parameterObject = parameterObject;
       this.parameterMetaClass = parameterMetaClass;
