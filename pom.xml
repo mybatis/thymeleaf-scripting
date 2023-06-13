@@ -137,6 +137,7 @@
             <systemPropertyVariables>
               <mybatis.version>${mybatis.version}</mybatis.version>
             </systemPropertyVariables>
+            <argLine>${argLine} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
           </configuration>
         </plugin>
       </plugins>
