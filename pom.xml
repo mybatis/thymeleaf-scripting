@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-       Copyright 2018-2022 the original author or authors.
+       Copyright 2018-2023 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -23,13 +23,12 @@
     <groupId>org.mybatis</groupId>
     <artifactId>mybatis-parent</artifactId>
     <version>40</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.mybatis.scripting</groupId>
   <artifactId>mybatis-thymeleaf</artifactId>
   <version>1.0.5-SNAPSHOT</version>
-  <packaging>jar</packaging>
 
   <name>MyBatis Thymeleaf</name>
   <description>Thymeleaf support for MyBatis</description>
@@ -45,10 +44,10 @@
   </contributors>
 
   <scm>
-    <url>https://github.com/mybatis/thymeleaf-scripting</url>
-    <connection>scm:git:ssh://github.com/mybatis/thymeleaf-scripting.git</connection>
+    <connection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</developerConnection>
     <tag>HEAD</tag>
+    <url>https://github.com/mybatis/thymeleaf-scripting</url>
   </scm>
   <issueManagement>
     <system>GitHub</system>
@@ -60,9 +59,9 @@
   </ciManagement>
   <distributionManagement>
     <site>
-      <id>gh-pages</id>
+      <id>gh-pages-scm</id>
       <name>MyBatis Thymeleaf GitHub Pages</name>
-      <url>git:ssh://git@github.com/mybatis/thymeleaf-scripting.git?gh-pages#</url>
+      <url>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</url>
     </site>
   </distributionManagement>
 
@@ -87,8 +86,8 @@
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
       <version>${mybatis.version}</version>
-      <optional>true</optional>
       <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.thymeleaf</groupId>
@@ -158,10 +157,10 @@
         <executions>
           <execution>
             <id>generate-html</id>
-            <phase>generate-resources</phase>
             <goals>
               <goal>process-asciidoc</goal>
             </goals>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
       </plugin>
@@ -197,7 +196,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                   </pluginExecutions>
