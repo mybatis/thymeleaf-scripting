@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-       Copyright 2018-2022 the original author or authors.
+       Copyright 2018-2023 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@
   <groupId>org.mybatis.scripting</groupId>
   <artifactId>mybatis-thymeleaf</artifactId>
   <version>1.0.5-SNAPSHOT</version>
-  <packaging>jar</packaging>
 
   <name>MyBatis Thymeleaf</name>
   <description>Thymeleaf support for MyBatis</description>
@@ -46,7 +45,7 @@
 
   <scm>
     <url>https://github.com/mybatis/thymeleaf-scripting</url>
-    <connection>scm:git:ssh://github.com/mybatis/thymeleaf-scripting.git</connection>
+    <connection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
@@ -60,9 +59,9 @@
   </ciManagement>
   <distributionManagement>
     <site>
-      <id>gh-pages</id>
+      <id>gh-pages-scm</id>
       <name>MyBatis Thymeleaf GitHub Pages</name>
-      <url>git:ssh://git@github.com/mybatis/thymeleaf-scripting.git?gh-pages#</url>
+      <url>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</url>
     </site>
   </distributionManagement>
 
