@@ -23,7 +23,7 @@
     <groupId>org.mybatis</groupId>
     <artifactId>mybatis-parent</artifactId>
     <version>40</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.mybatis.scripting</groupId>
@@ -44,10 +44,10 @@
   </contributors>
 
   <scm>
-    <url>https://github.com/mybatis/thymeleaf-scripting</url>
     <connection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</developerConnection>
     <tag>HEAD</tag>
+    <url>https://github.com/mybatis/thymeleaf-scripting</url>
   </scm>
   <issueManagement>
     <system>GitHub</system>
@@ -86,8 +86,8 @@
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
       <version>${mybatis.version}</version>
-      <optional>true</optional>
       <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.thymeleaf</groupId>
@@ -157,10 +157,10 @@
         <executions>
           <execution>
             <id>generate-html</id>
-            <phase>generate-resources</phase>
             <goals>
               <goal>process-asciidoc</goal>
             </goals>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
       </plugin>
@@ -196,7 +196,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                   </pluginExecutions>
