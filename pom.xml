@@ -32,7 +32,7 @@
 
   <name>MyBatis Thymeleaf</name>
   <description>Thymeleaf support for MyBatis</description>
-  <url>https://github.com/mybatis/thymeleaf-scripting</url>
+  <url>https://github.com/mybatis/thymeleaf-scripting/</url>
 
   <inceptionYear>2018</inceptionYear>
 
@@ -47,7 +47,7 @@
     <connection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mybatis/thymeleaf-scripting.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/mybatis/thymeleaf-scripting</url>
+    <url>https://github.com/mybatis/thymeleaf-scripting/</url>
   </scm>
   <issueManagement>
     <system>GitHub</system>
