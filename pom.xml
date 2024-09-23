@@ -23,7 +23,7 @@
     <groupId>org.mybatis</groupId>
     <artifactId>mybatis-parent</artifactId>
     <version>45</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <groupId>org.mybatis.scripting</groupId>
@@ -196,7 +196,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore/>
+                        <ignore />
                       </action>
                     </pluginExecution>
                   </pluginExecutions>
