@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyBatisParamTagProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf.processor</a> &gt; <span class="el_source">MyBatisParamTagProcessor.java</span></div><h1>MyBatisParamTagProcessor.java</h1><pre class="source lang-java linenums">/*
+ *    Copyright 2018-2022 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package org.mybatis.scripting.thymeleaf.processor;
+
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.function.UnaryOperator;
+
+import org.mybatis.scripting.thymeleaf.MyBatisBindingContext;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.engine.EngineEventUtils;
+import org.thymeleaf.engine.IterationStatusVar;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
+import org.thymeleaf.processor.element.IElementTagStructureHandler;
+import org.thymeleaf.standard.expression.IStandardExpression;
+import org.thymeleaf.standard.expression.StandardExpressionExecutionContext;
+import org.thymeleaf.templatemode.TemplateMode;
+
+/**
+ * The processor class for handling the {@code mb:p} tag. &lt;br&gt;
+ * This processor render bind variable(default: {@code #{…​}}) expression that can parsed data access library and
+ * register an iteration object to the bind variables.
+ *
+ * @author Kazuki Shimizu
+ *
+ * @version 1.0.0
+ */
+public class MyBatisParamTagProcessor extends AbstractAttributeTagProcessor {
+
+  private static final int PRECEDENCE = 1400;
+  private static final String ATTR_NAME = &quot;p&quot;;
+
+  private final StandardExpressionExecutionContext expressionExecutionContext;
+
+<span class="fc" id="L50">  private UnaryOperator&lt;String&gt; bindVariableRender = BindVariableRender.BuiltIn.MYBATIS;</span>
+
+  /**
+   * Constructor that can be specified the template mode and dialect prefix.
+   *
+   * @param templateMode
+   *          A target template mode
+   * @param prefix
+   *          A target dialect prefix
+   */
+  public MyBatisParamTagProcessor(final TemplateMode templateMode, final String prefix) {
+<span class="fc" id="L61">    super(templateMode, prefix, null, false, ATTR_NAME, true, PRECEDENCE, true);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    expressionExecutionContext = templateMode == TemplateMode.TEXT ? StandardExpressionExecutionContext.RESTRICTED</span>
+<span class="fc" id="L63">        : StandardExpressionExecutionContext.NORMAL;</span>
+<span class="fc" id="L64">  }</span>
+
+  /**
+   * Set a custom bind variable render function.&lt;br&gt;
+   * By default, render {@literal #{...}} format.
+   *
+   * @param bindVariableRender
+   *          a custom bind variable render function
+   *
+   * @since 1.0.2
+   */
+  public void setBindVariableRender(UnaryOperator&lt;String&gt; bindVariableRender) {
+<span class="fc" id="L76">    this.bindVariableRender = bindVariableRender;</span>
+<span class="fc" id="L77">  }</span>
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void doProcess(ITemplateContext context, IProcessableElementTag tag, AttributeName attributeName,
+      String attributeValue, IElementTagStructureHandler structureHandler) {
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    if (attributeValue.contains(&quot;${&quot;)) {</span>
+<span class="fc" id="L86">      attributeValue = getExpressionEvaluatedText(context, tag, attributeName, attributeValue);</span>
+    }
+
+<span class="fc" id="L89">    Pair parameterAndOptionPair = Pair.parse(attributeValue, ',');</span>
+<span class="fc" id="L90">    String parameterPath = parameterAndOptionPair.left;</span>
+<span class="fc" id="L91">    String options = parameterAndOptionPair.right;</span>
+
+<span class="fc" id="L93">    Pair objectNameAndPropertyPathPair = Pair.parse(parameterPath, '.');</span>
+<span class="fc" id="L94">    String objectName = objectNameAndPropertyPathPair.left;</span>
+<span class="fc" id="L95">    String nestedPropertyPath = objectNameAndPropertyPathPair.right;</span>
+
+    String body;
+<span class="fc" id="L98">    String iterationObjectName = objectName + &quot;Stat&quot;;</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    if (context.containsVariable(iterationObjectName)) {</span>
+<span class="fc" id="L100">      MyBatisBindingContext bindingContext = MyBatisBindingContext.load(context);</span>
+<span class="fc" id="L101">      IterationStatusVar iterationStatus = (IterationStatusVar) context.getVariable(iterationObjectName);</span>
+<span class="fc" id="L102">      String iterationObjectVariableName = bindingContext.generateUniqueName(objectName, iterationStatus);</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">      if (!bindingContext.containsCustomBindVariable(iterationObjectVariableName)) {</span>
+<span class="fc" id="L104">        bindingContext.setCustomBindVariable(iterationObjectVariableName, iterationStatus.getCurrent());</span>
+      }
+<span class="fc bfc" id="L106" title="All 2 branches covered.">      if (nestedPropertyPath.isEmpty()) {</span>
+<span class="fc" id="L107">        body = bindVariableRender.apply(iterationObjectVariableName + options);</span>
+      } else {
+<span class="fc" id="L109">        Object value = getExpressionEvaluatedValue(context, tag, attributeName, parameterPath);</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        if (isCollectionOrArray(value)) {</span>
+<span class="fc" id="L111">          body = generateCollectionBindVariables(value, iterationObjectVariableName + nestedPropertyPath, options);</span>
+        } else {
+<span class="fc" id="L113">          body = bindVariableRender.apply(iterationObjectVariableName + nestedPropertyPath + options);</span>
+        }
+      }
+<span class="fc" id="L116">    } else {</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">      Object value = nestedPropertyPath.isEmpty() ? context.getVariable(objectName)</span>
+<span class="fc" id="L118">          : getExpressionEvaluatedValue(context, tag, attributeName, parameterPath);</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">      if (isCollectionOrArray(value)) {</span>
+<span class="fc" id="L120">        body = generateCollectionBindVariables(value, parameterPath, options);</span>
+      } else {
+<span class="fc" id="L122">        body = bindVariableRender.apply(attributeValue);</span>
+      }
+    }
+<span class="fc" id="L125">    structureHandler.setBody(body, false);</span>
+<span class="fc" id="L126">  }</span>
+
+  private Object getExpressionEvaluatedValue(ITemplateContext context, IProcessableElementTag tag,
+      AttributeName attributeName, String parameterValue) {
+<span class="fc" id="L130">    IStandardExpression expression = EngineEventUtils.computeAttributeExpression(context, tag, attributeName,</span>
+        &quot;${&quot; + parameterValue + &quot;}&quot;);
+<span class="fc" id="L132">    return expression.execute(context, this.expressionExecutionContext);</span>
+  }
+
+  private String getExpressionEvaluatedText(ITemplateContext context, IProcessableElementTag tag,
+      AttributeName attributeName, String parameterValue) {
+<span class="fc" id="L137">    IStandardExpression expression = EngineEventUtils.computeAttributeExpression(context, tag, attributeName,</span>
+        &quot;|&quot; + parameterValue + &quot;|&quot;);
+<span class="fc" id="L139">    return expression.execute(context, this.expressionExecutionContext).toString();</span>
+  }
+
+  private boolean isCollectionOrArray(Object value) {
+<span class="fc bfc" id="L143" title="All 6 branches covered.">    return value != null &amp;&amp; (Collection.class.isAssignableFrom(value.getClass()) || value.getClass().isArray());</span>
+  }
+
+  private String generateCollectionBindVariables(Object value, String parameterPath, String options) {
+<span class="fc bfc" id="L147" title="All 2 branches covered.">    int size = value.getClass().isArray() ? Array.getLength(value) : ((Collection) value).size();</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">    if (size == 0) {</span>
+<span class="fc" id="L149">      return &quot;null&quot;;</span>
+    } else {
+<span class="fc" id="L151">      StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">      for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (i != 0) {</span>
+<span class="fc" id="L154">          sb.append(&quot;, &quot;);</span>
+        }
+<span class="fc" id="L156">        sb.append(bindVariableRender.apply(parameterPath + &quot;[&quot; + i + &quot;]&quot; + options));</span>
+      }
+<span class="fc" id="L158">      return sb.toString();</span>
+    }
+  }
+
+  private static class Pair {
+
+    private final String left;
+    private final String right;
+
+<span class="fc" id="L167">    private Pair(String left, String right) {</span>
+<span class="fc" id="L168">      this.left = left;</span>
+<span class="fc" id="L169">      this.right = right;</span>
+<span class="fc" id="L170">    }</span>
+
+    private static Pair parse(String value, char separator) {
+<span class="fc" id="L173">      int separatorIndex = value.indexOf(separator);</span>
+      String left;
+      String right;
+<span class="fc bfc" id="L176" title="All 2 branches covered.">      if (separatorIndex == -1) {</span>
+<span class="fc" id="L177">        left = value;</span>
+<span class="fc" id="L178">        right = &quot;&quot;;</span>
+      } else {
+<span class="fc" id="L180">        left = value.substring(0, separatorIndex);</span>
+<span class="fc" id="L181">        right = value.substring(separatorIndex);</span>
+      }
+<span class="fc" id="L183">      return new Pair(left, right);</span>
+    }
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
