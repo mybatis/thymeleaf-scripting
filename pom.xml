@@ -66,6 +66,10 @@
   </distributionManagement>
 
   <properties>
+    <!-- Maven compiler options -->
+    <java.version>11</java.version>
+    <java.release.version>11</java.release.version>
+
     <!-- Dependencies artifact version -->
     <mybatis.version>3.5.16</mybatis.version>
     <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
