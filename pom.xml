@@ -83,6 +83,8 @@
 
     <!-- Reproducible Builds -->
     <project.build.outputTimestamp>1669305733</project.build.outputTimestamp>
+
+    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
   </properties>
 
   <dependencies>
@@ -140,7 +142,6 @@
             <systemPropertyVariables>
               <mybatis.version>${mybatis.version}</mybatis.version>
             </systemPropertyVariables>
-            <argLine>${argLine} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
           </configuration>
         </plugin>
       </plugins>
