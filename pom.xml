@@ -128,7 +128,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>6.2.13</version>
+      <version>7.0.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
