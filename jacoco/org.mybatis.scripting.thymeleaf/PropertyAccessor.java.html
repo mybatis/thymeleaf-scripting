@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyAccessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf</a> &gt; <span class="el_source">PropertyAccessor.java</span></div><h1>PropertyAccessor.java</h1><pre class="source lang-java linenums">/*
+ *    Copyright 2018-2022 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package org.mybatis.scripting.thymeleaf;
+
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ * The interface for accessing a property. &lt;br&gt;
+ * If you want to customize a default {@code PropertyAccessor}, you implements class of this interface and you need to
+ * specify to a {@link SqlGenerator}. &lt;br&gt;
+ *
+ * @author Kazuki Shimizu
+ *
+ * @version 1.0.2
+ */
+public interface PropertyAccessor {
+
+  /**
+   * Get property names of specified type.
+   *
+   * @param type
+   *          a target type
+   *
+   * @return property names
+   */
+  Set&lt;String&gt; getPropertyNames(Class&lt;?&gt; type);
+
+  /**
+   * Get a property type of specified property.
+   *
+   * @param type
+   *          a target type
+   * @param name
+   *          a property name
+   *
+   * @return a property type
+   */
+  Class&lt;?&gt; getPropertyType(Class&lt;?&gt; type, String name);
+
+  /**
+   * Get a property value from specified target object.
+   *
+   * @param target
+   *          a target object
+   * @param name
+   *          a property name
+   *
+   * @return a property value
+   */
+  Object getPropertyValue(Object target, String name);
+
+  /**
+   * Set a property value to the specified target object.
+   *
+   * @param target
+   *          a target object
+   * @param name
+   *          a property name
+   * @param value
+   *          a property value
+   */
+  void setPropertyValue(Object target, String name, Object value);
+
+  /**
+   * The built-in property accessors.
+   */
+<span class="fc" id="L90">  enum BuiltIn implements PropertyAccessor {</span>
+
+    /**
+     * The implementation using Java Beans API provided by JDK.
+     */
+<span class="fc" id="L95">    STANDARD(new StandardPropertyAccessor());</span>
+
+    private final PropertyAccessor delegate;
+
+<span class="fc" id="L99">    BuiltIn(PropertyAccessor delegate) {</span>
+<span class="fc" id="L100">      this.delegate = delegate;</span>
+<span class="fc" id="L101">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set&lt;String&gt; getPropertyNames(Class&lt;?&gt; type) {
+<span class="fc" id="L108">      return delegate.getPropertyNames(type);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Class&lt;?&gt; getPropertyType(Class&lt;?&gt; type, String name) {
+<span class="fc" id="L116">      return delegate.getPropertyType(type, name);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getPropertyValue(Object target, String name) {
+<span class="fc" id="L124">      return delegate.getPropertyValue(target, name);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPropertyValue(Object target, String name, Object value) {
+<span class="fc" id="L132">      delegate.setPropertyValue(target, name, value);</span>
+<span class="fc" id="L133">    }</span>
+
+<span class="fc" id="L135">    static class StandardPropertyAccessor implements PropertyAccessor {</span>
+
+<span class="fc" id="L137">      private static Map&lt;Class&lt;?&gt;, Map&lt;String, PropertyDescriptor&gt;&gt; cache = new ConcurrentHashMap&lt;&gt;();</span>
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Set&lt;String&gt; getPropertyNames(Class&lt;?&gt; type) {
+<span class="fc" id="L144">        return getPropertyDescriptors(type).keySet();</span>
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Class&lt;?&gt; getPropertyType(Class&lt;?&gt; type, String name) {
+<span class="fc" id="L152">        return Optional.ofNullable(getPropertyDescriptors(type).get(name))</span>
+<span class="fc" id="L153">            .orElseThrow(() -&gt; new IllegalArgumentException(String.format(</span>
+<span class="fc" id="L154">                &quot;Does not get a property type because property '%s' not found on '%s' class.&quot;, name, type.getName())))</span>
+<span class="fc" id="L155">            .getPropertyType();</span>
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Object getPropertyValue(Object target, String name) {
+        try {
+<span class="fc" id="L164">          return Optional.ofNullable(getPropertyDescriptors(target.getClass()).get(name))</span>
+<span class="fc" id="L165">              .map(PropertyDescriptor::getReadMethod)</span>
+<span class="fc" id="L166">              .orElseThrow(() -&gt; new IllegalArgumentException(</span>
+<span class="fc" id="L167">                  String.format(&quot;Does not get a property value because property '%s' not found on '%s' class.&quot;, name,</span>
+<span class="fc" id="L168">                      target.getClass().getName())))</span>
+<span class="fc" id="L169">              .invoke(target);</span>
+<span class="fc" id="L170">        } catch (IllegalAccessException | InvocationTargetException e) {</span>
+<span class="fc" id="L171">          throw new IllegalStateException(e);</span>
+        }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void setPropertyValue(Object target, String name, Object value) {
+        try {
+<span class="fc" id="L181">          Optional.ofNullable(getPropertyDescriptors(target.getClass()).get(name))</span>
+<span class="fc" id="L182">              .map(PropertyDescriptor::getWriteMethod)</span>
+<span class="fc" id="L183">              .orElseThrow(() -&gt; new IllegalArgumentException(</span>
+<span class="fc" id="L184">                  String.format(&quot;Does not set a property value because property '%s' not found on '%s' class.&quot;, name,</span>
+<span class="fc" id="L185">                      target.getClass().getName())))</span>
+<span class="fc" id="L186">              .invoke(target, value);</span>
+<span class="fc" id="L187">        } catch (IllegalAccessException | InvocationTargetException e) {</span>
+<span class="fc" id="L188">          throw new IllegalStateException(e);</span>
+<span class="fc" id="L189">        }</span>
+<span class="fc" id="L190">      }</span>
+
+      /**
+       * Clear cache.
+       * &lt;p&gt;
+       * This method use by internal processing.
+       * &lt;/p&gt;
+       */
+      static void clearCache() {
+<span class="fc" id="L199">        cache.clear();</span>
+<span class="fc" id="L200">      }</span>
+
+      private static Map&lt;String, PropertyDescriptor&gt; getPropertyDescriptors(Class&lt;?&gt; type) {
+<span class="fc" id="L203">        return cache.computeIfAbsent(type, key -&gt; {</span>
+          try {
+<span class="fc" id="L205">            BeanInfo beanInfo = Introspector.getBeanInfo(type);</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">            return Stream.of(beanInfo.getPropertyDescriptors()).filter(x -&gt; !x.getName().equals(&quot;class&quot;))</span>
+<span class="fc" id="L207">                .collect(Collectors.toMap(PropertyDescriptor::getName, v -&gt; v));</span>
+<span class="nc" id="L208">          } catch (IntrospectionException e) {</span>
+<span class="nc" id="L209">            throw new IllegalStateException(e);</span>
+          } finally {
+<span class="fc" id="L211">            Introspector.flushFromCaches(type);</span>
+          }
+        });
+      }
+
+    }
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

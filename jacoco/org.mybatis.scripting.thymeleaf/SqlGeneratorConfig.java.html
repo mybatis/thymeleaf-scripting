@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SqlGeneratorConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf</a> &gt; <span class="el_source">SqlGeneratorConfig.java</span></div><h1>SqlGeneratorConfig.java</h1><pre class="source lang-java linenums">/*
+ *    Copyright 2018-2022 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package org.mybatis.scripting.thymeleaf;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import org.mybatis.scripting.thymeleaf.PropertyAccessor.BuiltIn.StandardPropertyAccessor;
+import org.mybatis.scripting.thymeleaf.processor.BindVariableRender;
+import org.thymeleaf.util.ClassLoaderUtils;
+import org.thymeleaf.util.StringUtils;
+
+/**
+ * Configuration class for {@link SqlGenerator}.
+ *
+ * @author Kazuki Shimizu
+ *
+ * @since 1.0.2
+ */
+<span class="fc" id="L46">public class SqlGeneratorConfig {</span>
+
+  private static class PropertyKeys {
+    private static final String CONFIG_FILE = &quot;mybatis-thymeleaf.config.file&quot;;
+    private static final String CONFIG_ENCODING = &quot;mybatis-thymeleaf.config.encoding&quot;;
+  }
+
+  private static class Defaults {
+    private static final String PROPERTIES_FILE = &quot;mybatis-thymeleaf.properties&quot;;
+  }
+
+  private static final Map&lt;Class&lt;?&gt;, Function&lt;String, Object&gt;&gt; TYPE_CONVERTERS;
+
+  static {
+<span class="fc" id="L60">    Map&lt;Class&lt;?&gt;, Function&lt;String, Object&gt;&gt; converters = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L61">    converters.put(boolean.class, v -&gt; Boolean.valueOf(v.trim()));</span>
+<span class="fc" id="L62">    converters.put(String.class, String::trim);</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">    converters.put(Character[].class, v -&gt; Stream.of(v.split(&quot;,&quot;)).map(String::trim).filter(e -&gt; e.length() == 1)</span>
+<span class="fc" id="L64">        .map(e -&gt; e.charAt(0)).toArray(Character[]::new));</span>
+<span class="fc" id="L65">    converters.put(Character.class, v -&gt; v.trim().charAt(0));</span>
+<span class="fc" id="L66">    converters.put(Charset.class, v -&gt; Charset.forName(v.trim()));</span>
+<span class="fc" id="L67">    converters.put(Long.class, v -&gt; Long.valueOf(v.trim()));</span>
+<span class="fc" id="L68">    converters.put(String[].class, v -&gt; Stream.of(v.split(&quot;,&quot;)).map(String::trim).toArray(String[]::new));</span>
+<span class="fc" id="L69">    converters.put(Class.class, SqlGeneratorConfig::toClassForName);</span>
+<span class="fc" id="L70">    TYPE_CONVERTERS = Collections.unmodifiableMap(converters);</span>
+<span class="fc" id="L71">  }</span>
+
+  /**
+   * Whether use the 2-way SQL feature.
+   */
+<span class="fc" id="L76">  private boolean use2way = true;</span>
+
+  /**
+   * The instance for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
+   */
+  private TemplateEngineCustomizer customizer;
+
+  /**
+   * Template file configuration.
+   */
+<span class="fc" id="L86">  private final TemplateFileConfig templateFile = new TemplateFileConfig();</span>
+
+  /**
+   * Dialect configuration.
+   */
+<span class="fc" id="L91">  private final DialectConfig dialect = new DialectConfig();</span>
+
+  /**
+   * Get whether use the 2-way SQL feature.
+   * &lt;p&gt;
+   * Default is {@code true}.
+   * &lt;/p&gt;
+   *
+   * @return If use the 2-way SQL feature, return {@code true}
+   */
+  public boolean isUse2way() {
+<span class="fc" id="L102">    return use2way;</span>
+  }
+
+  /**
+   * Set whether use the 2-way SQL feature.
+   *
+   * @param use2way
+   *          If use the 2-way SQL feature, set {@code true}
+   */
+  public void setUse2way(boolean use2way) {
+<span class="fc" id="L112">    this.use2way = use2way;</span>
+<span class="fc" id="L113">  }</span>
+
+  /**
+   * Get the interface for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
+   * &lt;p&gt;
+   * Default is {@code null}.
+   * &lt;/p&gt;
+   * This method exists for the backward compatibility.&lt;br&gt;
+   * Use {@link #getCustomizerInstance()} instead
+   *
+   * @return the interface for customizing a default TemplateEngine
+   */
+  @Deprecated
+  public Class&lt;? extends TemplateEngineCustomizer&gt; getCustomizer() {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    return customizer == null ? null : customizer.getClass();</span>
+  }
+
+  /**
+   * Set the interface for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
+   *
+   * @param customizer
+   *          the interface for customizing a default TemplateEngine
+   */
+  @Deprecated
+  public void setCustomizer(Class&lt;? extends TemplateEngineCustomizer&gt; customizer) {
+<span class="fc" id="L138">    this.customizer = newInstanceForType(customizer);</span>
+<span class="fc" id="L139">  }</span>
+
+  public TemplateEngineCustomizer getCustomizerInstance() {
+<span class="fc" id="L142">    return customizer;</span>
+  }
+
+  public void setCustomizerInstance(TemplateEngineCustomizer customizer) {
+<span class="fc" id="L146">    this.customizer = customizer;</span>
+<span class="fc" id="L147">  }</span>
+
+  /**
+   * Get a template file configuration.
+   *
+   * @return a template file configuration
+   */
+  public TemplateFileConfig getTemplateFile() {
+<span class="fc" id="L155">    return templateFile;</span>
+  }
+
+  /**
+   * Get a dialect configuration.
+   *
+   * @return a dialect configuration
+   */
+  public DialectConfig getDialect() {
+<span class="fc" id="L164">    return dialect;</span>
+  }
+
+  /**
+   * Template file configuration.
+   *
+   * @since 1.0.0
+   */
+<span class="fc" id="L172">  public static class TemplateFileConfig {</span>
+
+    /**
+     * The character encoding for reading template resource file.
+     */
+<span class="fc" id="L177">    private Charset encoding = StandardCharsets.UTF_8;</span>
+
+    /**
+     * The base directory for reading template resource file.
+     */
+<span class="fc" id="L182">    private String baseDir = &quot;&quot;;</span>
+
+    /**
+     * The patterns for reading as template resource file. (Can specify multiple patterns using comma(&quot;,&quot;) as separator
+     * character)
+     */
+<span class="fc" id="L188">    private String[] patterns = { &quot;*.sql&quot; };</span>
+
+    /**
+     * Whether use the cache feature when load template resource file.
+     */
+<span class="fc" id="L193">    private boolean cacheEnabled = true;</span>
+
+    /**
+     * The cache TTL(millisecond) for resolved templates.
+     */
+    private Long cacheTtl;
+
+    /**
+     * Get the character encoding for reading template resource file.
+     * &lt;p&gt;
+     * Default is {@code UTF-8}.
+     * &lt;/p&gt;
+     *
+     * @return the character encoding for reading template resource file
+     */
+    public Charset getEncoding() {
+<span class="fc" id="L209">      return encoding;</span>
+    }
+
+    /**
+     * Set the character encoding for reading template resource file.
+     *
+     * @param encoding
+     *          the character encoding for reading template resource file
+     */
+    public void setEncoding(Charset encoding) {
+<span class="fc" id="L219">      this.encoding = encoding;</span>
+<span class="fc" id="L220">    }</span>
+
+    /**
+     * Get the base directory for reading template resource file.
+     * &lt;p&gt;
+     * Default is {@code &quot;&quot;}(none).
+     * &lt;/p&gt;
+     *
+     * @return the base directory for reading template resource file
+     */
+    public String getBaseDir() {
+<span class="fc" id="L231">      return baseDir;</span>
+    }
+
+    /**
+     * Set the base directory for reading template resource file.
+     *
+     * @param baseDir
+     *          the base directory for reading template resource file
+     */
+    public void setBaseDir(String baseDir) {
+<span class="fc" id="L241">      this.baseDir = baseDir;</span>
+<span class="fc" id="L242">    }</span>
+
+    /**
+     * Get patterns for reading as template resource file.
+     * &lt;p&gt;
+     * Default is {@code &quot;*.sql&quot;}.
+     * &lt;/p&gt;
+     *
+     * @return patterns for reading as template resource file
+     */
+    public String[] getPatterns() {
+<span class="fc" id="L253">      return patterns;</span>
+    }
+
+    /**
+     * Set patterns for reading as template resource file.
+     *
+     * @param patterns
+     *          patterns for reading as template resource file
+     */
+    public void setPatterns(String... patterns) {
+<span class="fc" id="L263">      this.patterns = patterns;</span>
+<span class="fc" id="L264">    }</span>
+
+    /**
+     * Get whether use the cache feature when load template resource file.
+     * &lt;p&gt;
+     * Default is {@code true}.
+     * &lt;/p&gt;
+     *
+     * @return If use th cache feature, return {@code true}
+     */
+    public boolean isCacheEnabled() {
+<span class="fc" id="L275">      return cacheEnabled;</span>
+    }
+
+    /**
+     * Set whether use the cache feature when load template resource file.
+     *
+     * @param cacheEnabled
+     *          If use th cache feature, set {@code true}
+     */
+    public void setCacheEnabled(boolean cacheEnabled) {
+<span class="fc" id="L285">      this.cacheEnabled = cacheEnabled;</span>
+<span class="fc" id="L286">    }</span>
+
+    /**
+     * Get the cache TTL(millisecond) for resolved templates.
+     * &lt;p&gt;
+     * Default is {@code null}(indicate to use default value of Thymeleaf).
+     * &lt;/p&gt;
+     *
+     * @return the cache TTL(millisecond) for resolved templates
+     */
+    public Long getCacheTtl() {
+<span class="fc" id="L297">      return cacheTtl;</span>
+    }
+
+    /**
+     * Set the cache TTL(millisecond) for resolved templates.
+     *
+     * @param cacheTtl
+     *          the cache TTL(millisecond) for resolved templates
+     */
+    public void setCacheTtl(Long cacheTtl) {
+<span class="fc" id="L307">      this.cacheTtl = cacheTtl;</span>
+<span class="fc" id="L308">    }</span>
+
+  }
+
+  /**
+   * Dialect configuration.
+   *
+   * @since 1.0.0
+   */
+<span class="fc" id="L317">  public static class DialectConfig {</span>
+
+    /**
+     * The prefix name of dialect provided by this project.
+     */
+<span class="fc" id="L322">    private String prefix = &quot;mb&quot;;</span>
+
+    /**
+     * The escape character for wildcard of LIKE condition.
+     */
+<span class="fc" id="L327">    private Character likeEscapeChar = '\\';</span>
+
+    /**
+     * The format of escape clause for LIKE condition (Can specify format that can be allowed by String#format method).
+     */
+<span class="fc" id="L332">    private String likeEscapeClauseFormat = &quot;ESCAPE '%s'&quot;;</span>
+
+    /**
+     * Additional escape target characters(custom wildcard characters) for LIKE condition. (Can specify multiple
+     * characters using comma(&quot;,&quot;) as separator character)
+     */
+    private Character[] likeAdditionalEscapeTargetChars;
+
+    /**
+     * The bind variable render.
+     */
+    private BindVariableRender bindVariableRender;
+
+    /**
+     * Get the prefix name of dialect provided by this project.
+     * &lt;p&gt;
+     * Default is {@code &quot;mb&quot;}.
+     * &lt;/p&gt;
+     *
+     * @return the prefix name of dialect
+     */
+    public String getPrefix() {
+<span class="fc" id="L354">      return prefix;</span>
+    }
+
+    /**
+     * Set the prefix name of dialect provided by this project.
+     *
+     * @param prefix
+     *          the prefix name of dialect
+     */
+    public void setPrefix(String prefix) {
+<span class="fc" id="L364">      this.prefix = prefix;</span>
+<span class="fc" id="L365">    }</span>
+
+    /**
+     * Get the escape character for wildcard of LIKE condition.
+     * &lt;p&gt;
+     * Default is {@code '\'}.
+     * &lt;/p&gt;
+     *
+     * @return the escape character for wildcard
+     */
+    public Character getLikeEscapeChar() {
+<span class="fc" id="L376">      return likeEscapeChar;</span>
+    }
+
+    /**
+     * Set the escape character for wildcard of LIKE condition.
+     *
+     * @param likeEscapeChar
+     *          the escape character for wildcard
+     */
+    public void setLikeEscapeChar(Character likeEscapeChar) {
+<span class="fc" id="L386">      this.likeEscapeChar = likeEscapeChar;</span>
+<span class="fc" id="L387">    }</span>
+
+    /**
+     * Get the format of escape clause for LIKE condition.
+     * &lt;p&gt;
+     * Can specify format that can be allowed by String#format method. Default is {@code &quot;ESCAPE '%s'&quot;}.
+     * &lt;/p&gt;
+     *
+     * @return the format of escape clause for LIKE condition
+     */
+    public String getLikeEscapeClauseFormat() {
+<span class="fc" id="L398">      return likeEscapeClauseFormat;</span>
+    }
+
+    /**
+     * Set the format of escape clause for LIKE condition.
+     *
+     * @param likeEscapeClauseFormat
+     *          the format of escape clause for LIKE condition
+     */
+    public void setLikeEscapeClauseFormat(String likeEscapeClauseFormat) {
+<span class="fc" id="L408">      this.likeEscapeClauseFormat = likeEscapeClauseFormat;</span>
+<span class="fc" id="L409">    }</span>
+
+    /**
+     * Get additional escape target characters(custom wildcard characters) for LIKE condition.
+     * &lt;p&gt;
+     * Can specify multiple characters using comma(&quot;,&quot;) as separator character. Default is empty(none).
+     * &lt;/p&gt;
+     *
+     * @return additional escape target characters(custom wildcard characters)
+     */
+    public Character[] getLikeAdditionalEscapeTargetChars() {
+<span class="fc" id="L420">      return likeAdditionalEscapeTargetChars;</span>
+    }
+
+    /**
+     * Set additional escape target characters(custom wildcard characters) for LIKE condition.
+     *
+     * @param likeAdditionalEscapeTargetChars
+     *          additional escape target characters(custom wildcard characters)
+     */
+    public void setLikeAdditionalEscapeTargetChars(Character... likeAdditionalEscapeTargetChars) {
+<span class="fc" id="L430">      this.likeAdditionalEscapeTargetChars = likeAdditionalEscapeTargetChars;</span>
+<span class="fc" id="L431">    }</span>
+
+    /**
+     * Get a bind variable render.
+     * &lt;p&gt;
+     * Default is {@link BindVariableRender.BuiltIn#MYBATIS}
+     * &lt;/p&gt;
+     * This method exists for the backward compatibility. &lt;br&gt;
+     * Use {@link #getBindVariableRenderInstance()} instead
+     *
+     * @return a bind variable render
+     */
+    @Deprecated
+    public Class&lt;? extends BindVariableRender&gt; getBindVariableRender() {
+<span class="pc bpc" id="L445" title="1 of 2 branches missed.">      return bindVariableRender == null ? null : bindVariableRender.getClass();</span>
+    }
+
+    /**
+     * This method exists for the backward compatibility.&lt;br&gt;
+     * Use {@link #setBindVariableRenderInstance(BindVariableRender)} instead
+     *
+     * @param bindVariableRender
+     *          bindVariableRender class
+     */
+    @Deprecated
+    public void setBindVariableRender(Class&lt;? extends BindVariableRender&gt; bindVariableRender) {
+<span class="fc" id="L457">      this.bindVariableRender = newInstanceForType(bindVariableRender);</span>
+<span class="fc" id="L458">    }</span>
+
+    public BindVariableRender getBindVariableRenderInstance() {
+<span class="fc" id="L461">      return bindVariableRender;</span>
+    }
+
+    public void setBindVariableRenderInstance(BindVariableRender bindVariableRender) {
+<span class="fc" id="L465">      this.bindVariableRender = bindVariableRender;</span>
+<span class="fc" id="L466">    }</span>
+  }
+
+  /**
+   * Create an instance from default properties file. &lt;br&gt;
+   * If you want to customize a default {@code TemplateEngine}, you can configure some property using
+   * mybatis-thymeleaf.properties that encoded by UTF-8. Also, you can change the properties file that will read using
+   * system property (-Dmybatis-thymeleaf.config.file=... -Dmybatis-thymeleaf.config.encoding=...). &lt;br&gt;
+   * Supported properties are as follows:
+   * &lt;table border=&quot;1&quot;&gt;
+   * &lt;caption&gt;Supported properties&lt;/caption&gt;
+   * &lt;tr&gt;
+   * &lt;th&gt;Property Key&lt;/th&gt;
+   * &lt;th&gt;Description&lt;/th&gt;
+   * &lt;th&gt;Default&lt;/th&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;th colspan=&quot;3&quot;&gt;General configuration&lt;/th&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;use2way&lt;/td&gt;
+   * &lt;td&gt;Whether use the 2-way SQL&lt;/td&gt;
+   * &lt;td&gt;{@code true}&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;customizer&lt;/td&gt;
+   * &lt;td&gt;The implementation class for customizing a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf
+   * &lt;/td&gt;
+   * &lt;td&gt;None&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;th colspan=&quot;3&quot;&gt;Template file configuration&lt;/th&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;template-file.cache-enabled&lt;/td&gt;
+   * &lt;td&gt;Whether use the cache feature&lt;/td&gt;
+   * &lt;td&gt;{@code true}&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;template-file.cache-ttl&lt;/td&gt;
+   * &lt;td&gt;The cache TTL for resolved templates&lt;/td&gt;
+   * &lt;td&gt;None(use default value of Thymeleaf)&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;template-file.encoding&lt;/td&gt;
+   * &lt;td&gt;The character encoding for reading template resources&lt;/td&gt;
+   * &lt;td&gt;{@code &quot;UTF-8&quot;}&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;template-file.base-dir&lt;/td&gt;
+   * &lt;td&gt;The base directory for reading template resources&lt;/td&gt;
+   * &lt;td&gt;None(just under class path)&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;template-file.patterns&lt;/td&gt;
+   * &lt;td&gt;The patterns for reading as template resources&lt;/td&gt;
+   * &lt;td&gt;{@code &quot;*.sql&quot;}&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;th colspan=&quot;3&quot;&gt;Dialect configuration&lt;/th&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;dialect.prefix&lt;/td&gt;
+   * &lt;td&gt;The prefix name of dialect provided by this project&lt;/td&gt;
+   * &lt;td&gt;{@code &quot;mb&quot;}&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;dialect.like-escape-char&lt;/td&gt;
+   * &lt;td&gt;The escape character for wildcard of LIKE&lt;/td&gt;
+   * &lt;td&gt;{@code '\'} (backslash)&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;dialect.like-escape-clause-format&lt;/td&gt;
+   * &lt;td&gt;The format of escape clause&lt;/td&gt;
+   * &lt;td&gt;{@code &quot;ESCAPE '%s'&quot;}&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;tr&gt;
+   * &lt;td&gt;dialect.like-additional-escape-target-chars&lt;/td&gt;
+   * &lt;td&gt;The additional escape target characters(custom wildcard characters) for LIKE condition&lt;/td&gt;
+   * &lt;td&gt;None&lt;/td&gt;
+   * &lt;/tr&gt;
+   * &lt;/table&gt;
+   *
+   * @return a configuration instance
+   */
+  public static SqlGeneratorConfig newInstance() {
+<span class="fc" id="L552">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
+<span class="fc" id="L553">    applyDefaultProperties(config);</span>
+<span class="fc" id="L554">    return config;</span>
+  }
+
+  /**
+   * Create an instance from specified properties file. &lt;br&gt;
+   * you can configure some property using specified properties file that encoded by UTF-8. Also, you can change file
+   * encoding that will read using system property (-Dmybatis-thymeleaf.config.encoding=...).
+   *
+   * @param resourcePath
+   *          A property file resource path
+   *
+   * @return a configuration instance
+   *
+   * @see #newInstance()
+   */
+  public static SqlGeneratorConfig newInstanceWithResourcePath(String resourcePath) {
+<span class="fc" id="L570">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
+<span class="fc" id="L571">    applyResourcePath(config, resourcePath);</span>
+<span class="fc" id="L572">    return config;</span>
+  }
+
+  /**
+   * Create an instance from specified properties.
+   *
+   * @param customProperties
+   *          custom configuration properties
+   *
+   * @return a configuration instance
+   *
+   * @see #newInstance()
+   */
+  public static SqlGeneratorConfig newInstanceWithProperties(Properties customProperties) {
+<span class="fc" id="L586">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
+<span class="fc" id="L587">    applyProperties(config, customProperties);</span>
+<span class="fc" id="L588">    return config;</span>
+  }
+
+  /**
+   * Create an instance using specified customizer and override using a default properties file.
+   *
+   * @param customizer
+   *          baseline customizer
+   *
+   * @return a configuration instance
+   *
+   * @see #newInstance()
+   */
+  public static SqlGeneratorConfig newInstanceWithCustomizer(Consumer&lt;SqlGeneratorConfig&gt; customizer) {
+<span class="fc" id="L602">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
+<span class="fc" id="L603">    customizer.accept(config);</span>
+<span class="fc" id="L604">    applyDefaultProperties(config);</span>
+<span class="fc" id="L605">    return config;</span>
+  }
+
+  /**
+   * Apply properties that read from default properties file. &lt;br&gt;
+   * If you want to customize a default {@code TemplateEngine}, you can configure some property using
+   * mybatis-thymeleaf.properties that encoded by UTF-8. Also, you can change the properties file that will read using
+   * system property (-Dmybatis-thymeleaf.config.file=... -Dmybatis-thymeleaf.config.encoding=...).
+   */
+  static &lt;T extends SqlGeneratorConfig&gt; void applyDefaultProperties(T config) {
+<span class="fc" id="L615">    applyProperties(config, loadDefaultProperties());</span>
+<span class="fc" id="L616">  }</span>
+
+  /**
+   * Apply properties that read from specified properties file. &lt;br&gt;
+   * you can configure some property using specified properties file that encoded by UTF-8. Also, you can change file
+   * encoding that will read using system property (-Dmybatis-thymeleaf.config.encoding=...).
+   *
+   * @param resourcePath
+   *          A property file resource path
+   */
+  static &lt;T extends SqlGeneratorConfig&gt; void applyResourcePath(T config, String resourcePath) {
+<span class="fc" id="L627">    Properties properties = loadDefaultProperties();</span>
+<span class="fc" id="L628">    properties.putAll(loadProperties(resourcePath));</span>
+<span class="fc" id="L629">    applyProperties(config, properties);</span>
+<span class="fc" id="L630">  }</span>
+
+  /**
+   * Apply properties from specified properties.
+   *
+   * @param config
+   *          a configuration instance
+   * @param customProperties
+   *          custom configuration properties
+   */
+  static &lt;T extends SqlGeneratorConfig&gt; void applyProperties(T config, Properties customProperties) {
+<span class="fc" id="L641">    Properties properties = loadDefaultProperties();</span>
+<span class="fc" id="L642">    Optional.ofNullable(customProperties).ifPresent(properties::putAll);</span>
+<span class="fc" id="L643">    override(config, properties);</span>
+<span class="fc" id="L644">  }</span>
+
+  /**
+   * Create new instance using default constructor with specified type.
+   *
+   * @param type
+   *          a target type
+   * @param &lt;T&gt;
+   *          a target type
+   *
+   * @return new instance of target type
+   */
+  static &lt;T&gt; T newInstanceForType(Class&lt;T&gt; type) {
+    try {
+<span class="fc" id="L658">      return type.getConstructor().newInstance();</span>
+<span class="fc" id="L659">    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {</span>
+<span class="fc" id="L660">      throw new IllegalStateException(&quot;Cannot create an instance for class: &quot; + type, e);</span>
+    }
+  }
+
+  private static void override(SqlGeneratorConfig config, Properties properties) {
+<span class="fc" id="L665">    PropertyAccessor standardPropertyAccessor = PropertyAccessor.BuiltIn.STANDARD;</span>
+    try {
+<span class="fc" id="L667">      properties.forEach((key, value) -&gt; {</span>
+<span class="fc" id="L668">        String propertyPath = StringUtils.unCapitalize(StringUtils.capitalizeWords(key, &quot;-&quot;).replaceAll(&quot;-&quot;, &quot;&quot;));</span>
+        try {
+<span class="fc" id="L670">          Object target = config;</span>
+          String propertyName;
+<span class="fc bfc" id="L672" title="All 2 branches covered.">          if (propertyPath.indexOf('.') != -1) {</span>
+<span class="fc" id="L673">            String[] propertyPaths = StringUtils.split(propertyPath, &quot;.&quot;);</span>
+<span class="fc" id="L674">            propertyName = propertyPaths[propertyPaths.length - 1];</span>
+<span class="fc bfc" id="L675" title="All 2 branches covered.">            for (String path : Arrays.copyOf(propertyPaths, propertyPaths.length - 1)) {</span>
+<span class="fc" id="L676">              target = standardPropertyAccessor.getPropertyValue(target, path);</span>
+            }
+<span class="fc" id="L678">          } else {</span>
+<span class="fc" id="L679">            propertyName = propertyPath;</span>
+          }
+<span class="fc" id="L681">          Object convertedValue = TYPE_CONVERTERS</span>
+<span class="pc" id="L682">              .getOrDefault(standardPropertyAccessor.getPropertyType(target.getClass(), propertyName), v -&gt; v)</span>
+<span class="fc" id="L683">              .apply(value.toString());</span>
+<span class="fc" id="L684">          standardPropertyAccessor.setPropertyValue(target, propertyName, convertedValue);</span>
+<span class="fc" id="L685">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L686">          throw new IllegalArgumentException(</span>
+<span class="fc" id="L687">              String.format(&quot;Detected an invalid property. key='%s' value='%s'&quot;, key, value), e);</span>
+<span class="fc" id="L688">        }</span>
+<span class="fc" id="L689">      });</span>
+    } finally {
+<span class="fc" id="L691">      StandardPropertyAccessor.clearCache();</span>
+    }
+<span class="fc" id="L693">  }</span>
+
+  private static Properties loadDefaultProperties() {
+<span class="fc" id="L696">    return loadProperties(System.getProperty(PropertyKeys.CONFIG_FILE, Defaults.PROPERTIES_FILE));</span>
+  }
+
+  private static Properties loadProperties(String resourcePath) {
+<span class="fc" id="L700">    Properties properties = new Properties();</span>
+<span class="fc" id="L701">    Optional.ofNullable(ClassLoaderUtils.findResourceAsStream(resourcePath)).ifPresent(in -&gt; {</span>
+<span class="fc" id="L702">      Charset encoding = Optional.ofNullable(System.getProperty(PropertyKeys.CONFIG_ENCODING)).map(Charset::forName)</span>
+<span class="fc" id="L703">          .orElse(StandardCharsets.UTF_8);</span>
+<span class="fc" id="L704">      try (InputStreamReader inReader = new InputStreamReader(in, encoding);</span>
+<span class="fc" id="L705">          BufferedReader bufReader = new BufferedReader(inReader)) {</span>
+<span class="fc" id="L706">        properties.load(bufReader);</span>
+<span class="nc" id="L707">      } catch (IOException e) {</span>
+<span class="nc" id="L708">        throw new IllegalStateException(e);</span>
+<span class="fc" id="L709">      }</span>
+<span class="fc" id="L710">    });</span>
+<span class="fc" id="L711">    return properties;</span>
+  }
+
+  private static Class&lt;?&gt; toClassForName(String value) {
+    try {
+<span class="fc" id="L716">      return ClassLoaderUtils.loadClass(value.trim());</span>
+<span class="fc" id="L717">    } catch (ClassNotFoundException e) {</span>
+<span class="fc" id="L718">      throw new IllegalStateException(e);</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

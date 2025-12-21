@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ThymeleafSqlSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf</a> &gt; <span class="el_source">ThymeleafSqlSource.java</span></div><h1>ThymeleafSqlSource.java</h1><pre class="source lang-java linenums">/*
+ *    Copyright 2018-2022 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package org.mybatis.scripting.thymeleaf;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.function.BiFunction;
+
+import org.apache.ibatis.builder.SqlSourceBuilder;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.SqlSource;
+import org.apache.ibatis.reflection.MetaClass;
+import org.apache.ibatis.scripting.xmltags.DynamicContext;
+import org.apache.ibatis.session.Configuration;
+import org.thymeleaf.context.IContext;
+
+/**
+ * The {@code SqlSource} for integrating with Thymeleaf.
+ *
+ * @author Kazuki Shimizu
+ *
+ * @version 1.0.0
+ *
+ * @see ThymeleafLanguageDriver
+ */
+class ThymeleafSqlSource implements SqlSource {
+
+  private static class TemporaryTakeoverKeys {
+    private static final String CONFIGURATION = &quot;__configuration__&quot;;
+    private static final String DYNAMIC_CONTEXT = &quot;__dynamicContext__&quot;;
+    private static final String PROCESSING_PARAMETER_TYPE = &quot;__processingParameterType__&quot;;
+  }
+
+  private final Configuration configuration;
+  private final SqlGenerator sqlGenerator;
+  private final SqlSourceBuilder sqlSourceBuilder;
+  private final String sqlTemplate;
+  private final Class&lt;?&gt; parameterType;
+
+  /**
+   * Constructor for for integrating with template engine provide by Thymeleaf.
+   *
+   * @param configuration
+   *          A configuration instance of MyBatis
+   * @param sqlGenerator
+   *          A sql generator using the Thymeleaf feature
+   * @param sqlTemplate
+   *          A template string of SQL (inline SQL or template file path)
+   * @param parameterType
+   *          A parameter type that specified at mapper method argument or xml element
+   */
+  ThymeleafSqlSource(Configuration configuration, SqlGenerator sqlGenerator, String sqlTemplate,
+<span class="fc" id="L73">      Class&lt;?&gt; parameterType) {</span>
+<span class="fc" id="L74">    this.configuration = configuration;</span>
+<span class="fc" id="L75">    this.sqlGenerator = sqlGenerator;</span>
+<span class="fc" id="L76">    this.sqlTemplate = sqlTemplate;</span>
+<span class="fc" id="L77">    this.parameterType = parameterType;</span>
+<span class="fc" id="L78">    this.sqlSourceBuilder = new SqlSourceBuilder(configuration);</span>
+<span class="fc" id="L79">  }</span>
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public BoundSql getBoundSql(Object parameterObject) {
+    Class&lt;?&gt; processingParameterType;
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    if (parameterType == null) {</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">      processingParameterType = parameterObject == null ? Object.class : parameterObject.getClass();</span>
+    } else {
+<span class="fc" id="L90">      processingParameterType = parameterType;</span>
+    }
+
+<span class="fc" id="L93">    DynamicContext dynamicContext = new DynamicContext(configuration, parameterObject);</span>
+<span class="fc" id="L94">    Map&lt;String, Object&gt; customVariables = dynamicContext.getBindings();</span>
+<span class="fc" id="L95">    customVariables.put(TemporaryTakeoverKeys.CONFIGURATION, configuration);</span>
+<span class="fc" id="L96">    customVariables.put(TemporaryTakeoverKeys.DYNAMIC_CONTEXT, dynamicContext);</span>
+<span class="fc" id="L97">    customVariables.put(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE, processingParameterType);</span>
+<span class="fc" id="L98">    String sql = sqlGenerator.generate(sqlTemplate, parameterObject, dynamicContext::bind, customVariables);</span>
+
+<span class="fc" id="L100">    SqlSource sqlSource = sqlSourceBuilder.parse(sql, processingParameterType, dynamicContext.getBindings());</span>
+<span class="fc" id="L101">    BoundSql boundSql = sqlSource.getBoundSql(parameterObject);</span>
+<span class="fc" id="L102">    dynamicContext.getBindings().forEach(boundSql::setAdditionalParameter);</span>
+
+<span class="fc" id="L104">    return boundSql;</span>
+  }
+
+  /**
+   * The factory class for Thymeleaf's context.
+   *
+   * @since 1.0.2
+   */
+<span class="fc" id="L112">  static class ContextFactory implements BiFunction&lt;Object, Map&lt;String, Object&gt;, IContext&gt; {</span>
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IContext apply(Object parameter, Map&lt;String, Object&gt; customVariable) {
+<span class="fc" id="L118">      Configuration configuration = (Configuration) customVariable.remove(TemporaryTakeoverKeys.CONFIGURATION);</span>
+<span class="fc" id="L119">      DynamicContext dynamicContext = (DynamicContext) customVariable.remove(TemporaryTakeoverKeys.DYNAMIC_CONTEXT);</span>
+<span class="fc" id="L120">      Class&lt;?&gt; processingParameterType = (Class&lt;?&gt;) customVariable</span>
+<span class="fc" id="L121">          .remove(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE);</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">      MyBatisBindingContext bindingContext = new MyBatisBindingContext(</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">          parameter != null &amp;&amp; configuration.getTypeHandlerRegistry().hasTypeHandler(processingParameterType));</span>
+<span class="fc" id="L124">      dynamicContext.bind(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);</span>
+      IContext context;
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      if (parameter instanceof Map) {</span>
+        @SuppressWarnings(value = &quot;unchecked&quot;)
+<span class="fc" id="L128">        Map&lt;String, Object&gt; map = (Map&lt;String, Object&gt;) parameter;</span>
+<span class="fc" id="L129">        context = new MapBasedContext(map, dynamicContext, configuration.getVariables());</span>
+<span class="fc" id="L130">      } else {</span>
+<span class="fc" id="L131">        MetaClass metaClass = MetaClass.forClass(processingParameterType, configuration.getReflectorFactory());</span>
+<span class="fc" id="L132">        context = new MetaClassBasedContext(parameter, metaClass, processingParameterType, dynamicContext,</span>
+<span class="fc" id="L133">            configuration.getVariables());</span>
+      }
+<span class="fc" id="L135">      return context;</span>
+    }
+  }
+
+  private abstract static class AbstractContext implements IContext {
+
+    private final DynamicContext dynamicContext;
+    private final Properties configurationProperties;
+    private final Set&lt;String&gt; variableNames;
+
+<span class="fc" id="L145">    private AbstractContext(DynamicContext dynamicContext, Properties configurationProperties) {</span>
+<span class="fc" id="L146">      this.dynamicContext = dynamicContext;</span>
+<span class="fc" id="L147">      this.configurationProperties = configurationProperties;</span>
+<span class="fc" id="L148">      this.variableNames = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L149">      addVariableNames(dynamicContext.getBindings().keySet());</span>
+<span class="fc" id="L150">      Optional.ofNullable(configurationProperties).ifPresent(v -&gt; addVariableNames(v.stringPropertyNames()));</span>
+<span class="fc" id="L151">    }</span>
+
+    void addVariableNames(Collection&lt;String&gt; names) {
+<span class="fc" id="L154">      variableNames.addAll(names);</span>
+<span class="fc" id="L155">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Locale getLocale() {
+<span class="fc" id="L162">      return Locale.getDefault();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsVariable(String name) {
+<span class="nc" id="L170">      return variableNames.contains(name);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set&lt;String&gt; getVariableNames() {
+<span class="fc" id="L178">      return variableNames;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getVariable(String name) {
+<span class="fc bfc" id="L186" title="All 2 branches covered.">      if (dynamicContext.getBindings().containsKey(name)) {</span>
+<span class="fc" id="L187">        return dynamicContext.getBindings().get(name);</span>
+      }
+<span class="fc bfc" id="L189" title="All 4 branches covered.">      if (configurationProperties != null &amp;&amp; configurationProperties.containsKey(name)) {</span>
+<span class="fc" id="L190">        return configurationProperties.getProperty(name);</span>
+      }
+<span class="fc" id="L192">      return getParameterValue(name);</span>
+    }
+
+    abstract Object getParameterValue(String name);
+
+  }
+
+  private static class MapBasedContext extends AbstractContext {
+
+    private final Map&lt;String, Object&gt; variables;
+
+    private MapBasedContext(Map&lt;String, Object&gt; parameterMap, DynamicContext dynamicContext,
+        Properties configurationProperties) {
+<span class="fc" id="L205">      super(dynamicContext, configurationProperties);</span>
+<span class="fc" id="L206">      this.variables = parameterMap;</span>
+<span class="fc" id="L207">      addVariableNames(parameterMap.keySet());</span>
+<span class="fc" id="L208">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getParameterValue(String name) {
+<span class="fc" id="L215">      return variables.get(name);</span>
+    }
+
+  }
+
+  private static class MetaClassBasedContext extends AbstractContext {
+
+    private final Object parameterObject;
+    private final MetaClass parameterMetaClass;
+    private final Class&lt;?&gt; parameterType;
+
+    private MetaClassBasedContext(Object parameterObject, MetaClass parameterMetaClass, Class&lt;?&gt; parameterType,
+        DynamicContext dynamicContext, Properties configurationProperties) {
+<span class="fc" id="L228">      super(dynamicContext, configurationProperties);</span>
+<span class="fc" id="L229">      this.parameterObject = parameterObject;</span>
+<span class="fc" id="L230">      this.parameterMetaClass = parameterMetaClass;</span>
+<span class="fc" id="L231">      this.parameterType = parameterType;</span>
+<span class="fc" id="L232">      addVariableNames(Arrays.asList(parameterMetaClass.getGetterNames()));</span>
+<span class="fc" id="L233">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getParameterValue(String name) {
+      try {
+<span class="fc" id="L241">        return parameterMetaClass.getGetInvoker(name).invoke(parameterObject, null);</span>
+<span class="fc" id="L242">      } catch (IllegalAccessException | InvocationTargetException e) {</span>
+<span class="fc" id="L243">        throw new IllegalStateException(</span>
+<span class="fc" id="L244">            String.format(&quot;Cannot get a value for property named '%s' in '%s'&quot;, name, parameterType), e);</span>
+      }
+    }
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

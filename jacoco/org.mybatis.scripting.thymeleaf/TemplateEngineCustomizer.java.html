@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemplateEngineCustomizer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf</a> &gt; <span class="el_source">TemplateEngineCustomizer.java</span></div><h1>TemplateEngineCustomizer.java</h1><pre class="source lang-java linenums">/*
+ *    Copyright 2018-2022 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package org.mybatis.scripting.thymeleaf;
+
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.templateresolver.ITemplateResolver;
+
+/**
+ * The interface for customizing a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf. &lt;br&gt;
+ * If you want to customize a default {@code TemplateEngine}, you implements class of this interface and you need to
+ * specify the 'customizer' property of mybatis-thymeleaf.properties. &lt;br&gt;
+ * &lt;br&gt;
+ * e.g.) Implementation class:
+ *
+ * &lt;pre&gt;
+ * package com.example;
+ *
+ * // ...
+ * public class MyTemplateEngineCustomizer implements TemplateEngineCustomizer {
+ *   public void customize(TemplateEngine defaultTemplateEngine) {
+ *     // ...
+ *   }
+ * }
+ * &lt;/pre&gt;
+ *
+ * &lt;br&gt;
+ * e.g.) Configuration file (mybatis-thymeleaf.properties):
+ *
+ * &lt;pre&gt;
+ * customizer = com.example.MyTemplateEngineCustomizer
+ * &lt;/pre&gt;
+ *
+ * @author Kazuki Shimizu
+ *
+ * @version 1.0.0
+ */
+@FunctionalInterface
+public interface TemplateEngineCustomizer extends Consumer&lt;TemplateEngine&gt; {
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see #customize(TemplateEngine)
+   */
+  @Override
+  default void accept(TemplateEngine templateEngine) {
+<span class="fc" id="L63">    customize(templateEngine);</span>
+<span class="fc" id="L64">  }</span>
+
+  /**
+   * Customize a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf.
+   *
+   * @param defaultTemplateEngine
+   *          a default {@code TemplateEngine} instanced by the MyBatis Thymeleaf
+   */
+  void customize(TemplateEngine defaultTemplateEngine);
+
+  /**
+   * Utility method to extract a {@code ITemplateResolver} that implements specified type.
+   *
+   * @param templateEngine
+   *          A target {@code TemplateEngine}
+   * @param type
+   *          A target type for extracting instance
+   * @param &lt;T&gt;
+   *          A type that implements the {@code ITemplateResolver}
+   *
+   * @return A {@code ITemplateResolver} instance that implements specified type
+   */
+  static &lt;T extends ITemplateResolver&gt; Optional&lt;T&gt; extractTemplateResolver(TemplateEngine templateEngine,
+      Class&lt;T&gt; type) {
+<span class="fc" id="L88">    return templateEngine.getTemplateResolvers().stream().filter(type::isInstance).map(type::cast).findFirst();</span>
+  }
+
+  /**
+   * Enum for providing builtin customizer instance.
+   *
+   * @since 1.0.0
+   */
+<span class="fc" id="L96">  enum BuiltIn implements TemplateEngineCustomizer {</span>
+
+    /**
+     * Default instance.
+     * &lt;p&gt;
+     * This customizer instance do nothing.
+     * &lt;/p&gt;
+     */
+<span class="fc" id="L104">    DO_NOTHING {</span>
+      @Override
+      public void customize(TemplateEngine defaultTemplateEngine) {
+        // NOP
+<span class="fc" id="L108">      }</span>
+    }
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
