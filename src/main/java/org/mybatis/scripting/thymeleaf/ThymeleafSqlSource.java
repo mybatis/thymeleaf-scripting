@@ -36,6 +36,7 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.parsing.GenericTokenParser;
 import org.apache.ibatis.reflection.MetaClass;
+import org.apache.ibatis.reflection.ParamNameResolver;
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
 import org.thymeleaf.context.IContext;
@@ -61,6 +62,7 @@ class ThymeleafSqlSource implements SqlSource {
   private final SqlGenerator sqlGenerator;
   private final String sqlTemplate;
   private final Class<?> parameterType;
+  private final ParamNameResolver paramNameResolver;
 
   /**
    * Constructor for for integrating with template engine provide by Thymeleaf.
@@ -74,12 +76,23 @@ class ThymeleafSqlSource implements SqlSource {
    * @param parameterType
    *          A parameter type that specified at mapper method argument or xml element
    */
+  ThymeleafSqlSource(Configuration configuration, SqlGenerator sqlGenerator, String sqlTemplate, Class<?> parameterType,
+      ParamNameResolver paramNameResolver) {
+    this.configuration = configuration;
+    this.sqlGenerator = sqlGenerator;
+    this.sqlTemplate = sqlTemplate;
+    this.parameterType = parameterType;
+    this.paramNameResolver = paramNameResolver;
+  }
+
+  @Deprecated
   ThymeleafSqlSource(Configuration configuration, SqlGenerator sqlGenerator, String sqlTemplate,
       Class<?> parameterType) {
     this.configuration = configuration;
     this.sqlGenerator = sqlGenerator;
     this.sqlTemplate = sqlTemplate;
     this.parameterType = parameterType;
+    this.paramNameResolver = null;
   }
 
   /**
@@ -104,7 +117,7 @@ class ThymeleafSqlSource implements SqlSource {
     customVariables.put(TemporaryTakeoverKeys.PROCESSING_PARAMETER_TYPE, processingParameterType);
     String sql = sqlGenerator.generate(sqlTemplate, parameterObject, bindings::put, customVariables);
 
-    SqlSource sqlSource = parse(configuration, sql, parameterObject, bindings);
+    SqlSource sqlSource = parse(configuration, sql, parameterObject, bindings, paramNameResolver);
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     bindings.forEach(boundSql::setAdditionalParameter);
 
@@ -112,11 +125,11 @@ class ThymeleafSqlSource implements SqlSource {
   }
 
   private static SqlSource parse(Configuration configuration, String originalSql, Object parameterObject,
-      Map<String, Object> additionalParameters) {
+      Map<String, Object> additionalParameters, ParamNameResolver pnResolver) {
     Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
     List<ParameterMapping> parameterMappings = new ArrayList<>();
     ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler(parameterMappings, configuration,
-        parameterObject, parameterType, additionalParameters, true);
+        parameterObject, parameterType, additionalParameters, pnResolver, false);
     GenericTokenParser parser = new GenericTokenParser("#{", "}", handler);
     return SqlSourceBuilder.buildSqlSource(configuration, parser.parse(originalSql), parameterMappings);
   }
