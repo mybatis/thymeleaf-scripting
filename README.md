@@ -2,8 +2,7 @@
 
 [![Java CI](https://github.com/mybatis/thymeleaf-scripting/actions/workflows/ci.yaml/badge.svg)](https://github.com/mybatis/thymeleaf-scripting/actions/workflows/ci.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/mybatis/thymeleaf-scripting/badge.svg?branch=master)](https://coveralls.io/github/mybatis/thymeleaf-scripting?branch=master)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/org.mybatis.scripting/mybatis-thymeleaf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.mybatis.scripting/mybatis-thymeleaf)
-[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.mybatis.scripting/mybatis-thymeleaf.svg)](https://oss.sonatype.org/content/repositories/snapshots/org/mybatis/scripting/mybatis-thymeleaf/)
+[![Maven Central](https://img.shields.io/maven-central/v/org.mybatis.scripting/mybatis-thymeleaf?label=maven%20central)](https://central.sonatype.com/artifact/org.mybatis.scripting/mybatis-thymeleaf)
 [![License](https://img.shields.io/:license-apache-brightgreen.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 ![thymeleaf-scripting](https://mybatis.org/images/mybatis-logo.png)
