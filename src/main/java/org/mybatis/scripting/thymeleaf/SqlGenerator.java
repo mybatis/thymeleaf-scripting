@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.mybatis.scripting.thymeleaf;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -49,7 +48,7 @@ public class SqlGenerator {
   }
 
   private final ITemplateEngine templateEngine;
-  private Map<String, Object> defaultCustomVariables = Collections.emptyMap();
+  private Map<String, Object> defaultCustomVariables = Map.of();
   private PropertyAccessor propertyAccessor = PropertyAccessor.BuiltIn.STANDARD;
   private BiFunction<Object, Map<String, Object>, IContext> contextFactory = DefaultContext::new;
 
@@ -87,8 +86,7 @@ public class SqlGenerator {
    *          a default custom variables for passing to template engine
    */
   public void setDefaultCustomVariables(Map<String, Object> defaultCustomVariables) {
-    this.defaultCustomVariables = Optional.ofNullable(defaultCustomVariables).map(Collections::unmodifiableMap)
-        .orElseGet(Collections::emptyMap);
+    this.defaultCustomVariables = defaultCustomVariables == null ? Map.of() : Map.copyOf(defaultCustomVariables);
   }
 
   /**

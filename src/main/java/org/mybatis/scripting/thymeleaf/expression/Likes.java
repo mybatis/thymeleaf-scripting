@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.mybatis.scripting.thymeleaf.expression;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -34,7 +33,7 @@ public class Likes {
 
   private char escapeChar = '\\';
 
-  private Set<Character> additionalEscapeTargetChars = Collections.emptySet();
+  private Set<Character> additionalEscapeTargetChars = Set.of();
 
   private Function<Character, String> escapeClauseSupplier = targetEscapeChar -> "ESCAPE '" + targetEscapeChar + "'";
 

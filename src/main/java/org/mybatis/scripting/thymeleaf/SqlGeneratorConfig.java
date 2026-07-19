@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -67,7 +66,7 @@ public class SqlGeneratorConfig {
     converters.put(Long.class, v -> Long.valueOf(v.trim()));
     converters.put(String[].class, v -> Stream.of(v.split(",")).map(String::trim).toArray(String[]::new));
     converters.put(Class.class, SqlGeneratorConfig::toClassForName);
-    TYPE_CONVERTERS = Collections.unmodifiableMap(converters);
+    TYPE_CONVERTERS = Map.copyOf(converters);
   }
 
   /**

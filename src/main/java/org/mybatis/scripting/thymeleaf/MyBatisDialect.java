@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.mybatis.scripting.thymeleaf;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -124,7 +123,7 @@ public class MyBatisDialect extends AbstractProcessorDialect implements IExpress
      */
     @Override
     public Set<String> getAllExpressionObjectNames() {
-      return Collections.singleton("likes");
+      return Set.of("likes");
     }
 
     /**
