@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SqlGenerator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf</a> &gt; <span class="el_source">SqlGenerator.java</span></div><h1>SqlGenerator.java</h1><pre class="source lang-java linenums">/*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.mybatis.scripting.thymeleaf;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -44,21 +43,21 @@ import org.thymeleaf.templateresolver.StringTemplateResolver;
  */
 public class SqlGenerator {
 
-<span class="nc" id="L47">  static class ContextKeys {</span>
+<span class="nc" id="L46">  static class ContextKeys {</span>
     static final String PARAMETER_OBJECT = &quot;_parameter&quot;;
   }
 
   private final ITemplateEngine templateEngine;
-<span class="fc" id="L52">  private Map&lt;String, Object&gt; defaultCustomVariables = Collections.emptyMap();</span>
-<span class="fc" id="L53">  private PropertyAccessor propertyAccessor = PropertyAccessor.BuiltIn.STANDARD;</span>
-<span class="fc" id="L54">  private BiFunction&lt;Object, Map&lt;String, Object&gt;, IContext&gt; contextFactory = DefaultContext::new;</span>
+<span class="fc" id="L51">  private Map&lt;String, Object&gt; defaultCustomVariables = Map.of();</span>
+<span class="fc" id="L52">  private PropertyAccessor propertyAccessor = PropertyAccessor.BuiltIn.STANDARD;</span>
+<span class="fc" id="L53">  private BiFunction&lt;Object, Map&lt;String, Object&gt;, IContext&gt; contextFactory = DefaultContext::new;</span>
 
   /**
    * Constructor for creating instance with default {@code TemplateEngine}.
    */
-<span class="fc" id="L59">  public SqlGenerator() {</span>
-<span class="fc" id="L60">    this.templateEngine = createDefaultTemplateEngine(SqlGeneratorConfig.newInstance());</span>
-<span class="fc" id="L61">  }</span>
+<span class="fc" id="L58">  public SqlGenerator() {</span>
+<span class="fc" id="L59">    this.templateEngine = createDefaultTemplateEngine(SqlGeneratorConfig.newInstance());</span>
+<span class="fc" id="L60">  }</span>
 
   /**
    * Constructor for creating instance with user specified {@link SqlGenerator}.
@@ -66,9 +65,9 @@ public class SqlGenerator {
    * @param config
    *          A user defined {@link SqlGeneratorConfig} instance
    */
-<span class="fc" id="L69">  public SqlGenerator(SqlGeneratorConfig config) {</span>
-<span class="fc" id="L70">    this.templateEngine = createDefaultTemplateEngine(config);</span>
-<span class="fc" id="L71">  }</span>
+<span class="fc" id="L68">  public SqlGenerator(SqlGeneratorConfig config) {</span>
+<span class="fc" id="L69">    this.templateEngine = createDefaultTemplateEngine(config);</span>
+<span class="fc" id="L70">  }</span>
 
   /**
    * Constructor for creating instance with user defined {@code ITemplateEngine}.
@@ -76,9 +75,9 @@ public class SqlGenerator {
    * @param templateEngine
    *          A user defined {@code ITemplateEngine} instance
    */
-<span class="fc" id="L79">  public SqlGenerator(ITemplateEngine templateEngine) {</span>
-<span class="fc" id="L80">    this.templateEngine = templateEngine;</span>
-<span class="fc" id="L81">  }</span>
+<span class="fc" id="L78">  public SqlGenerator(ITemplateEngine templateEngine) {</span>
+<span class="fc" id="L79">    this.templateEngine = templateEngine;</span>
+<span class="fc" id="L80">  }</span>
 
   /**
    * Set default custom variables.
@@ -87,9 +86,8 @@ public class SqlGenerator {
    *          a default custom variables for passing to template engine
    */
   public void setDefaultCustomVariables(Map&lt;String, Object&gt; defaultCustomVariables) {
-<span class="fc" id="L90">    this.defaultCustomVariables = Optional.ofNullable(defaultCustomVariables).map(Collections::unmodifiableMap)</span>
-<span class="fc" id="L91">        .orElseGet(Collections::emptyMap);</span>
-<span class="fc" id="L92">  }</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">    this.defaultCustomVariables = defaultCustomVariables == null ? Map.of() : Map.copyOf(defaultCustomVariables);</span>
+<span class="fc" id="L90">  }</span>
 
   /**
    * Get specified default custom variables.
@@ -97,7 +95,7 @@ public class SqlGenerator {
    * @return specified default custom variables
    */
   public Map&lt;String, Object&gt; getDefaultCustomVariables() {
-<span class="nc" id="L100">    return defaultCustomVariables;</span>
+<span class="nc" id="L98">    return defaultCustomVariables;</span>
   }
 
   /**
@@ -110,8 +108,8 @@ public class SqlGenerator {
    *          a property accessor
    */
   public void setPropertyAccessor(PropertyAccessor propertyAccessor) {
-<span class="fc" id="L113">    this.propertyAccessor = Optional.ofNullable(propertyAccessor).orElse(PropertyAccessor.BuiltIn.STANDARD);</span>
-<span class="fc" id="L114">  }</span>
+<span class="fc" id="L111">    this.propertyAccessor = Optional.ofNullable(propertyAccessor).orElse(PropertyAccessor.BuiltIn.STANDARD);</span>
+<span class="fc" id="L112">  }</span>
 
   /**
    * Set a factory function for creating instance of custom context.
@@ -120,46 +118,46 @@ public class SqlGenerator {
    *          a factory function
    */
   void setContextFactory(BiFunction&lt;Object, Map&lt;String, Object&gt;, IContext&gt; contextFactory) {
-<span class="fc" id="L123">    this.contextFactory = contextFactory;</span>
-<span class="fc" id="L124">  }</span>
+<span class="fc" id="L121">    this.contextFactory = contextFactory;</span>
+<span class="fc" id="L122">  }</span>
 
   private ITemplateEngine createDefaultTemplateEngine(SqlGeneratorConfig config) {
-<span class="fc" id="L127">    MyBatisDialect dialect = new MyBatisDialect(config.getDialect().getPrefix());</span>
-<span class="fc" id="L128">    Optional.ofNullable(config.getDialect().getBindVariableRenderInstance()).ifPresent(dialect::setBindVariableRender);</span>
-<span class="fc" id="L129">    Likes likes = Likes.newBuilder().escapeChar(config.getDialect().getLikeEscapeChar())</span>
-<span class="fc" id="L130">        .escapeClauseFormat(config.getDialect().getLikeEscapeClauseFormat())</span>
-<span class="fc" id="L131">        .additionalEscapeTargetChars(config.getDialect().getLikeAdditionalEscapeTargetChars()).build();</span>
-<span class="fc" id="L132">    dialect.setLikes(likes);</span>
+<span class="fc" id="L125">    MyBatisDialect dialect = new MyBatisDialect(config.getDialect().getPrefix());</span>
+<span class="fc" id="L126">    Optional.ofNullable(config.getDialect().getBindVariableRenderInstance()).ifPresent(dialect::setBindVariableRender);</span>
+<span class="fc" id="L127">    Likes likes = Likes.newBuilder().escapeChar(config.getDialect().getLikeEscapeChar())</span>
+<span class="fc" id="L128">        .escapeClauseFormat(config.getDialect().getLikeEscapeClauseFormat())</span>
+<span class="fc" id="L129">        .additionalEscapeTargetChars(config.getDialect().getLikeAdditionalEscapeTargetChars()).build();</span>
+<span class="fc" id="L130">    dialect.setLikes(likes);</span>
 
     // Create an ClassLoaderTemplateResolver instance
-<span class="fc" id="L135">    ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();</span>
-<span class="fc bfc" id="L136" title="All 2 branches covered.">    TemplateMode mode = config.isUse2way() ? TemplateMode.CSS : TemplateMode.TEXT;</span>
-<span class="fc" id="L137">    classLoaderTemplateResolver.setOrder(1);</span>
-<span class="fc" id="L138">    classLoaderTemplateResolver.setTemplateMode(mode);</span>
-<span class="fc" id="L139">    classLoaderTemplateResolver</span>
-<span class="fc" id="L140">        .setResolvablePatterns(Arrays.stream(config.getTemplateFile().getPatterns()).collect(Collectors.toSet()));</span>
-<span class="fc" id="L141">    classLoaderTemplateResolver.setCharacterEncoding(config.getTemplateFile().getEncoding().name());</span>
-<span class="fc" id="L142">    classLoaderTemplateResolver.setCacheable(config.getTemplateFile().isCacheEnabled());</span>
-<span class="fc" id="L143">    classLoaderTemplateResolver.setCacheTTLMs(config.getTemplateFile().getCacheTtl());</span>
-<span class="fc" id="L144">    classLoaderTemplateResolver.setPrefix(config.getTemplateFile().getBaseDir());</span>
+<span class="fc" id="L133">    ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">    TemplateMode mode = config.isUse2way() ? TemplateMode.CSS : TemplateMode.TEXT;</span>
+<span class="fc" id="L135">    classLoaderTemplateResolver.setOrder(1);</span>
+<span class="fc" id="L136">    classLoaderTemplateResolver.setTemplateMode(mode);</span>
+<span class="fc" id="L137">    classLoaderTemplateResolver</span>
+<span class="fc" id="L138">        .setResolvablePatterns(Arrays.stream(config.getTemplateFile().getPatterns()).collect(Collectors.toSet()));</span>
+<span class="fc" id="L139">    classLoaderTemplateResolver.setCharacterEncoding(config.getTemplateFile().getEncoding().name());</span>
+<span class="fc" id="L140">    classLoaderTemplateResolver.setCacheable(config.getTemplateFile().isCacheEnabled());</span>
+<span class="fc" id="L141">    classLoaderTemplateResolver.setCacheTTLMs(config.getTemplateFile().getCacheTtl());</span>
+<span class="fc" id="L142">    classLoaderTemplateResolver.setPrefix(config.getTemplateFile().getBaseDir());</span>
 
     // Create an StringTemplateResolver instance
-<span class="fc" id="L147">    StringTemplateResolver stringTemplateResolver = new StringTemplateResolver();</span>
-<span class="fc" id="L148">    stringTemplateResolver.setOrder(2);</span>
-<span class="fc" id="L149">    stringTemplateResolver.setTemplateMode(mode);</span>
+<span class="fc" id="L145">    StringTemplateResolver stringTemplateResolver = new StringTemplateResolver();</span>
+<span class="fc" id="L146">    stringTemplateResolver.setOrder(2);</span>
+<span class="fc" id="L147">    stringTemplateResolver.setTemplateMode(mode);</span>
 
     // Create an TemplateEngine instance
-<span class="fc" id="L152">    TemplateEngine targetTemplateEngine = new TemplateEngine();</span>
-<span class="fc" id="L153">    targetTemplateEngine.addTemplateResolver(classLoaderTemplateResolver);</span>
-<span class="fc" id="L154">    targetTemplateEngine.addTemplateResolver(stringTemplateResolver);</span>
-<span class="fc" id="L155">    targetTemplateEngine.addDialect(dialect);</span>
-<span class="fc" id="L156">    targetTemplateEngine.setEngineContextFactory(</span>
-<span class="fc" id="L157">        new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));</span>
+<span class="fc" id="L150">    TemplateEngine targetTemplateEngine = new TemplateEngine();</span>
+<span class="fc" id="L151">    targetTemplateEngine.addTemplateResolver(classLoaderTemplateResolver);</span>
+<span class="fc" id="L152">    targetTemplateEngine.addTemplateResolver(stringTemplateResolver);</span>
+<span class="fc" id="L153">    targetTemplateEngine.addDialect(dialect);</span>
+<span class="fc" id="L154">    targetTemplateEngine.setEngineContextFactory(</span>
+<span class="fc" id="L155">        new MyBatisIntegratingEngineContextFactory(targetTemplateEngine.getEngineContextFactory()));</span>
 
     // Create an TemplateEngineCustomizer instance and apply
-<span class="fc" id="L160">    Optional.ofNullable(config.getCustomizerInstance()).ifPresent(x -&gt; x.accept(targetTemplateEngine));</span>
+<span class="fc" id="L158">    Optional.ofNullable(config.getCustomizerInstance()).ifPresent(x -&gt; x.accept(targetTemplateEngine));</span>
 
-<span class="fc" id="L162">    return targetTemplateEngine;</span>
+<span class="fc" id="L160">    return targetTemplateEngine;</span>
   }
 
   /**
@@ -173,7 +171,7 @@ public class SqlGenerator {
    * @return a processed SQL by template engine
    */
   public String generate(CharSequence sqlTemplate, Object parameter) {
-<span class="fc" id="L176">    return generate(sqlTemplate, parameter, null, null);</span>
+<span class="fc" id="L174">    return generate(sqlTemplate, parameter, null, null);</span>
   }
 
   /**
@@ -190,7 +188,7 @@ public class SqlGenerator {
    */
   public String generate(CharSequence sqlTemplate, Object parameter,
       BiConsumer&lt;String, Object&gt; customBindVariableBinder) {
-<span class="fc" id="L193">    return generate(sqlTemplate, parameter, customBindVariableBinder, null);</span>
+<span class="fc" id="L191">    return generate(sqlTemplate, parameter, customBindVariableBinder, null);</span>
   }
 
   /**
@@ -206,7 +204,7 @@ public class SqlGenerator {
    * @return a processed SQL by template engine
    */
   public String generate(CharSequence sqlTemplate, Object parameter, Map&lt;String, Object&gt; customVariables) {
-<span class="fc" id="L209">    return generate(sqlTemplate, parameter, null, customVariables);</span>
+<span class="fc" id="L207">    return generate(sqlTemplate, parameter, null, customVariables);</span>
   }
 
   /**
@@ -226,79 +224,79 @@ public class SqlGenerator {
   public String generate(CharSequence sqlTemplate, Object parameter,
       BiConsumer&lt;String, Object&gt; customBindVariableBinder, Map&lt;String, Object&gt; customVariables) {
 
-<span class="fc" id="L229">    Map&lt;String, Object&gt; processingCustomVariables = new HashMap&lt;&gt;(defaultCustomVariables);</span>
-<span class="fc" id="L230">    Optional.ofNullable(customVariables).ifPresent(processingCustomVariables::putAll);</span>
+<span class="fc" id="L227">    Map&lt;String, Object&gt; processingCustomVariables = new HashMap&lt;&gt;(defaultCustomVariables);</span>
+<span class="fc" id="L228">    Optional.ofNullable(customVariables).ifPresent(processingCustomVariables::putAll);</span>
 
-<span class="fc" id="L232">    IContext context = contextFactory.apply(parameter, processingCustomVariables);</span>
-<span class="fc" id="L233">    String sql = templateEngine.process(sqlTemplate.toString(), context);</span>
+<span class="fc" id="L230">    IContext context = contextFactory.apply(parameter, processingCustomVariables);</span>
+<span class="fc" id="L231">    String sql = templateEngine.process(sqlTemplate.toString(), context);</span>
 
-<span class="fc" id="L235">    MyBatisBindingContext bindingContext = MyBatisBindingContext.load(context);</span>
-<span class="pc bpc" id="L236" title="1 of 4 branches missed.">    if (bindingContext != null &amp;&amp; customBindVariableBinder != null) {</span>
-<span class="fc" id="L237">      bindingContext.getCustomBindVariables().forEach(customBindVariableBinder);</span>
+<span class="fc" id="L233">    MyBatisBindingContext bindingContext = MyBatisBindingContext.load(context);</span>
+<span class="pc bpc" id="L234" title="1 of 4 branches missed.">    if (bindingContext != null &amp;&amp; customBindVariableBinder != null) {</span>
+<span class="fc" id="L235">      bindingContext.getCustomBindVariables().forEach(customBindVariableBinder);</span>
     }
 
-<span class="fc" id="L240">    return sql;</span>
+<span class="fc" id="L238">    return sql;</span>
   }
 
   private class DefaultContext implements IContext {
 
     private final Object parameter;
     private final Map&lt;String, Object&gt; mapParameter;
-<span class="fc" id="L247">    private final Set&lt;String&gt; propertyNames = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L245">    private final Set&lt;String&gt; propertyNames = new HashSet&lt;&gt;();</span>
     private final Map&lt;String, Object&gt; customVariables;
 
-<span class="fc" id="L250">    private DefaultContext(Object parameter, Map&lt;String, Object&gt; customVariables) {</span>
-<span class="fc" id="L251">      this.parameter = parameter;</span>
+<span class="fc" id="L248">    private DefaultContext(Object parameter, Map&lt;String, Object&gt; customVariables) {</span>
+<span class="fc" id="L249">      this.parameter = parameter;</span>
       boolean fallback;
-<span class="fc bfc" id="L253" title="All 2 branches covered.">      if (parameter instanceof Map) {</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">      if (parameter instanceof Map) {</span>
         @SuppressWarnings(&quot;unchecked&quot;)
-<span class="fc" id="L255">        Map&lt;String, Object&gt; map = (Map&lt;String, Object&gt;) parameter;</span>
-<span class="fc" id="L256">        propertyNames.addAll(map.keySet());</span>
-<span class="fc" id="L257">        this.mapParameter = map;</span>
-<span class="fc" id="L258">        fallback = false;</span>
-<span class="fc" id="L259">      } else {</span>
-<span class="fc" id="L260">        this.mapParameter = null;</span>
-<span class="fc bfc" id="L261" title="All 2 branches covered.">        if (parameter != null) {</span>
-<span class="fc" id="L262">          propertyNames.addAll(propertyAccessor.getPropertyNames(parameter.getClass()));</span>
+<span class="fc" id="L253">        Map&lt;String, Object&gt; map = (Map&lt;String, Object&gt;) parameter;</span>
+<span class="fc" id="L254">        propertyNames.addAll(map.keySet());</span>
+<span class="fc" id="L255">        this.mapParameter = map;</span>
+<span class="fc" id="L256">        fallback = false;</span>
+<span class="fc" id="L257">      } else {</span>
+<span class="fc" id="L258">        this.mapParameter = null;</span>
+<span class="fc bfc" id="L259" title="All 2 branches covered.">        if (parameter != null) {</span>
+<span class="fc" id="L260">          propertyNames.addAll(propertyAccessor.getPropertyNames(parameter.getClass()));</span>
         }
-<span class="fc" id="L264">        fallback = propertyNames.isEmpty();</span>
+<span class="fc" id="L262">        fallback = propertyNames.isEmpty();</span>
       }
-<span class="fc" id="L266">      MyBatisBindingContext bindingContext = new MyBatisBindingContext(fallback);</span>
-<span class="fc" id="L267">      this.customVariables = customVariables;</span>
-<span class="fc" id="L268">      customVariables.put(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);</span>
-<span class="fc" id="L269">      customVariables.put(ContextKeys.PARAMETER_OBJECT, parameter);</span>
-<span class="fc" id="L270">    }</span>
+<span class="fc" id="L264">      MyBatisBindingContext bindingContext = new MyBatisBindingContext(fallback);</span>
+<span class="fc" id="L265">      this.customVariables = customVariables;</span>
+<span class="fc" id="L266">      customVariables.put(MyBatisBindingContext.CONTEXT_VARIABLE_NAME, bindingContext);</span>
+<span class="fc" id="L267">      customVariables.put(ContextKeys.PARAMETER_OBJECT, parameter);</span>
+<span class="fc" id="L268">    }</span>
 
     @Override
     public Locale getLocale() {
-<span class="fc" id="L274">      return Locale.getDefault();</span>
+<span class="fc" id="L272">      return Locale.getDefault();</span>
     }
 
     @Override
     public boolean containsVariable(String name) {
-<span class="nc bnc" id="L279" title="All 4 branches missed.">      return customVariables.containsKey(name) || propertyNames.contains(name);</span>
+<span class="nc bnc" id="L277" title="All 4 branches missed.">      return customVariables.containsKey(name) || propertyNames.contains(name);</span>
     }
 
     @Override
     public Set&lt;String&gt; getVariableNames() {
-<span class="fc" id="L284">      Set&lt;String&gt; variableNames = new HashSet&lt;&gt;(customVariables.keySet());</span>
-<span class="fc" id="L285">      variableNames.addAll(propertyNames);</span>
-<span class="fc" id="L286">      return variableNames;</span>
+<span class="fc" id="L282">      Set&lt;String&gt; variableNames = new HashSet&lt;&gt;(customVariables.keySet());</span>
+<span class="fc" id="L283">      variableNames.addAll(propertyNames);</span>
+<span class="fc" id="L284">      return variableNames;</span>
     }
 
     @Override
     public Object getVariable(String name) {
-<span class="fc bfc" id="L291" title="All 2 branches covered.">      if (customVariables.containsKey(name)) {</span>
-<span class="fc" id="L292">        return customVariables.get(name);</span>
+<span class="fc bfc" id="L289" title="All 2 branches covered.">      if (customVariables.containsKey(name)) {</span>
+<span class="fc" id="L290">        return customVariables.get(name);</span>
       }
-<span class="fc bfc" id="L294" title="All 2 branches covered.">      if (mapParameter == null) {</span>
-<span class="fc" id="L295">        return propertyAccessor.getPropertyValue(parameter, name);</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">      if (mapParameter == null) {</span>
+<span class="fc" id="L293">        return propertyAccessor.getPropertyValue(parameter, name);</span>
       } else {
-<span class="fc" id="L297">        return mapParameter.get(name);</span>
+<span class="fc" id="L295">        return mapParameter.get(name);</span>
       }
     }
 
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

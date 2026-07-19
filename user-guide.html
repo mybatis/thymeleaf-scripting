@@ -41,8 +41,8 @@
 <h1>MyBatis Thymeleaf User&#8217;s Guide</h1>
 <div class="details">
 <span id="author" class="author">The MyBatis Team</span><br>
-<span id="revnumber">version 1.1.1,</span>
-<span id="revdate">2025-12-21</span>
+<span id="revnumber">version 1.2.0,</span>
+<span id="revdate">2026-07-19</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -370,7 +370,7 @@ for integrating with template engine provide by Thymeleaf.</p>
   <span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.mybatis.scripting<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>mybatis-thymeleaf<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>1.1.1<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;version&gt;</span>1.2.0<span class="tag">&lt;/version&gt;</span>
   <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;/dependencies&gt;</span></code></pre>
 </div>
@@ -402,7 +402,7 @@ for using the "Sonatype OSS Snapshots Repository" as follow:</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
   compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis:mybatis:3.5.19</span><span class="delimiter">&quot;</span></span>) <span class="comment">// Adjust version to your application</span>
-  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting:mybatis-thymeleaf:1.1.1</span><span class="delimiter">&quot;</span></span>)
+  compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis.scripting:mybatis-thymeleaf:1.2.0</span><span class="delimiter">&quot;</span></span>)
 }</code></pre>
 </div>
 </div>
@@ -1754,7 +1754,7 @@ conditionsMap.put(<span class="string"><span class="delimiter">&quot;</span><spa
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">SqlGenerator sqlGenerator = <span class="keyword">new</span> SqlGenerator();
 sqlGenerator.setDefaultCustomVariables(
-    <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">accountsTableName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="predefined-type">Map</span>.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">accountsTableName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="1"></i><b>(1)</b>
 
 Account account = <span class="keyword">new</span> Account();
 account.setName(<span class="string"><span class="delimiter">&quot;</span><span class="content">Taro Yamada</span><span class="delimiter">&quot;</span></span>);
@@ -2600,7 +2600,7 @@ fun findById(id: Int): Name</code></pre>
 -->
 <div>
     <div class="text-center">
-        <p>Copyright &copy;2018-2025 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</p>
+        <p>Copyright &copy;2018-2026 <a href="http://www.mybatis.org/">MyBatis.org</a>. All rights reserved.</p>
     </div>
 </div>
 </body>

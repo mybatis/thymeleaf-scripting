@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SqlGeneratorConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MyBatis Thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.mybatis.scripting.thymeleaf</a> &gt; <span class="el_source">SqlGeneratorConfig.java</span></div><h1>SqlGeneratorConfig.java</h1><pre class="source lang-java linenums">/*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -43,7 +42,7 @@ import org.thymeleaf.util.StringUtils;
  *
  * @since 1.0.2
  */
-<span class="fc" id="L46">public class SqlGeneratorConfig {</span>
+<span class="fc" id="L45">public class SqlGeneratorConfig {</span>
 
   private static class PropertyKeys {
     private static final String CONFIG_FILE = &quot;mybatis-thymeleaf.config.file&quot;;
@@ -57,23 +56,23 @@ import org.thymeleaf.util.StringUtils;
   private static final Map&lt;Class&lt;?&gt;, Function&lt;String, Object&gt;&gt; TYPE_CONVERTERS;
 
   static {
-<span class="fc" id="L60">    Map&lt;Class&lt;?&gt;, Function&lt;String, Object&gt;&gt; converters = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L61">    converters.put(boolean.class, v -&gt; Boolean.valueOf(v.trim()));</span>
-<span class="fc" id="L62">    converters.put(String.class, String::trim);</span>
-<span class="pc bpc" id="L63" title="1 of 2 branches missed.">    converters.put(Character[].class, v -&gt; Stream.of(v.split(&quot;,&quot;)).map(String::trim).filter(e -&gt; e.length() == 1)</span>
-<span class="fc" id="L64">        .map(e -&gt; e.charAt(0)).toArray(Character[]::new));</span>
-<span class="fc" id="L65">    converters.put(Character.class, v -&gt; v.trim().charAt(0));</span>
-<span class="fc" id="L66">    converters.put(Charset.class, v -&gt; Charset.forName(v.trim()));</span>
-<span class="fc" id="L67">    converters.put(Long.class, v -&gt; Long.valueOf(v.trim()));</span>
-<span class="fc" id="L68">    converters.put(String[].class, v -&gt; Stream.of(v.split(&quot;,&quot;)).map(String::trim).toArray(String[]::new));</span>
-<span class="fc" id="L69">    converters.put(Class.class, SqlGeneratorConfig::toClassForName);</span>
-<span class="fc" id="L70">    TYPE_CONVERTERS = Collections.unmodifiableMap(converters);</span>
-<span class="fc" id="L71">  }</span>
+<span class="fc" id="L59">    Map&lt;Class&lt;?&gt;, Function&lt;String, Object&gt;&gt; converters = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L60">    converters.put(boolean.class, v -&gt; Boolean.valueOf(v.trim()));</span>
+<span class="fc" id="L61">    converters.put(String.class, String::trim);</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    converters.put(Character[].class, v -&gt; Stream.of(v.split(&quot;,&quot;)).map(String::trim).filter(e -&gt; e.length() == 1)</span>
+<span class="fc" id="L63">        .map(e -&gt; e.charAt(0)).toArray(Character[]::new));</span>
+<span class="fc" id="L64">    converters.put(Character.class, v -&gt; v.trim().charAt(0));</span>
+<span class="fc" id="L65">    converters.put(Charset.class, v -&gt; Charset.forName(v.trim()));</span>
+<span class="fc" id="L66">    converters.put(Long.class, v -&gt; Long.valueOf(v.trim()));</span>
+<span class="fc" id="L67">    converters.put(String[].class, v -&gt; Stream.of(v.split(&quot;,&quot;)).map(String::trim).toArray(String[]::new));</span>
+<span class="fc" id="L68">    converters.put(Class.class, SqlGeneratorConfig::toClassForName);</span>
+<span class="fc" id="L69">    TYPE_CONVERTERS = Map.copyOf(converters);</span>
+<span class="fc" id="L70">  }</span>
 
   /**
    * Whether use the 2-way SQL feature.
    */
-<span class="fc" id="L76">  private boolean use2way = true;</span>
+<span class="fc" id="L75">  private boolean use2way = true;</span>
 
   /**
    * The instance for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
@@ -83,12 +82,12 @@ import org.thymeleaf.util.StringUtils;
   /**
    * Template file configuration.
    */
-<span class="fc" id="L86">  private final TemplateFileConfig templateFile = new TemplateFileConfig();</span>
+<span class="fc" id="L85">  private final TemplateFileConfig templateFile = new TemplateFileConfig();</span>
 
   /**
    * Dialect configuration.
    */
-<span class="fc" id="L91">  private final DialectConfig dialect = new DialectConfig();</span>
+<span class="fc" id="L90">  private final DialectConfig dialect = new DialectConfig();</span>
 
   /**
    * Get whether use the 2-way SQL feature.
@@ -99,7 +98,7 @@ import org.thymeleaf.util.StringUtils;
    * @return If use the 2-way SQL feature, return {@code true}
    */
   public boolean isUse2way() {
-<span class="fc" id="L102">    return use2way;</span>
+<span class="fc" id="L101">    return use2way;</span>
   }
 
   /**
@@ -109,8 +108,8 @@ import org.thymeleaf.util.StringUtils;
    *          If use the 2-way SQL feature, set {@code true}
    */
   public void setUse2way(boolean use2way) {
-<span class="fc" id="L112">    this.use2way = use2way;</span>
-<span class="fc" id="L113">  }</span>
+<span class="fc" id="L111">    this.use2way = use2way;</span>
+<span class="fc" id="L112">  }</span>
 
   /**
    * Get the interface for customizing a default TemplateEngine instanced by the mybatis-thymeleaf.
@@ -124,7 +123,7 @@ import org.thymeleaf.util.StringUtils;
    */
   @Deprecated
   public Class&lt;? extends TemplateEngineCustomizer&gt; getCustomizer() {
-<span class="nc bnc" id="L127" title="All 2 branches missed.">    return customizer == null ? null : customizer.getClass();</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">    return customizer == null ? null : customizer.getClass();</span>
   }
 
   /**
@@ -135,16 +134,16 @@ import org.thymeleaf.util.StringUtils;
    */
   @Deprecated
   public void setCustomizer(Class&lt;? extends TemplateEngineCustomizer&gt; customizer) {
-<span class="fc" id="L138">    this.customizer = newInstanceForType(customizer);</span>
-<span class="fc" id="L139">  }</span>
+<span class="fc" id="L137">    this.customizer = newInstanceForType(customizer);</span>
+<span class="fc" id="L138">  }</span>
 
   public TemplateEngineCustomizer getCustomizerInstance() {
-<span class="fc" id="L142">    return customizer;</span>
+<span class="fc" id="L141">    return customizer;</span>
   }
 
   public void setCustomizerInstance(TemplateEngineCustomizer customizer) {
-<span class="fc" id="L146">    this.customizer = customizer;</span>
-<span class="fc" id="L147">  }</span>
+<span class="fc" id="L145">    this.customizer = customizer;</span>
+<span class="fc" id="L146">  }</span>
 
   /**
    * Get a template file configuration.
@@ -152,7 +151,7 @@ import org.thymeleaf.util.StringUtils;
    * @return a template file configuration
    */
   public TemplateFileConfig getTemplateFile() {
-<span class="fc" id="L155">    return templateFile;</span>
+<span class="fc" id="L154">    return templateFile;</span>
   }
 
   /**
@@ -161,7 +160,7 @@ import org.thymeleaf.util.StringUtils;
    * @return a dialect configuration
    */
   public DialectConfig getDialect() {
-<span class="fc" id="L164">    return dialect;</span>
+<span class="fc" id="L163">    return dialect;</span>
   }
 
   /**
@@ -169,28 +168,28 @@ import org.thymeleaf.util.StringUtils;
    *
    * @since 1.0.0
    */
-<span class="fc" id="L172">  public static class TemplateFileConfig {</span>
+<span class="fc" id="L171">  public static class TemplateFileConfig {</span>
 
     /**
      * The character encoding for reading template resource file.
      */
-<span class="fc" id="L177">    private Charset encoding = StandardCharsets.UTF_8;</span>
+<span class="fc" id="L176">    private Charset encoding = StandardCharsets.UTF_8;</span>
 
     /**
      * The base directory for reading template resource file.
      */
-<span class="fc" id="L182">    private String baseDir = &quot;&quot;;</span>
+<span class="fc" id="L181">    private String baseDir = &quot;&quot;;</span>
 
     /**
      * The patterns for reading as template resource file. (Can specify multiple patterns using comma(&quot;,&quot;) as separator
      * character)
      */
-<span class="fc" id="L188">    private String[] patterns = { &quot;*.sql&quot; };</span>
+<span class="fc" id="L187">    private String[] patterns = { &quot;*.sql&quot; };</span>
 
     /**
      * Whether use the cache feature when load template resource file.
      */
-<span class="fc" id="L193">    private boolean cacheEnabled = true;</span>
+<span class="fc" id="L192">    private boolean cacheEnabled = true;</span>
 
     /**
      * The cache TTL(millisecond) for resolved templates.
@@ -206,7 +205,7 @@ import org.thymeleaf.util.StringUtils;
      * @return the character encoding for reading template resource file
      */
     public Charset getEncoding() {
-<span class="fc" id="L209">      return encoding;</span>
+<span class="fc" id="L208">      return encoding;</span>
     }
 
     /**
@@ -216,8 +215,8 @@ import org.thymeleaf.util.StringUtils;
      *          the character encoding for reading template resource file
      */
     public void setEncoding(Charset encoding) {
-<span class="fc" id="L219">      this.encoding = encoding;</span>
-<span class="fc" id="L220">    }</span>
+<span class="fc" id="L218">      this.encoding = encoding;</span>
+<span class="fc" id="L219">    }</span>
 
     /**
      * Get the base directory for reading template resource file.
@@ -228,7 +227,7 @@ import org.thymeleaf.util.StringUtils;
      * @return the base directory for reading template resource file
      */
     public String getBaseDir() {
-<span class="fc" id="L231">      return baseDir;</span>
+<span class="fc" id="L230">      return baseDir;</span>
     }
 
     /**
@@ -238,8 +237,8 @@ import org.thymeleaf.util.StringUtils;
      *          the base directory for reading template resource file
      */
     public void setBaseDir(String baseDir) {
-<span class="fc" id="L241">      this.baseDir = baseDir;</span>
-<span class="fc" id="L242">    }</span>
+<span class="fc" id="L240">      this.baseDir = baseDir;</span>
+<span class="fc" id="L241">    }</span>
 
     /**
      * Get patterns for reading as template resource file.
@@ -250,7 +249,7 @@ import org.thymeleaf.util.StringUtils;
      * @return patterns for reading as template resource file
      */
     public String[] getPatterns() {
-<span class="fc" id="L253">      return patterns;</span>
+<span class="fc" id="L252">      return patterns;</span>
     }
 
     /**
@@ -260,8 +259,8 @@ import org.thymeleaf.util.StringUtils;
      *          patterns for reading as template resource file
      */
     public void setPatterns(String... patterns) {
-<span class="fc" id="L263">      this.patterns = patterns;</span>
-<span class="fc" id="L264">    }</span>
+<span class="fc" id="L262">      this.patterns = patterns;</span>
+<span class="fc" id="L263">    }</span>
 
     /**
      * Get whether use the cache feature when load template resource file.
@@ -272,7 +271,7 @@ import org.thymeleaf.util.StringUtils;
      * @return If use th cache feature, return {@code true}
      */
     public boolean isCacheEnabled() {
-<span class="fc" id="L275">      return cacheEnabled;</span>
+<span class="fc" id="L274">      return cacheEnabled;</span>
     }
 
     /**
@@ -282,8 +281,8 @@ import org.thymeleaf.util.StringUtils;
      *          If use th cache feature, set {@code true}
      */
     public void setCacheEnabled(boolean cacheEnabled) {
-<span class="fc" id="L285">      this.cacheEnabled = cacheEnabled;</span>
-<span class="fc" id="L286">    }</span>
+<span class="fc" id="L284">      this.cacheEnabled = cacheEnabled;</span>
+<span class="fc" id="L285">    }</span>
 
     /**
      * Get the cache TTL(millisecond) for resolved templates.
@@ -294,7 +293,7 @@ import org.thymeleaf.util.StringUtils;
      * @return the cache TTL(millisecond) for resolved templates
      */
     public Long getCacheTtl() {
-<span class="fc" id="L297">      return cacheTtl;</span>
+<span class="fc" id="L296">      return cacheTtl;</span>
     }
 
     /**
@@ -304,8 +303,8 @@ import org.thymeleaf.util.StringUtils;
      *          the cache TTL(millisecond) for resolved templates
      */
     public void setCacheTtl(Long cacheTtl) {
-<span class="fc" id="L307">      this.cacheTtl = cacheTtl;</span>
-<span class="fc" id="L308">    }</span>
+<span class="fc" id="L306">      this.cacheTtl = cacheTtl;</span>
+<span class="fc" id="L307">    }</span>
 
   }
 
@@ -314,22 +313,22 @@ import org.thymeleaf.util.StringUtils;
    *
    * @since 1.0.0
    */
-<span class="fc" id="L317">  public static class DialectConfig {</span>
+<span class="fc" id="L316">  public static class DialectConfig {</span>
 
     /**
      * The prefix name of dialect provided by this project.
      */
-<span class="fc" id="L322">    private String prefix = &quot;mb&quot;;</span>
+<span class="fc" id="L321">    private String prefix = &quot;mb&quot;;</span>
 
     /**
      * The escape character for wildcard of LIKE condition.
      */
-<span class="fc" id="L327">    private Character likeEscapeChar = '\\';</span>
+<span class="fc" id="L326">    private Character likeEscapeChar = '\\';</span>
 
     /**
      * The format of escape clause for LIKE condition (Can specify format that can be allowed by String#format method).
      */
-<span class="fc" id="L332">    private String likeEscapeClauseFormat = &quot;ESCAPE '%s'&quot;;</span>
+<span class="fc" id="L331">    private String likeEscapeClauseFormat = &quot;ESCAPE '%s'&quot;;</span>
 
     /**
      * Additional escape target characters(custom wildcard characters) for LIKE condition. (Can specify multiple
@@ -351,7 +350,7 @@ import org.thymeleaf.util.StringUtils;
      * @return the prefix name of dialect
      */
     public String getPrefix() {
-<span class="fc" id="L354">      return prefix;</span>
+<span class="fc" id="L353">      return prefix;</span>
     }
 
     /**
@@ -361,8 +360,8 @@ import org.thymeleaf.util.StringUtils;
      *          the prefix name of dialect
      */
     public void setPrefix(String prefix) {
-<span class="fc" id="L364">      this.prefix = prefix;</span>
-<span class="fc" id="L365">    }</span>
+<span class="fc" id="L363">      this.prefix = prefix;</span>
+<span class="fc" id="L364">    }</span>
 
     /**
      * Get the escape character for wildcard of LIKE condition.
@@ -373,7 +372,7 @@ import org.thymeleaf.util.StringUtils;
      * @return the escape character for wildcard
      */
     public Character getLikeEscapeChar() {
-<span class="fc" id="L376">      return likeEscapeChar;</span>
+<span class="fc" id="L375">      return likeEscapeChar;</span>
     }
 
     /**
@@ -383,8 +382,8 @@ import org.thymeleaf.util.StringUtils;
      *          the escape character for wildcard
      */
     public void setLikeEscapeChar(Character likeEscapeChar) {
-<span class="fc" id="L386">      this.likeEscapeChar = likeEscapeChar;</span>
-<span class="fc" id="L387">    }</span>
+<span class="fc" id="L385">      this.likeEscapeChar = likeEscapeChar;</span>
+<span class="fc" id="L386">    }</span>
 
     /**
      * Get the format of escape clause for LIKE condition.
@@ -395,7 +394,7 @@ import org.thymeleaf.util.StringUtils;
      * @return the format of escape clause for LIKE condition
      */
     public String getLikeEscapeClauseFormat() {
-<span class="fc" id="L398">      return likeEscapeClauseFormat;</span>
+<span class="fc" id="L397">      return likeEscapeClauseFormat;</span>
     }
 
     /**
@@ -405,8 +404,8 @@ import org.thymeleaf.util.StringUtils;
      *          the format of escape clause for LIKE condition
      */
     public void setLikeEscapeClauseFormat(String likeEscapeClauseFormat) {
-<span class="fc" id="L408">      this.likeEscapeClauseFormat = likeEscapeClauseFormat;</span>
-<span class="fc" id="L409">    }</span>
+<span class="fc" id="L407">      this.likeEscapeClauseFormat = likeEscapeClauseFormat;</span>
+<span class="fc" id="L408">    }</span>
 
     /**
      * Get additional escape target characters(custom wildcard characters) for LIKE condition.
@@ -417,7 +416,7 @@ import org.thymeleaf.util.StringUtils;
      * @return additional escape target characters(custom wildcard characters)
      */
     public Character[] getLikeAdditionalEscapeTargetChars() {
-<span class="fc" id="L420">      return likeAdditionalEscapeTargetChars;</span>
+<span class="fc" id="L419">      return likeAdditionalEscapeTargetChars;</span>
     }
 
     /**
@@ -427,8 +426,8 @@ import org.thymeleaf.util.StringUtils;
      *          additional escape target characters(custom wildcard characters)
      */
     public void setLikeAdditionalEscapeTargetChars(Character... likeAdditionalEscapeTargetChars) {
-<span class="fc" id="L430">      this.likeAdditionalEscapeTargetChars = likeAdditionalEscapeTargetChars;</span>
-<span class="fc" id="L431">    }</span>
+<span class="fc" id="L429">      this.likeAdditionalEscapeTargetChars = likeAdditionalEscapeTargetChars;</span>
+<span class="fc" id="L430">    }</span>
 
     /**
      * Get a bind variable render.
@@ -442,7 +441,7 @@ import org.thymeleaf.util.StringUtils;
      */
     @Deprecated
     public Class&lt;? extends BindVariableRender&gt; getBindVariableRender() {
-<span class="pc bpc" id="L445" title="1 of 2 branches missed.">      return bindVariableRender == null ? null : bindVariableRender.getClass();</span>
+<span class="pc bpc" id="L444" title="1 of 2 branches missed.">      return bindVariableRender == null ? null : bindVariableRender.getClass();</span>
     }
 
     /**
@@ -454,16 +453,16 @@ import org.thymeleaf.util.StringUtils;
      */
     @Deprecated
     public void setBindVariableRender(Class&lt;? extends BindVariableRender&gt; bindVariableRender) {
-<span class="fc" id="L457">      this.bindVariableRender = newInstanceForType(bindVariableRender);</span>
-<span class="fc" id="L458">    }</span>
+<span class="fc" id="L456">      this.bindVariableRender = newInstanceForType(bindVariableRender);</span>
+<span class="fc" id="L457">    }</span>
 
     public BindVariableRender getBindVariableRenderInstance() {
-<span class="fc" id="L461">      return bindVariableRender;</span>
+<span class="fc" id="L460">      return bindVariableRender;</span>
     }
 
     public void setBindVariableRenderInstance(BindVariableRender bindVariableRender) {
-<span class="fc" id="L465">      this.bindVariableRender = bindVariableRender;</span>
-<span class="fc" id="L466">    }</span>
+<span class="fc" id="L464">      this.bindVariableRender = bindVariableRender;</span>
+<span class="fc" id="L465">    }</span>
   }
 
   /**
@@ -549,9 +548,9 @@ import org.thymeleaf.util.StringUtils;
    * @return a configuration instance
    */
   public static SqlGeneratorConfig newInstance() {
-<span class="fc" id="L552">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
-<span class="fc" id="L553">    applyDefaultProperties(config);</span>
-<span class="fc" id="L554">    return config;</span>
+<span class="fc" id="L551">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
+<span class="fc" id="L552">    applyDefaultProperties(config);</span>
+<span class="fc" id="L553">    return config;</span>
   }
 
   /**
@@ -567,9 +566,9 @@ import org.thymeleaf.util.StringUtils;
    * @see #newInstance()
    */
   public static SqlGeneratorConfig newInstanceWithResourcePath(String resourcePath) {
-<span class="fc" id="L570">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
-<span class="fc" id="L571">    applyResourcePath(config, resourcePath);</span>
-<span class="fc" id="L572">    return config;</span>
+<span class="fc" id="L569">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
+<span class="fc" id="L570">    applyResourcePath(config, resourcePath);</span>
+<span class="fc" id="L571">    return config;</span>
   }
 
   /**
@@ -583,9 +582,9 @@ import org.thymeleaf.util.StringUtils;
    * @see #newInstance()
    */
   public static SqlGeneratorConfig newInstanceWithProperties(Properties customProperties) {
-<span class="fc" id="L586">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
-<span class="fc" id="L587">    applyProperties(config, customProperties);</span>
-<span class="fc" id="L588">    return config;</span>
+<span class="fc" id="L585">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
+<span class="fc" id="L586">    applyProperties(config, customProperties);</span>
+<span class="fc" id="L587">    return config;</span>
   }
 
   /**
@@ -599,10 +598,10 @@ import org.thymeleaf.util.StringUtils;
    * @see #newInstance()
    */
   public static SqlGeneratorConfig newInstanceWithCustomizer(Consumer&lt;SqlGeneratorConfig&gt; customizer) {
-<span class="fc" id="L602">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
-<span class="fc" id="L603">    customizer.accept(config);</span>
-<span class="fc" id="L604">    applyDefaultProperties(config);</span>
-<span class="fc" id="L605">    return config;</span>
+<span class="fc" id="L601">    SqlGeneratorConfig config = new SqlGeneratorConfig();</span>
+<span class="fc" id="L602">    customizer.accept(config);</span>
+<span class="fc" id="L603">    applyDefaultProperties(config);</span>
+<span class="fc" id="L604">    return config;</span>
   }
 
   /**
@@ -612,8 +611,8 @@ import org.thymeleaf.util.StringUtils;
    * system property (-Dmybatis-thymeleaf.config.file=... -Dmybatis-thymeleaf.config.encoding=...).
    */
   static &lt;T extends SqlGeneratorConfig&gt; void applyDefaultProperties(T config) {
-<span class="fc" id="L615">    applyProperties(config, loadDefaultProperties());</span>
-<span class="fc" id="L616">  }</span>
+<span class="fc" id="L614">    applyProperties(config, loadDefaultProperties());</span>
+<span class="fc" id="L615">  }</span>
 
   /**
    * Apply properties that read from specified properties file. &lt;br&gt;
@@ -624,10 +623,10 @@ import org.thymeleaf.util.StringUtils;
    *          A property file resource path
    */
   static &lt;T extends SqlGeneratorConfig&gt; void applyResourcePath(T config, String resourcePath) {
-<span class="fc" id="L627">    Properties properties = loadDefaultProperties();</span>
-<span class="fc" id="L628">    properties.putAll(loadProperties(resourcePath));</span>
-<span class="fc" id="L629">    applyProperties(config, properties);</span>
-<span class="fc" id="L630">  }</span>
+<span class="fc" id="L626">    Properties properties = loadDefaultProperties();</span>
+<span class="fc" id="L627">    properties.putAll(loadProperties(resourcePath));</span>
+<span class="fc" id="L628">    applyProperties(config, properties);</span>
+<span class="fc" id="L629">  }</span>
 
   /**
    * Apply properties from specified properties.
@@ -638,10 +637,10 @@ import org.thymeleaf.util.StringUtils;
    *          custom configuration properties
    */
   static &lt;T extends SqlGeneratorConfig&gt; void applyProperties(T config, Properties customProperties) {
-<span class="fc" id="L641">    Properties properties = loadDefaultProperties();</span>
-<span class="fc" id="L642">    Optional.ofNullable(customProperties).ifPresent(properties::putAll);</span>
-<span class="fc" id="L643">    override(config, properties);</span>
-<span class="fc" id="L644">  }</span>
+<span class="fc" id="L640">    Properties properties = loadDefaultProperties();</span>
+<span class="fc" id="L641">    Optional.ofNullable(customProperties).ifPresent(properties::putAll);</span>
+<span class="fc" id="L642">    override(config, properties);</span>
+<span class="fc" id="L643">  }</span>
 
   /**
    * Create new instance using default constructor with specified type.
@@ -655,69 +654,69 @@ import org.thymeleaf.util.StringUtils;
    */
   static &lt;T&gt; T newInstanceForType(Class&lt;T&gt; type) {
     try {
-<span class="fc" id="L658">      return type.getConstructor().newInstance();</span>
-<span class="fc" id="L659">    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {</span>
-<span class="fc" id="L660">      throw new IllegalStateException(&quot;Cannot create an instance for class: &quot; + type, e);</span>
+<span class="fc" id="L657">      return type.getConstructor().newInstance();</span>
+<span class="fc" id="L658">    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {</span>
+<span class="fc" id="L659">      throw new IllegalStateException(&quot;Cannot create an instance for class: &quot; + type, e);</span>
     }
   }
 
   private static void override(SqlGeneratorConfig config, Properties properties) {
-<span class="fc" id="L665">    PropertyAccessor standardPropertyAccessor = PropertyAccessor.BuiltIn.STANDARD;</span>
+<span class="fc" id="L664">    PropertyAccessor standardPropertyAccessor = PropertyAccessor.BuiltIn.STANDARD;</span>
     try {
-<span class="fc" id="L667">      properties.forEach((key, value) -&gt; {</span>
-<span class="fc" id="L668">        String propertyPath = StringUtils.unCapitalize(StringUtils.capitalizeWords(key, &quot;-&quot;).replaceAll(&quot;-&quot;, &quot;&quot;));</span>
+<span class="fc" id="L666">      properties.forEach((key, value) -&gt; {</span>
+<span class="fc" id="L667">        String propertyPath = StringUtils.unCapitalize(StringUtils.capitalizeWords(key, &quot;-&quot;).replaceAll(&quot;-&quot;, &quot;&quot;));</span>
         try {
-<span class="fc" id="L670">          Object target = config;</span>
+<span class="fc" id="L669">          Object target = config;</span>
           String propertyName;
-<span class="fc bfc" id="L672" title="All 2 branches covered.">          if (propertyPath.indexOf('.') != -1) {</span>
-<span class="fc" id="L673">            String[] propertyPaths = StringUtils.split(propertyPath, &quot;.&quot;);</span>
-<span class="fc" id="L674">            propertyName = propertyPaths[propertyPaths.length - 1];</span>
-<span class="fc bfc" id="L675" title="All 2 branches covered.">            for (String path : Arrays.copyOf(propertyPaths, propertyPaths.length - 1)) {</span>
-<span class="fc" id="L676">              target = standardPropertyAccessor.getPropertyValue(target, path);</span>
+<span class="fc bfc" id="L671" title="All 2 branches covered.">          if (propertyPath.indexOf('.') != -1) {</span>
+<span class="fc" id="L672">            String[] propertyPaths = StringUtils.split(propertyPath, &quot;.&quot;);</span>
+<span class="fc" id="L673">            propertyName = propertyPaths[propertyPaths.length - 1];</span>
+<span class="fc bfc" id="L674" title="All 2 branches covered.">            for (String path : Arrays.copyOf(propertyPaths, propertyPaths.length - 1)) {</span>
+<span class="fc" id="L675">              target = standardPropertyAccessor.getPropertyValue(target, path);</span>
             }
-<span class="fc" id="L678">          } else {</span>
-<span class="fc" id="L679">            propertyName = propertyPath;</span>
+<span class="fc" id="L677">          } else {</span>
+<span class="fc" id="L678">            propertyName = propertyPath;</span>
           }
-<span class="fc" id="L681">          Object convertedValue = TYPE_CONVERTERS</span>
-<span class="pc" id="L682">              .getOrDefault(standardPropertyAccessor.getPropertyType(target.getClass(), propertyName), v -&gt; v)</span>
-<span class="fc" id="L683">              .apply(value.toString());</span>
-<span class="fc" id="L684">          standardPropertyAccessor.setPropertyValue(target, propertyName, convertedValue);</span>
-<span class="fc" id="L685">        } catch (IllegalArgumentException e) {</span>
-<span class="fc" id="L686">          throw new IllegalArgumentException(</span>
-<span class="fc" id="L687">              String.format(&quot;Detected an invalid property. key='%s' value='%s'&quot;, key, value), e);</span>
-<span class="fc" id="L688">        }</span>
-<span class="fc" id="L689">      });</span>
+<span class="fc" id="L680">          Object convertedValue = TYPE_CONVERTERS</span>
+<span class="pc" id="L681">              .getOrDefault(standardPropertyAccessor.getPropertyType(target.getClass(), propertyName), v -&gt; v)</span>
+<span class="fc" id="L682">              .apply(value.toString());</span>
+<span class="fc" id="L683">          standardPropertyAccessor.setPropertyValue(target, propertyName, convertedValue);</span>
+<span class="fc" id="L684">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L685">          throw new IllegalArgumentException(</span>
+<span class="fc" id="L686">              String.format(&quot;Detected an invalid property. key='%s' value='%s'&quot;, key, value), e);</span>
+<span class="fc" id="L687">        }</span>
+<span class="fc" id="L688">      });</span>
     } finally {
-<span class="fc" id="L691">      StandardPropertyAccessor.clearCache();</span>
+<span class="fc" id="L690">      StandardPropertyAccessor.clearCache();</span>
     }
-<span class="fc" id="L693">  }</span>
+<span class="fc" id="L692">  }</span>
 
   private static Properties loadDefaultProperties() {
-<span class="fc" id="L696">    return loadProperties(System.getProperty(PropertyKeys.CONFIG_FILE, Defaults.PROPERTIES_FILE));</span>
+<span class="fc" id="L695">    return loadProperties(System.getProperty(PropertyKeys.CONFIG_FILE, Defaults.PROPERTIES_FILE));</span>
   }
 
   private static Properties loadProperties(String resourcePath) {
-<span class="fc" id="L700">    Properties properties = new Properties();</span>
-<span class="fc" id="L701">    Optional.ofNullable(ClassLoaderUtils.findResourceAsStream(resourcePath)).ifPresent(in -&gt; {</span>
-<span class="fc" id="L702">      Charset encoding = Optional.ofNullable(System.getProperty(PropertyKeys.CONFIG_ENCODING)).map(Charset::forName)</span>
-<span class="fc" id="L703">          .orElse(StandardCharsets.UTF_8);</span>
-<span class="fc" id="L704">      try (InputStreamReader inReader = new InputStreamReader(in, encoding);</span>
-<span class="fc" id="L705">          BufferedReader bufReader = new BufferedReader(inReader)) {</span>
-<span class="fc" id="L706">        properties.load(bufReader);</span>
-<span class="nc" id="L707">      } catch (IOException e) {</span>
-<span class="nc" id="L708">        throw new IllegalStateException(e);</span>
-<span class="fc" id="L709">      }</span>
-<span class="fc" id="L710">    });</span>
-<span class="fc" id="L711">    return properties;</span>
+<span class="fc" id="L699">    Properties properties = new Properties();</span>
+<span class="fc" id="L700">    Optional.ofNullable(ClassLoaderUtils.findResourceAsStream(resourcePath)).ifPresent(in -&gt; {</span>
+<span class="fc" id="L701">      Charset encoding = Optional.ofNullable(System.getProperty(PropertyKeys.CONFIG_ENCODING)).map(Charset::forName)</span>
+<span class="fc" id="L702">          .orElse(StandardCharsets.UTF_8);</span>
+<span class="fc" id="L703">      try (InputStreamReader inReader = new InputStreamReader(in, encoding);</span>
+<span class="fc" id="L704">          BufferedReader bufReader = new BufferedReader(inReader)) {</span>
+<span class="fc" id="L705">        properties.load(bufReader);</span>
+<span class="nc" id="L706">      } catch (IOException e) {</span>
+<span class="nc" id="L707">        throw new IllegalStateException(e);</span>
+<span class="fc" id="L708">      }</span>
+<span class="fc" id="L709">    });</span>
+<span class="fc" id="L710">    return properties;</span>
   }
 
   private static Class&lt;?&gt; toClassForName(String value) {
     try {
-<span class="fc" id="L716">      return ClassLoaderUtils.loadClass(value.trim());</span>
-<span class="fc" id="L717">    } catch (ClassNotFoundException e) {</span>
-<span class="fc" id="L718">      throw new IllegalStateException(e);</span>
+<span class="fc" id="L715">      return ClassLoaderUtils.loadClass(value.trim());</span>
+<span class="fc" id="L716">    } catch (ClassNotFoundException e) {</span>
+<span class="fc" id="L717">      throw new IllegalStateException(e);</span>
     }
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
