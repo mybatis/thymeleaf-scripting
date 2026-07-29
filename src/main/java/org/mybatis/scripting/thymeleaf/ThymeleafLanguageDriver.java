@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.parsing.XNode;
+import org.apache.ibatis.reflection.ParamNameResolver;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
@@ -84,7 +85,7 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    */
   @Override
   public SqlSource createSqlSource(Configuration configuration, XNode script, Class<?> parameterType) {
-    return createSqlSource(configuration, script.getNode().getTextContent(), parameterType);
+    return createSqlSource(configuration, script.getNode().getTextContent(), parameterType, null);
   }
 
   /**
@@ -92,7 +93,19 @@ public class ThymeleafLanguageDriver implements LanguageDriver {
    */
   @Override
   public SqlSource createSqlSource(Configuration configuration, String script, Class<?> parameterType) {
-    return new ThymeleafSqlSource(configuration, sqlGenerator, script.trim(), parameterType);
+    return createSqlSource(configuration, script, parameterType, null);
+  }
+
+  @Override
+  public SqlSource createSqlSource(Configuration configuration, XNode script, Class<?> parameterType,
+      ParamNameResolver paramNameResolver) {
+    return createSqlSource(configuration, script.getNode().getTextContent(), parameterType, paramNameResolver);
+  }
+
+  @Override
+  public SqlSource createSqlSource(Configuration configuration, String script, Class<?> parameterType,
+      ParamNameResolver paramNameResolver) {
+    return new ThymeleafSqlSource(configuration, sqlGenerator, script.trim(), parameterType, paramNameResolver);
   }
 
 }
