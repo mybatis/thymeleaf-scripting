@@ -214,12 +214,4 @@
     </profile>
   </profiles>
 
-  <repositories>
-    <repository>
-      <id>sonatype-oss-snapshots</id>
-      <name>Sonatype OSS Snapshots Repository</name>
-      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-    </repository>
-  </repositories>
-
 </project>
