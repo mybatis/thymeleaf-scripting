@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,7 +109,7 @@ class AnnotationDrivenMapperTest {
     // collection is empty
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       NameMapper mapper = sqlSession.getMapper(NameMapper.class);
-      List<Name> names = mapper.findByFirstNames(Collections.emptyList());
+      List<Name> names = mapper.findByFirstNames(List.of());
       Assertions.assertEquals(0, names.size());
     }
     // single value
@@ -453,7 +452,7 @@ class AnnotationDrivenMapperTest {
         PersonMapper.Conditions conditions1 = new PersonMapper.Conditions();
         conditions1.setMails(Arrays.asList("mybatis1.main@test.com", "mybatis2.sub@test.com"));
         PersonMapper.Conditions conditions2 = new PersonMapper.Conditions();
-        conditions2.setMails(Collections.singletonList("mybatis1.sub@test.com"));
+        conditions2.setMails(List.of("mybatis1.sub@test.com"));
         List<Mail> mails = mapper.selectMailsByConditionsArray(Arrays.asList(conditions1, conditions2));
         Assertions.assertEquals(3, mails.size());
         {

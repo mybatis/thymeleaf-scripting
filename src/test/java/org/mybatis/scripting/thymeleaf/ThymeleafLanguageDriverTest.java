@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.io.Resources;
@@ -130,8 +130,7 @@ class ThymeleafLanguageDriverTest {
     Assertions.assertNull(classLoaderTemplateResolver.getCacheTTLMs());
     Assertions.assertEquals("UTF-8", classLoaderTemplateResolver.getCharacterEncoding());
     Assertions.assertEquals("", classLoaderTemplateResolver.getPrefix());
-    Assertions.assertEquals(new LinkedHashSet<>(Collections.singleton("*.sql")),
-        classLoaderTemplateResolver.getResolvablePatterns());
+    Assertions.assertEquals(new LinkedHashSet<>(Set.of("*.sql")), classLoaderTemplateResolver.getResolvablePatterns());
 
     StringTemplateResolver stringTemplateResolver = TemplateEngineCustomizer
         .extractTemplateResolver(templateEngine, StringTemplateResolver.class)

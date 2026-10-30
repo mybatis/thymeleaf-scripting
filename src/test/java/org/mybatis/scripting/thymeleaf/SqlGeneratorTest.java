@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018-2022 the original author or authors.
+ *    Copyright 2018-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.mybatis.scripting.thymeleaf;
 import java.beans.PropertyDescriptor;
 import java.io.Reader;
 import java.sql.Connection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -189,7 +188,7 @@ class SqlGeneratorTest {
         + "WHERE id = /*[# mb:p='id']*/ 1 /*[/]*/ " + "/*[/]*/";
     // @formatter: on
     {
-      Map<String, Object> param = Collections.singletonMap("id", 2);
+      Map<String, Object> param = Map.of("id", 2);
 
       String sql = sqlGenerator.generate(sqlTemplate, param);
 
@@ -200,7 +199,7 @@ class SqlGeneratorTest {
       Assertions.assertEquals("Flintstone", record.get("LASTNAME"));
     }
     {
-      Map<String, Object> param = Collections.emptyMap();
+      Map<String, Object> param = Map.of();
 
       String sql = sqlGenerator.generate(sqlTemplate, param);
       System.out.println(sql);
@@ -215,7 +214,7 @@ class SqlGeneratorTest {
   @Test
   void processWithCustomVariables() {
     SqlGenerator sqlGenerator = new SqlGenerator(config);
-    sqlGenerator.setDefaultCustomVariables(Collections.singletonMap("tableName", "names"));
+    sqlGenerator.setDefaultCustomVariables(Map.of("tableName", "names"));
 
     NamedParameterJdbcOperations jdbcOperations = new NamedParameterJdbcTemplate(dataSource);
 
@@ -224,7 +223,7 @@ class SqlGeneratorTest {
         + "WHERE id = /*[# mb:p='id']*/ 1 /*[/]*/ " + "/*[/]*/";
     // @formatter: on
     {
-      Map<String, Object> customVariables = Collections.singletonMap("id", 2);
+      Map<String, Object> customVariables = Map.of("id", 2);
 
       String sql = sqlGenerator.generate(sqlTemplate, null, customVariables);
 
@@ -248,7 +247,7 @@ class SqlGeneratorTest {
         + "/*[/]*/";
     // @formatter: on
     {
-      Map<String, Object> param = Collections.singletonMap("name", "Be%");
+      Map<String, Object> param = Map.of("name", "Be%");
       MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(param);
 
       String sql = sqlGenerator.generate(sqlTemplate, param, mapSqlParameterSource::addValue);
